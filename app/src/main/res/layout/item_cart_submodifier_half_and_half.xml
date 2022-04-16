@@ -40,7 +40,6 @@
     <CheckBox
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="2x"
         android:layout_weight="0.15"
         android:visibility="invisible"
         android:id="@+id/check2x"/>

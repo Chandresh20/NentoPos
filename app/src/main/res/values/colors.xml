@@ -32,4 +32,6 @@
 
     <color name="button_main">#1296eb</color>
     <color name="button_dark">#0984db</color>
+
+    <color name="login_background">#f0faff</color>
 </resources>

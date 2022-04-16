@@ -47,7 +47,6 @@
         <View
             android:layout_width="wrap_content"
             android:layout_height="1dp"
-            android:layout_margin = "@dimen/dialog_item_margin"
             android:background="@color/black" />
 
         <ScrollView
@@ -57,6 +56,8 @@
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="match_parent"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:layout_height="wrap_content" >
 
                 <LinearLayout

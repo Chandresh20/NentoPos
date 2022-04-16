@@ -60,8 +60,10 @@ class ProgressDialogRepository(private val ctx: Context, private val fManager: F
     }
 
     fun showSyncDialog() {
-        syncDialog = SyncDialog.getDialog(ctx)
-        syncDialog.show(fManager, "$currentId:Sync")
+        if (!SyncDialog.isShowing) {
+            syncDialog = SyncDialog.getDialog(ctx)
+            syncDialog.show(fManager, "$currentId:Sync")
+        }
     }
 
     fun dismissSyncDialog() {

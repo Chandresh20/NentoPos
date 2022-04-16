@@ -72,8 +72,9 @@
         android:layout_width="0dp"
         app:cardBackgroundColor="#FFF"
         app:cardCornerRadius="10dp"
-        android:layout_margin="4dp"
+        android:layout_margin="8dp"
         android:padding="4dp"
+        android:translationZ="10dp"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toTopOf="@+id/checkoutBtn"
         app:layout_constraintEnd_toEndOf="parent"
@@ -101,6 +102,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
                 android:text="$0.0"
+                android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -121,6 +123,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
                 android:text="$0.0"
+                android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/subTotalText" />
 
@@ -141,6 +144,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
                 android:text="$0.0"
+                android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/discountText" />
 
@@ -174,6 +178,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
                 android:text="$0.0"
+                android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/taxRecyclerView" />
 
@@ -203,6 +208,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
                     android:autofillHints="table"
                     android:visibility="gone"
                     android:tooltipText="table" />
@@ -211,11 +217,11 @@
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:text="Table"
-                    android:textAlignment="textStart"
+                    android:textAlignment="center"
                     android:textAllCaps="false"
                     android:layout_marginEnd="8dp"
                     android:id="@+id/tableBtn"
-                    android:background="@color/white"
+                    android:background="@drawable/spinner_background_light"
                     android:layout_height="30dp"/>
 
                 <Button
@@ -300,6 +306,7 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:text="Total"
+                android:textSize="18sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
@@ -310,6 +317,8 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
                 android:text="0.0"
+                android:textSize="18sp"
+                android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
@@ -319,11 +328,13 @@
     <Button
         android:id="@+id/checkoutBtn"
         android:layout_width="0dp"
-        android:layout_height="30dp"
+        android:layout_height="40dp"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:text="Checkout"
+        android:textAllCaps="false"
+        android:textSize="22sp"
         android:background="@drawable/btn_green_selector"
         android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -332,11 +343,11 @@
 
     <Button
         android:id="@+id/sendToKitchenBtn"
-        android:layout_width="80dp"
-        android:layout_height="30dp"
+        android:layout_width="60dp"
+        android:layout_height="40dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        android:background="@drawable/kitchensend"
+        android:background="@drawable/send_to_kitchen"
         android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

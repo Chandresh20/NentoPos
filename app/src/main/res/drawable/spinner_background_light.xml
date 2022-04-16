@@ -8,13 +8,13 @@
 
                     <stroke android:color="@color/pos_spinner_boarder"
                         android:width="@dimen/pos_spinner_boarder_width"/>
-                    <corners android:radius="@dimen/pos_spinner_corners"/>
+                    <corners android:radius="2dp"/>
                 </shape>
             </item>
             <item android:right="8dp">
                 <bitmap
                     android:gravity="end|center_vertical"
-                    android:src="@drawable/down_arrow_white"/>
+                    android:src="@drawable/down_arrow_black"/>
             </item>
         </layer-list>
     </item>

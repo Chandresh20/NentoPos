@@ -2,13 +2,21 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item >
-        <shape>
-            <corners android:radius="5dp"/>
-            <stroke android:color="@color/app_primary" android:width="1dp"/>
-            <padding android:bottom="3dp" android:top="3dp" android:left="3dp" android:right="3dp"/>
-        </shape>
+        <layer-list>
+            <item>
+                <shape xmlns:android="http://schemas.android.com/apk/res/android">
+
+                    <stroke android:color="@color/pos_spinner_boarder"
+                        android:width="@dimen/pos_spinner_boarder_width"/>
+                    <corners android:radius="@dimen/pos_spinner_corners"/>
+                </shape>
+            </item>
+            <item android:right="4dp">
+                <bitmap
+                    android:gravity="end|center_vertical"
+                    android:src="@drawable/down_arrow_white"/>
+            </item>
+        </layer-list>
     </item>
-
-
 
 </selector>

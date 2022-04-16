@@ -28,6 +28,8 @@ class SyncDialog : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        isShowing = true
+        isCancelable = false
         syncBinding = DialogSyncBinding.inflate(inflater, container, false)
         val synCompleteReceiver = object: BroadcastReceiver(){
             @SuppressLint("SetTextI18n")
@@ -56,6 +58,7 @@ class SyncDialog : DialogFragment() {
             Log.d("OfflineOrders", "Avaialble: ${offlineOrders?.size}")
         }
         syncBinding.closeBtn.setOnClickListener {
+            isShowing = false
             this.dismiss()
         }
         syncBinding.synNowBtn.setOnClickListener {
@@ -67,7 +70,13 @@ class SyncDialog : DialogFragment() {
         return syncBinding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        this.dialog?.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        super.onViewCreated(view, savedInstanceState)
+    }
+
     companion object {
+        var isShowing = false
         fun getDialog(ctx: Context) : SyncDialog {
             val dialog = SyncDialog()
             dialog.ctx = ctx
