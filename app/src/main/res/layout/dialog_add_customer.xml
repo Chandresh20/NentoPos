@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="600dp"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="30dp"
+    app:cardElevation="10dp">
+
+    <LinearLayout
+        android:layout_width="600dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+
+        <RelativeLayout
+            android:id="@+id/appbar"
+            android:layout_margin = "@dimen/dialog_item_margin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/close_button2"
+                android:layout_width="@dimen/dialog_cancel_button_size"
+                android:layout_height="@dimen/dialog_cancel_button_size"
+                android:layout_margin="@dimen/dialog_item_margin"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_close"
+                app:tint="@color/black" />
+
+            <TextView
+                android:id="@+id/total"
+                android:layout_centerVertical="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="20dp"
+                android:gravity="start"
+                android:text="Add Customer"
+                android:textColor="@color/black"
+                android:textSize="@dimen/dialog_title_text"
+                android:textStyle="bold" />
+
+        </RelativeLayout>
+
+        <View
+            android:layout_width="wrap_content"
+            android:layout_height="1dp"
+            android:layout_margin = "@dimen/dialog_item_margin"
+            android:background="@color/black" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin ="@dimen/dialog_item_margin"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="start|center"
+                        android:text="Customer Name"
+                        android:textSize="@dimen/dialog_button_text_size" />
+
+                    <EditText
+                        android:id="@+id/customer_name_et"
+                        android:layout_width="@dimen/dialog_customer_edit_size"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="4dp"
+                        android:layout_weight="1"
+                        android:padding="@dimen/dialog_edit_text_padding"
+                        android:background="@drawable/outline_black" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin = "@dimen/dialog_item_margin"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="start|center"
+                        android:text="Email Address"
+                        android:textSize="@dimen/dialog_button_text_size" />
+
+                    <EditText
+                        android:id="@+id/email_address_et"
+                        android:layout_width="@dimen/dialog_customer_edit_size"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="4dp"
+                        android:layout_weight="1"
+                        android:padding="@dimen/dialog_edit_text_padding"
+                        android:background="@drawable/outline_black" />
+
+                </LinearLayout>
+
+                <!--            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_margin = "@dimen/dialog_item_margin"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:gravity="start|center"
+                                    android:text="Code Regional"
+                                    android:textSize="@dimen/dialog_button_text_size" />
+
+                                <com.hbb20.CountryCodePicker
+                                    android:id="@+id/country_code_picker"
+                                    android:layout_width="0dp"
+                                    android:layout_height="45dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/text_view_bg"
+                                    android:gravity="start|center"
+                                    android:paddingStart="15dp"
+                                    android:paddingEnd="15dp"
+                                    android:textColor="@color/black"
+                                    android:textColorHint="@color/black_light"
+                                    android:textSize="22sp" />
+
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_margin = "@dimen/dialog_item_margin"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:gravity="start|center"
+                                    android:text="Mobile"
+                                    android:textSize="@dimen/dialog_button_text_size" />
+
+                                <EditText
+                                    android:id="@+id/mobile_number_et"
+                                    android:layout_width="0dp"
+                                    android:layout_height="@dimen/dialog_reservation_ed"
+                                    android:layout_margin="4dp"
+                                    android:layout_weight="1"
+                                    android:paddingLeft="15dp"
+                                    android:paddingEnd="15dp"
+                                    android:inputType="number"
+                                    android:background="@drawable/grey_strok" />
+
+                            </LinearLayout>  -->
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:orientation="horizontal"
+                    android:layout_margin="@dimen/dialog_item_margin"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="195dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="start|center"
+                        android:text="Mobile"
+                        android:textSize="@dimen/dialog_button_text_size" />
+
+                    <com.hbb20.CountryCodePicker
+                        android:id="@+id/country_code_picker"
+                        android:layout_width="150dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="start|center"
+                        android:padding="5dp"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/black"
+                        android:textSize="22sp" />
+
+                    <EditText
+                        android:id="@+id/mobile_number_et"
+                        android:layout_width="300dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="4dp"
+                        android:padding="@dimen/dialog_edit_text_padding"
+                        android:inputType="number"
+                        android:background="@drawable/outline_black" />
+
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin = "@dimen/dialog_item_margin"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="start|center"
+                        android:text="Address"
+                        android:textSize="@dimen/dialog_button_text_size" />
+
+                    <EditText
+                        android:id="@+id/address_et"
+                        android:layout_width="@dimen/dialog_customer_edit_size"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="4dp"
+                        android:layout_weight="1"
+                        android:padding="@dimen/dialog_edit_text_padding"
+                        android:background="@drawable/outline_black" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin = "@dimen/dialog_item_margin"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="start|center"
+                        android:text="Customer Type"
+                        android:textSize="@dimen/dialog_button_text_size" />
+
+                    <Spinner
+                        android:id="@+id/customer_type_spinner"
+                        android:layout_width="@dimen/dialog_customer_edit_size"
+                        android:layout_height="44dp"
+                        android:layout_weight="1"
+                        android:layout_margin="4dp"
+                        android:background="@drawable/outline_black"
+                        android:gravity="start|center"
+                        android:padding="@dimen/dialog_edit_text_padding" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin = "@dimen/dialog_item_margin"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="start|center"
+                        android:text="Remarks"
+                        android:textSize="@dimen/dialog_button_text_size" />
+
+                    <EditText
+                        android:id="@+id/remark_et"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="4dp"
+                        android:layout_weight="1"
+                        android:layout_width="@dimen/dialog_customer_edit_size"
+                        android:padding="@dimen/dialog_edit_text_padding"
+                        android:background="@drawable/outline_black" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/dialog_item_margin"
+                    android:padding="@dimen/dialog_item_margin"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1" />
+
+                    <TextView
+                        android:id="@+id/add_customer_btn"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/dialog_button_height"
+                        android:layout_toStartOf="@id/close_button"
+                        android:layout_weight="0.5"
+                        android:background="@drawable/btn_app_color_selected"
+                        android:gravity="center"
+                        android:text="Submit"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/dialog_button_text_size" />
+
+                    <TextView
+                        android:id="@+id/close_button"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/dialog_button_height"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginStart="10sp"
+                        android:layout_weight="0.5"
+                        android:background="@drawable/btn_red_selector"
+                        android:gravity="center"
+                        android:text="Close"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/dialog_button_text_size" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

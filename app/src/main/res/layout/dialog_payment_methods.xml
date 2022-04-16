@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:background="@drawable/white_card"
+    android:layout_width="match_parent"
+    android:padding="16dp"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Payment Method"
+            android:gravity="center"
+            android:textSize="@dimen/dialog_title_text"
+            android:layout_weight="1"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/closeBtn"
+            android:src="@drawable/icon_close"/>
+    </LinearLayout>
+
+    <Button
+        android:layout_width="@dimen/payment_method_btn_size"
+        android:layout_height="wrap_content"
+        android:text= "Cash"
+        android:id="@+id/paymentCash"
+        android:layout_margin="8dp"
+        android:textColor="@color/white"
+        android:background="@drawable/btn_app_color_selected"/>
+
+    <Button
+        android:layout_width="@dimen/payment_method_btn_size"
+        android:layout_height="wrap_content"
+        android:text= "Debit Card"
+        android:id="@+id/paymentDebit"
+        android:layout_margin="8dp"
+        android:textColor="@color/white"
+        android:background="@drawable/btn_app_color_selected"/>
+
+    <Button
+        android:layout_width="@dimen/payment_method_btn_size"
+        android:layout_height="wrap_content"
+        android:text= "Credit Card"
+        android:id="@+id/paymentCredit"
+        android:layout_margin="8dp"
+        android:textColor="@color/white"
+        android:background="@drawable/btn_app_color_selected"/>
+
+</LinearLayout>

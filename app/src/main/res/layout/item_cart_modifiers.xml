@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/modifierName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Modifier"
+            android:layout_weight="1"
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:textSize="@dimen/modifier_cat_title" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:text="0 included/ 0 available"
+            android:id="@+id/modifierAvailableText"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginBottom="8dp"
+        android:src="@color/black"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:id="@+id/halfAndHalfImages"
+        android:layout_marginStart="8dp"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="@dimen/half_images_size"
+            android:layout_height="@dimen/half_images_size"
+            android:layout_gravity="center"
+            android:src="@drawable/icon_full"/>
+
+        <ImageView
+            android:layout_width="@dimen/half_images_size"
+            android:layout_height="@dimen/half_images_size"
+            android:layout_marginStart="-8dp"
+            android:src="@drawable/icon_half_left"/>
+
+        <ImageView
+            android:layout_width="@dimen/half_images_size"
+            android:layout_height="@dimen/half_images_size"
+            android:src="@drawable/icon_half_right"/>
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:id="@+id/recyclerSubModifier"
+        android:layout_height="wrap_content"/>
+</LinearLayout>

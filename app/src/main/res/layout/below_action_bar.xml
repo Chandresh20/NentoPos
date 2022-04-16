@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@drawable/rounded_black"
+    android:orientation="horizontal"
+    android:layout_width="0dp"
+    android:layout_height="0dp"
+    android:weightSum="1"
+    android:gravity="center">
+
+    <ImageView
+        android:layout_width="0dp"
+        android:layout_height="@dimen/below_bar_height"
+        android:padding="@dimen/below_item_padding"
+        android:layout_weight="0.1"
+        android:layout_gravity="start"
+        android:id="@+id/nav_menu_btn"
+        android:src="@drawable/ic_menu"/>
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:textSize="@dimen/below_bar_text_size"
+        android:layout_weight="0.1"
+        android:id="@+id/navPosBtn"
+        android:text="POS"/>
+
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_weight="0.28"
+        android:id="@+id/navOnlineOrders"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:src="@drawable/online_outline"
+            android:layout_width="match_parent"
+            android:padding="4dp"
+            android:visibility="gone"
+            android:id="@+id/onlineOutline"
+            android:layout_height="match_parent"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Online Orders (0)"
+            android:id="@+id/onlineOrderText"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/white"
+            android:textSize="@dimen/below_bar_text_size" />
+
+    </RelativeLayout>
+
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:textSize="@dimen/below_bar_text_size"
+        android:layout_weight="0.3"
+        android:gravity="center"
+        android:id="@+id/navOngoingOrders"
+        android:text="Ongoing Orders (0)"/>
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:textSize="@dimen/below_bar_text_size"
+        android:layout_weight="0.1"
+        android:gravity="center"
+        android:id="@+id/navTables"
+        android:text="Tables"/>
+
+    <ImageView
+        android:layout_width="0dp"
+        android:layout_height="@dimen/below_bar_height"
+        android:padding="@dimen/below_item_padding"
+        android:layout_weight="0.1"
+        android:id="@+id/changeOutlet"
+        android:src="@drawable/ic_exchange"/>
+</LinearLayout>

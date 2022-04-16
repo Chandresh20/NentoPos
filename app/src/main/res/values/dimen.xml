@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="below_bar_corner_radius">8dp</dimen>
+
+    <dimen name="progress_text_size">26dp</dimen>
+
+    <dimen name="title_text">26sp</dimen>
+
+    <!-- login -->
+    <dimen name="edit_text_padding_top_bottom">20dp</dimen>
+    <dimen name="edit_text_padding_start">8dp</dimen>
+    <dimen name="edit_text_border">5dp</dimen>
+    <dimen name="edit_text_border_width">3dp</dimen>
+    <dimen name="login_btn_corners">25dp</dimen>
+    <dimen name="login_text_size">25sp</dimen>
+
+    <!-- Below Bar -->
+    <dimen name="below_bar_height">50dp</dimen>
+    <dimen name="below_item_padding">13dp</dimen>
+    <dimen name="below_bar_text_size">20sp</dimen>
+
+    <!-- POS -->
+    <dimen name="spinner_text_size">22sp</dimen>
+    <dimen name="spinner_padding_vert">8dp</dimen>
+    <dimen name="categories_radius">25dp</dimen>
+    <dimen name="pos_spinner_corners">5dp</dimen>
+    <dimen name="pos_spinner_boarder_width">2dp</dimen>
+    <dimen name="category_text_size">15sp</dimen>
+    <dimen name="product_text_size">15sp</dimen>
+    <dimen name="product_card_radius">10dp</dimen>
+    <dimen name="product_card_width">180dp</dimen>
+    <dimen name="product_card_height">120dp</dimen>
+    <dimen name="drawer_button_margin">16dp</dimen>
+    <dimen name="drawer_button_size">25sp</dimen>
+    <dimen name="pos_spinner_width">180dp</dimen>
+    <dimen name="pos_spinner_height">45dp</dimen>
+
+    <!-- cart -->
+    <dimen name="cart_width">350dp</dimen>
+    <dimen name="modifier_cat_title">22sp</dimen>
+    <dimen name="cart_top_icon_size">40dp</dimen>
+    <dimen name="cart_top_button_padding">8dp</dimen>
+    <dimen name="cart_top_button_margin">4dp</dimen>
+
+    <!-- subCart -->
+    <dimen name="subcart_corners">35dp</dimen>
+    <dimen name="subcart_title_size">22sp</dimen>
+    <dimen name="subcart_title_sides_padding">16dp</dimen>
+    <dimen name="half_images_size">53dp</dimen>
+    <dimen name="qty_change_btn_size">45dp</dimen>
+
+
+
+    <!-- dialog -->
+    <dimen name="simple_dialog_width">400dp</dimen>
+    <dimen name="simple_dialog_height">300dp</dimen>
+    <dimen name="dialog_radius">25dp</dimen>
+    <dimen name="dialog_title_text">26sp</dimen>
+    <dimen name="dialog_top_padding">20dp</dimen>
+    <dimen name="dialog_bottom_padding">20dp</dimen>
+    <dimen name="dialog_sub_text">22sp</dimen>
+    <dimen name="dialog_edit_text">22sp</dimen>
+    <dimen name="payment_method_btn_size">400dp</dimen>
+    <dimen name="dialog_appbar_margin">55dp</dimen>
+    <dimen name="dialog_cancel_button_size">50dp</dimen>
+    <dimen name="dialog_item_margin">8dp</dimen>
+    <dimen name="dialog_button_padding">8dp</dimen>
+    <dimen name="calculator_button_width">50dp</dimen>
+    <dimen name="dialog_button_height">50dp</dimen>
+    <dimen name="dialog_body_text_size">25sp</dimen>
+    <dimen name="dialog_button_text_size">20sp</dimen>
+    <dimen name="dialog_recycler_item_text">22sp</dimen>
+    <dimen name="lottie_progress_bar_size">400dp</dimen>
+    <dimen name="dialog_customer_edit_size">150dp</dimen>
+    <dimen name="dialog_edit_text_padding">8dp</dimen>
+
+    <!-- common -->
+    <dimen name="small_btn_corners">5dp</dimen>
+    <dimen name="header_text">25sp</dimen>
+
+    <!-- All Orders -->
+    <dimen name="search_icon_size">40dp</dimen>
+    <dimen name="all_order_button_width">150dp</dimen>
+    <dimen name="all_order_tabs_height">45dp</dimen>
+    <dimen name="all_order_tab_text_size">18sp</dimen>
+    <dimen name="all_order_table_headings_height">55dp</dimen>
+    <dimen name="all_order_header_text">16sp</dimen>
+
+
+    <!-- Online orders -->
+    <dimen name="online_item_height">200dp</dimen>
+    <dimen name="online_item_button_margin">15dp</dimen>
+    <dimen name="order_text">16sp</dimen>
+
+    <!-- invoice -->
+    <dimen name="invoice_text_main">22sp</dimen>
+    <dimen name="invoice_summary_text">22sp</dimen>
+    <dimen name="invoice_modifier_text">22sp</dimen>
+    <dimen name="invoice_tax_text">18sp</dimen>
+
+</resources>

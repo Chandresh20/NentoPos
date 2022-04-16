@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="30dp"
+    android:layout_marginEnd="30dp"
+    android:layout_marginTop="20dp"
+    android:layout_marginBottom="10dp"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="20dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/top_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/table_no"
+                android:layout_marginBottom="3dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Table: NA"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/order_no"
+                android:layout_marginBottom="3dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Order Number: NA"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/waiter_name"
+                android:layout_marginBottom="3dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Waiter: NA"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/order_status"
+                android:layout_marginBottom="3dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="NA"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/edit_order"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_alignParentEnd="true"
+            android:layout_gravity="center"
+            android:background="@drawable/image_bg"
+            android:padding="6dp"
+            android:src="@drawable/ic_edit"
+            android:visibility="gone"
+            app:tint="@color/white" />
+
+        <LinearLayout
+            android:layout_marginTop="6dp"
+            android:orientation="horizontal"
+            android:layout_below="@id/top_layout"
+            android:layout_width="match_parent"
+            android:layout_height="45dp" >
+
+            <TextView
+                android:id="@+id/complete_order"
+                android:layout_weight="2.3"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/image_bg"
+                android:backgroundTint="@color/green"
+                android:padding="4dp"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:layout_gravity="center"
+                android:text="Complete"/>
+
+            <ImageView
+                android:id="@+id/cancelOrder"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:background="@drawable/image_bg"
+                android:backgroundTint="@color/red"
+                android:layout_marginStart="10dp"
+                android:padding="2dp"
+                android:src="@drawable/ic_close"
+                app:tint="@color/white" />
+
+            <!--            <ImageView-->
+            <!--                android:layout_width="0dp"-->
+            <!--                android:layout_weight="1"-->
+            <!--                android:layout_height="match_parent"-->
+            <!--                android:background="@drawable/image_bg"-->
+            <!--                android:layout_marginStart="10dp"-->
+            <!--                android:contentDescription="@string/todo"-->
+            <!--                android:padding="2dp"-->
+            <!--                android:src="@drawable/ic_print"-->
+            <!--                app:tint="@color/white"-->
+            <!--                />-->
+
+            <ImageView
+                android:id="@+id/get_invoice"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:background="@drawable/image_bg"
+                android:layout_marginStart="10dp"
+                android:padding="2dp"
+                android:src="@drawable/ic_file"
+                app:tint="@color/white"
+                />
+
+            <ImageView
+                android:id="@+id/send_sms"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/image_bg"
+                android:padding="2dp"
+                android:src="@drawable/ic_sms"
+                app:tint="@color/white" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/paidTick"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:layout_width="40dp"
+            android:layout_margin="10dp"
+            android:visibility="gone"
+            android:src="@drawable/paid_tick"
+            android:layout_height="40dp"/>
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>

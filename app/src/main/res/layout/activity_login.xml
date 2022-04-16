@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:background="#ADF"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <EditText
+            android:id="@+id/emailEditText"
+            android:layout_width="600dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/login_edit_text"
+            android:hint="Your Name"
+            android:inputType="textEmailAddress"
+            android:paddingStart="@dimen/edit_text_padding_start"
+            android:paddingTop="@dimen/edit_text_padding_top_bottom"
+            android:paddingEnd="@dimen/edit_text_padding_start"
+            android:paddingBottom="@dimen/edit_text_padding_top_bottom"
+            android:textSize="@dimen/login_text_size"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/logoImage" />
+
+        <EditText
+            android:id="@+id/passwordEditText"
+            android:layout_width="600dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="16dp"
+            android:textSize="@dimen/login_text_size"
+            android:background="@drawable/login_edit_text"
+            android:hint="Your Password"
+            android:inputType="textPassword"
+            android:paddingStart="@dimen/edit_text_padding_start"
+            android:paddingTop="@dimen/edit_text_padding_top_bottom"
+            android:paddingEnd="@dimen/edit_text_padding_start"
+            android:paddingBottom="@dimen/edit_text_padding_top_bottom"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/emailEditText" />
+
+        <Button
+            android:id="@+id/loginBtn"
+            android:layout_width="600dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/login_btn"
+            android:text="Login"
+            android:textSize="@dimen/login_text_size"
+            android:textColor="@color/white"
+            android:textAllCaps="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/passwordEditText" />
+
+        <LinearLayout
+            android:layout_width="400dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="45dp"
+            android:orientation="vertical"
+            android:id="@+id/loginSubUserBtn"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/loginBtn">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Or Use"
+                android:textSize="22sp" />
+
+            <Button
+                android:id="@+id/loginSubUserBtn1"
+                android:layout_width="400dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/login_btn"
+                android:text="Cashier's Login"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="@dimen/login_text_size" />
+
+        </LinearLayout>
+
+
+        <TextView
+            android:id="@+id/errorText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:text="Error"
+            android:textColor="#F00"
+            android:textSize="@dimen/login_text_size"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/loginSubUserBtn" />
+
+        <ImageView
+            android:id="@+id/logoImage"
+            android:layout_width="600dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/logo" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:src="@drawable/ic_lock"
+            app:layout_constraintBottom_toBottomOf="@+id/passwordEditText"
+            app:layout_constraintEnd_toEndOf="@+id/passwordEditText"
+            app:layout_constraintTop_toTopOf="@+id/passwordEditText" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.core.widget.NestedScrollView>

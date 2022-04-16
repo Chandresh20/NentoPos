@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:orientation="horizontal"
+    android:gravity="end"
+    android:weightSum="1"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="SubModName"
+        android:textStyle="bold"
+        android:singleLine="true"
+        android:layout_gravity="center"
+        android:layout_weight="0.37"
+        android:id="@+id/subModName"/>
+
+    <CheckBox
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/checkFull"
+        android:gravity="center"
+        android:layout_weight="0.11" />
+
+    <CheckBox
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/checkFHalf"
+        android:gravity="center"
+        android:layout_weight="0.11" />
+
+    <CheckBox
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/checkSHalf"
+        android:gravity="center"
+        android:layout_weight="0.11" />
+
+    <CheckBox
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="2x"
+        android:layout_weight="0.15"
+        android:visibility="invisible"
+        android:id="@+id/check2x"/>
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/finalPrice"
+        android:gravity="end"
+        android:visibility="visible"
+        android:layout_weight="0.15"
+        android:text="0$"/>
+
+</LinearLayout>

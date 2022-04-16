@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:cardCornerRadius="@dimen/dialog_radius">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:paddingBottom="@dimen/dialog_appbar_margin"
+        android:orientation="vertical">
+
+
+        <RelativeLayout
+            android:id="@+id/appbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp">
+
+            <ImageView
+                android:id="@+id/close_button"
+                android:layout_width="@dimen/dialog_cancel_button_size"
+                android:layout_height="@dimen/dialog_cancel_button_size"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_margin="@dimen/dialog_item_margin"
+                android:src="@drawable/ic_close"
+                app:tint="@color/black" />
+
+            <TextView
+                android:id="@+id/header_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center"
+                android:layout_marginStart="20dp"
+                android:gravity="start"
+                android:text="Order Details"
+                android:textColor="@color/black"
+                android:textSize="@dimen/dialog_title_text"
+                android:textStyle="bold" />
+
+            <!--            By chandresh-->
+            <Button
+                android:id="@+id/order_complete_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_toEndOf="@+id/header_text"
+                android:gravity="center"
+                android:background="@drawable/btn_app_color_selected"
+                android:layout_centerVertical="true"
+                android:text="Mark As Order Complete"
+                android:textColor="@color/white"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:textAllCaps="false"
+                android:textSize="20sp" />
+
+            <Button
+                android:id="@+id/applyBtn"
+                android:layout_toLeftOf="@+id/close_button"
+                android:layout_width="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:textColor="@color/white"
+                android:background="@drawable/btn_green_selector"
+                android:text="Apply" />
+
+
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="14dp"
+            android:background="@color/black" />
+
+        <LinearLayout
+            android:id="@+id/header_layout"
+            android:layout_marginTop="20dp"
+            android:background="@color/app_primary"
+            android:orientation="horizontal"
+            android:layout_width="800dp"
+            android:layout_height="70dp" >
+
+            <TextView
+                android:text="Item"
+                android:textColor="@color/white"
+                android:textSize="@dimen/dialog_body_text_size"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:layout_weight="4"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+
+            <View
+                android:background="@color/white"
+                android:layout_width="1dp"
+                android:layout_height="match_parent" />
+
+            <TextView
+                android:text="Qty."
+                android:textColor="@color/white"
+                android:textSize="@dimen/dialog_body_text_size"
+                android:gravity="center"
+                android:layout_margin="4dp"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+
+            <View
+                android:background="@color/white"
+                android:layout_width="1dp"
+                android:layout_height="match_parent" />
+
+            <TextView
+                android:text="Notes"
+                android:textColor="@color/white"
+                android:textSize="@dimen/dialog_body_text_size"
+                android:gravity="center"
+                android:layout_margin="4dp"
+                android:layout_gravity="center"
+                android:layout_weight="3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+
+            <View
+                android:background="@color/white"
+                android:layout_width="1dp"
+                android:layout_height="match_parent" />
+
+            <TextView
+                android:text="Action"
+                android:textColor="@color/white"
+                android:textSize="@dimen/dialog_body_text_size"
+                android:gravity="center"
+                android:layout_margin="4dp"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerView_order_details"
+                    android:layout_marginTop="4dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/product_addons_recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+
+            </LinearLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

@@ -1,0 +1,99 @@
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:cardCornerRadius="20dp">
+
+    <LinearLayout
+        android:layout_marginStart="@dimen/dialog_item_margin"
+        android:layout_marginEnd="@dimen/dialog_item_margin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/total"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="40dp"
+                android:gravity="start"
+                android:text="Add Discount"
+                android:layout_weight="1"
+                android:textSize="@dimen/dialog_title_text"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/close_button"
+                android:layout_width="@dimen/dialog_cancel_button_size"
+                android:layout_height="@dimen/dialog_cancel_button_size"
+                android:src="@drawable/ic_close" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/dialog_item_margin"
+            android:layout_marginBottom="@dimen/dialog_item_margin"
+            android:background="@color/black" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:gravity="end"
+            android:weightSum="1"
+            android:orientation="horizontal">
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:hint="discount"
+                android:background="@drawable/outline_black"
+                android:padding="8dp"
+                android:layout_margin="8dp"
+                android:textSize="@dimen/dialog_title_text"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="%"
+                android:layout_marginEnd="32dp"
+                android:layout_gravity="center"
+                android:textSize="@dimen/dialog_title_text"/>
+
+            <TextView
+                android:id="@+id/confirm"
+                android:layout_width="0dp"
+                android:layout_weight="0.4"
+                android:layout_height="@dimen/dialog_button_height"
+                android:background="@drawable/btn_app_color_selected"
+                android:gravity="center"
+                android:text="Add"
+                android:layout_margin="@dimen/dialog_item_margin"
+                android:textColor="@color/white"
+                android:textSize="@dimen/dialog_button_text_size" />
+
+            <TextView
+                android:id="@+id/close_button2"
+                android:layout_width="0dp"
+                android:layout_weight="0.4"
+                android:layout_height="@dimen/dialog_button_height"
+                android:layout_alignParentEnd="true"
+                android:layout_margin="@dimen/dialog_item_margin"
+                android:background="@drawable/btn_red_selector"
+                android:gravity="center"
+                android:text="Close"
+                android:textColor="@color/white"
+                android:textSize="@dimen/dialog_button_text_size" />
+        </LinearLayout>
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

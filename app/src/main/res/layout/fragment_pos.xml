@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:background="@color/pos_background"
+    android:id="@+id/posBackground"
+    android:layout_height="match_parent">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/categoryRecycler"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toStartOf="@+id/includedCart"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/menuSpinner" />
+
+    <Button
+        android:id="@+id/reloadBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="156dp"
+        android:text="reload"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.026"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/productRecycler" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/productRecycler"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="16dp"
+        android:background="@color/pos_background"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/includedCart"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/categoryRecycler"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <Spinner
+        android:id="@+id/menuSpinner"
+        android:layout_width="@dimen/pos_spinner_width"
+        android:layout_height="@dimen/pos_spinner_height"
+        android:theme="@style/Theme.AppCompat"
+        android:background="@drawable/pos_spinner_background"
+        android:layout_marginStart="16dp"
+        android:gravity="center"
+        android:paddingTop="@dimen/spinner_padding_vert"
+        android:paddingBottom="@dimen/spinner_padding_vert"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <include
+        android:id="@+id/includedCart"
+        layout="@layout/include_cart_layout"
+        android:layout_width="@dimen/cart_width"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <include
+        android:id="@+id/includedModifier"
+        layout="@layout/include_cart_modifier"
+        android:layout_width="450dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/includedCart"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/relodbtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginBottom="100dp"
+        android:text="Reload new"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/reloadAll"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:text="reload ALl"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/relodbtn"
+        app:layout_constraintStart_toEndOf="@+id/relodbtn" />
+
+    <Button
+        android:id="@+id/testSentry"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:text="Test sentry"
+        android:visibility="gone"
+        app:layout_constraintStart_toEndOf="@+id/reloadAll"
+        app:layout_constraintTop_toTopOf="@+id/reloadAll" />
+
+    <TextView
+        android:id="@+id/noProductText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        android:text="Product Not Found!"
+        android:textColor="@color/white"
+        android:visibility="gone"
+        android:translationZ="2dp"
+        android:textSize="@dimen/title_text"
+        app:layout_constraintEnd_toStartOf="@+id/includedCart"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/categoryRecycler" />
+
+    <Spinner
+        android:id="@+id/userSpinner"
+        android:layout_width="@dimen/pos_spinner_width"
+        android:layout_height="@dimen/pos_spinner_height"
+        android:layout_marginStart="16dp"
+        android:theme="@style/Theme.AppCompat"
+        android:background="@drawable/pos_spinner_background"
+        android:gravity="center"
+        android:paddingTop="@dimen/spinner_padding_vert"
+        android:paddingBottom="@dimen/spinner_padding_vert"
+        app:layout_constraintBottom_toBottomOf="@+id/menuSpinner"
+        app:layout_constraintStart_toEndOf="@+id/menuSpinner"
+        app:layout_constraintTop_toTopOf="@+id/menuSpinner" />
+
+    <AutoCompleteTextView
+        android:id="@+id/posAutoComplete"
+        android:layout_width="@dimen/pos_spinner_width"
+        android:layout_height="@dimen/pos_spinner_height"
+        android:layout_marginStart="16dp"
+        android:imeOptions="actionSearch"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:hint="Guest"
+        android:textColorHint="@color/light_grey"
+        android:background="@drawable/pos_spinner_background"
+        app:layout_constraintBottom_toBottomOf="@+id/userSpinner"
+        app:layout_constraintStart_toEndOf="@+id/userSpinner"
+        app:layout_constraintTop_toTopOf="@+id/userSpinner" />
+
+    <Button
+        android:id="@+id/addCustBtn"
+        android:layout_width="50dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/add_btn"
+        app:layout_constraintBottom_toBottomOf="@+id/posAutoComplete"
+        app:layout_constraintStart_toEndOf="@+id/posAutoComplete"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/syncInPOS"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:gravity="center"
+        app:layout_constraintEnd_toStartOf="@+id/includedCart"
+        app:layout_constraintTop_toTopOf="parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/outletText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:text="Nento"
+            android:textColor="@color/white" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Last Refereshed"
+            android:textStyle="italic"
+            android:textColor="@color/white"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_gravity="center"
+                android:src="@drawable/green_circle"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/syncText"
+                android:textColor="@color/white"
+                android:text="NA mins ago"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/noAccess"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No Access"
+        android:visibility="gone"
+        android:textColor="@color/white"
+        android:textSize="@dimen/title_text"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/includedCart"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

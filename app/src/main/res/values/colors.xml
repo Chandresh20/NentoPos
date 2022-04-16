@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <color name="app_primary">#229ae8</color>
+    <color name="pos_background">#003353</color>
+    <color name="product_selected1">#9CF</color>
+    <color name="product_selected2">#59f</color>
+    <color name="product_normal1">#EEE</color>
+    <color name="product_normal2">#AAA</color>
+
+    <color name="pos_spinner_boarder">#999</color>
+    <color name="small_btn_active">#FF0</color>
+    <color name="btn_red">#F32</color>
+    <color name="btn_green">#2A4</color>
+    <color name="below_bar_color">#333</color>
+
+    <color name="light_grey">#AAA</color>
+
+    <color name="orange">#FF6D00</color>
+    <color name="yellow">#ffac03</color>
+    <color name="green">#00C853</color>
+    <color name="red">#FF0202</color>
+    <color name="button">#a6bfa0</color>
+    <color name="cashierLoginBG">#02a4ff</color>
+
+    <color name="button_main">#1296eb</color>
+    <color name="button_dark">#0984db</color>
+</resources>

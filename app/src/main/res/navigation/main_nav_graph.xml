@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_nav_graph"
+    app:startDestination="@id/navigation_login">
+
+    <fragment android:id="@+id/navigation_login"
+        android:label="Login Screen"
+        android:name="com.tjcg.nentopos.fragments.LoginFragment"
+        tools:layout="@layout/activity_login">
+        <action
+            android:id="@+id/action_navigation_login_to_navigation_pos"
+            app:destination="@id/navigation_pos" />
+    </fragment>
+
+    <fragment android:id="@+id/navigation_pos"
+        android:label="@string/pos_name"
+        android:name="com.tjcg.nentopos.fragments.POSFragment"
+        tools:layout="@layout/fragment_pos">
+        <action
+            android:id="@+id/action_navigation_pos_to_navigation_kitchen"
+            app:destination="@id/navigation_kitchen" />
+    </fragment>
+
+    <fragment android:id="@+id/navigation_all_orders"
+        android:label="All Order Screen"
+        android:name="com.tjcg.nentopos.fragments.AllOrderFragment"
+        tools:layout="@layout/fragment_all_orders"/>
+
+    <fragment android:id="@+id/navigation_kitchen"
+        android:label="Kitchen Display"
+        android:name="com.tjcg.nentopos.fragments.KitchenDisplayFragment"
+        tools:layout="@layout/fragment_kitchen_display"/>
+
+    <fragment android:id="@+id/navigation_counter"
+        android:label="Counter Display"
+        android:name="com.tjcg.nentopos.fragments.CounterDisplayFragment"
+        tools:layout="@layout/fragment_counter_display"/>
+
+    <fragment android:id="@+id/navigation_online_orders"
+        android:label="Online Orders"
+        android:name="com.tjcg.nentopos.fragments.OnlineOrderFragment"
+        tools:layout="@layout/fragment_online_order"/>
+
+    <fragment android:id="@+id/navigation_ongoing_orders"
+        android:label="Ongoing Orders"
+        android:name="com.tjcg.nentopos.fragments.OngoingOrderFragment"
+        tools:layout="@layout/fragment_ongoing_order"/>
+
+    <fragment android:id="@+id/navigation_invoice"
+        tools:layout="@layout/fragment_invoice"
+        android:name="com.tjcg.nentopos.fragments.InvoiceFragment"
+        android:label="Invoice"/>
+
+    <fragment android:id="@+id/navigation_subUser_login"
+        android:label="SubUser Login"
+        android:name="com.tjcg.nentopos.fragments.SubUserLoginFragment"
+        tools:layout="@layout/fragment_subuser_login"/>
+
+</navigation>

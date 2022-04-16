@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:orientation="horizontal"
+    android:weightSum="1"
+    android:layout_height="wrap_content">
+
+    <CheckBox
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.1"
+        android:text="@null"
+        android:id="@+id/subModCheck"/>
+
+    <TextView
+        android:id="@+id/subModifierName"
+        android:layout_weight="0.5"
+        android:layout_width="0dp"
+        android:textStyle="bold"
+        android:layout_height="wrap_content"
+        android:text="subModifierName"/>
+
+    <CheckBox
+        android:layout_width="0dp"
+        android:layout_weight="0.2"
+        android:layout_height="wrap_content"
+        android:id="@+id/check2x"
+        android:visibility="invisible"
+        android:text="2x"/>
+
+    <TextView
+        android:layout_width="0dp"
+        android:text="$0"
+        android:visibility="invisible"
+        android:gravity="end"
+        android:layout_weight="0.2"
+        android:id="@+id/subModPrice"
+        android:layout_height="wrap_content"/>
+</LinearLayout>

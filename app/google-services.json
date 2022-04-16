@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "813832496931",
+    "project_id": "menuonline-pos",
+    "storage_bucket": "menuonline-pos.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:813832496931:android:40801bf3dbe42d08d00e96",
+        "android_client_info": {
+          "package_name": "com.tjcg.nentopos"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "813832496931-1g32qvivravccnld2nvb5e52tl0he1sa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDv9yq8PMvzONp0AAFUyqAWLSlnNbmdwD4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "813832496931-1g32qvivravccnld2nvb5e52tl0he1sa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

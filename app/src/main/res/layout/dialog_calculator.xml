@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="30dp"
+    app:cardElevation="10dp">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/close_button"
+                android:layout_width="@dimen/dialog_cancel_button_size"
+                android:layout_height="@dimen/dialog_cancel_button_size"
+                android:layout_gravity="end"
+                android:src="@drawable/icon_close" />
+
+            <LinearLayout
+                android:layout_width="800dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="visible">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:padding="8dp"
+                    android:text="Total Amount"
+                    android:textSize="@dimen/dialog_title_text" />
+
+                <TextView
+                    android:id="@+id/total_amount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin= "@dimen/dialog_item_margin"
+                    android:gravity="end|center"
+                    android:text="1000"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/dialog_title_text"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="visible">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:padding="@dimen/dialog_button_padding"
+                    android:text="Customer Payment"
+                    android:textSize="@dimen/dialog_body_text_size" />
+
+                <TextView
+                    android:id="@+id/customer_paid"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin= "@dimen/dialog_item_margin"
+                    android:gravity="end|center"
+                    android:text="0"
+                    android:layout_gravity="center"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/dialog_body_text_size"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="visible">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:padding="@dimen/dialog_button_padding"
+                    android:text="Balance Due"
+                    android:textSize="@dimen/dialog_body_text_size" />
+
+                <TextView
+                    android:id="@+id/balance_due"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:layout_weight="1"
+                    android:gravity="end|center"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/dialog_body_text_size"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@color/black"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/btn1"
+                        android:layout_width="@dimen/calculator_button_width"
+                        android:layout_height="@dimen/dialog_button_height"
+                        android:layout_margin="1dp"
+                        android:background="@drawable/btn_black_selector"
+                        android:gravity="center"
+                        android:layout_weight="1"
+                        android:text="1"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/dialog_button_text_size" />
+
+                    <TextView
+                        android:id="@+id/btn2"
+                        android:layout_width="@dimen/calculator_button_width"
+                        android:layout_height="@dimen/dialog_button_height"
+                        android:layout_margin="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/btn_black_selector"
+                        android:gravity="center"
+                        android:text="2"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/dialog_button_text_size" />
+
+                    <TextView
+                        android:id="@+id/btn3"
+                        android:layout_width="@dimen/calculator_button_width"
+                        android:layout_height="@dimen/dialog_button_height"
+                        android:layout_margin="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/btn_black_selector"
+                        android:gravity="center"
+                        android:text="3"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/dialog_button_text_size" />
+
+                    <TextView
+                        android:id="@+id/btn55"
+                        android:layout_width="@dimen/calculator_button_width"
+                        android:layout_height="@dimen/dialog_button_height"
+                        android:layout_margin="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/btn_app_color_selected"
+                        android:gravity="center"
+                        android:text="5"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/dialog_button_text_size" />
+
+                    <TextView
+                        android:id="@+id/btn1010"
+                        android:layout_width="@dimen/calculator_button_width"
+                        android:layout_height="@dimen/dialog_button_height"
+                        android:layout_margin="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/btn_app_color_selected"
+                        android:gravity="center"
+                        android:text="10"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/dialog_button_text_size" />
+
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/btn4"
+                        android:layout_width="@dimen/calculator_button_width"
+                        android:layout_height="@dimen/dialog_button_height"
+                        android:layout_margin="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/btn_black_selector"
+                        android:gravity="center"
+                        android:text="4"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/dialog_button_text_size" />
+
+                    <TextView
+                        android:id="@+id/btn5"
+                        android:layout_width="@dimen/calculator_button_width"
+                        android:layout_height="@dimen/dialog_button_height"
+                        android:layout_margin="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/btn_black_selector"
+                        android:gravity="center"
+                        android:text="5"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/dialog_button_text_size" />
+
+                    <TextView
+                        android:id="@+id/btn6"
+                        android:layout_width="@dimen/calculator_button_width"
+                        android:layout_height="@dimen/dialog_button_height"
+                        android:layout_margin="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/btn_black_selector"
+                        android:gravity="center"
+                        android:text="6"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/dialog_button_text_size" />
+
+                    <TextView
+                        android:id="@+id/btn20"
+                        android:layout_width="@dimen/calculator_button_width"
+                        android:layout_height="@dimen/dialog_button_height"
+                        android:layout_margin="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/btn_app_color_selected"
+                        android:gravity="center"
+                        android:text="20"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/dialog_button_text_size" />
+
+                    <TextView
+                        android:id="@+id/btn50"
+                        android:layout_width="@dimen/calculator_button_width"
+                        android:layout_height="@dimen/dialog_button_height"
+                        android:layout_margin="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/btn_app_color_selected"
+                        android:gravity="center"
+                        android:text="50"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/dialog_button_text_size" />
+
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/btn7"
+                        android:layout_width="@dimen/calculator_button_width"
+                        android:layout_height="@dimen/dialog_button_height"
+                        android:layout_margin="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/btn_black_selector"
+                        android:gravity="center"
+                        android:text="7"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/dialog_button_text_size" />
+
+                    <TextView
+                        android:id="@+id/btn8"
+                        android:layout_width="@dimen/calculator_button_width"
+                        android:layout_height="@dimen/dialog_button_height"
+                        android:layout_margin="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/btn_black_selector"
+                        android:gravity="center"
+                        android:text="8"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/dialog_button_text_size" />
+
+                    <TextView
+                        android:id="@+id/btn9"
+                        android:layout_width="@dimen/calculator_button_width"
+                        android:layout_height="@dimen/dialog_button_height"
+                        android:layout_margin="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/btn_black_selector"
+                        android:gravity="center"
+                        android:text="9"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/dialog_button_text_size" />
+
+                    <TextView
+                        android:id="@+id/btn100"
+                        android:layout_width="@dimen/calculator_button_width"
+                        android:layout_height="@dimen/dialog_button_height"
+                        android:layout_margin="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/btn_app_color_selected"
+                        android:gravity="center"
+                        android:text="100"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/dialog_button_text_size" />
+
+                    <TextView
+                        android:id="@+id/btn1000"
+                        android:layout_width="@dimen/calculator_button_width"
+                        android:layout_height="@dimen/dialog_button_height"
+                        android:layout_margin="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/btn_app_color_selected"
+                        android:gravity="center"
+                        android:text="1000"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/dialog_button_text_size" />
+
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/btn0"
+                        android:layout_width="@dimen/calculator_button_width"
+                        android:layout_height="@dimen/dialog_button_height"
+                        android:layout_margin="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/btn_black_selector"
+                        android:gravity="center"
+                        android:text="0"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/dialog_button_text_size" />
+
+                    <TextView
+                        android:id="@+id/btn00"
+                        android:layout_width="@dimen/calculator_button_width"
+                        android:layout_height="@dimen/dialog_button_height"
+                        android:layout_margin="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/btn_black_selector"
+                        android:gravity="center"
+                        android:text="00"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/dialog_button_text_size" />
+
+                    <TextView
+                        android:id="@+id/btnPoint"
+                        android:layout_width="@dimen/calculator_button_width"
+                        android:layout_height="@dimen/dialog_button_height"
+                        android:layout_margin="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/btn_black_selector"
+                        android:gravity="center"
+                        android:text="."
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/dialog_button_text_size" />
+
+                    <TextView
+                        android:id="@+id/btnC"
+                        android:layout_width="@dimen/calculator_button_width"
+                        android:layout_height="@dimen/dialog_button_height"
+                        android:layout_margin="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/btn_app_color_selected"
+                        android:gravity="center"
+                        android:text="C"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/dialog_button_text_size" />
+
+                    <TextView
+                        android:id="@+id/next"
+                        android:layout_width="@dimen/calculator_button_width"
+                        android:layout_height="@dimen/dialog_button_height"
+                        android:layout_margin="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/btn_red_selector"
+                        android:gravity="center"
+                        android:text="Next"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/dialog_button_text_size" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.cardview.widget.CardView>

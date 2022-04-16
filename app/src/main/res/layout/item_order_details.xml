@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="4dp"
+    android:orientation="horizontal">
+
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="4dp"
+        android:layout_weight="4"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/product_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|center"
+            android:gravity="start"
+            android:text=""
+            android:textColor="@color/black"
+            android:textSize="@dimen/dialog_recycler_item_text" />
+
+
+        <LinearLayout
+            android:id="@+id/modifier_item_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+
+    </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/product_quantity"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|top"
+        android:layout_margin="4dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text=""
+        android:textSize="@dimen/dialog_recycler_item_text"
+        android:textColor="@color/black" />
+
+    <TextView
+        android:id="@+id/customer_note"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|top"
+        android:layout_margin="4dp"
+        android:layout_weight="3"
+        android:gravity="center"
+        android:text=""
+        android:textColor="@color/black"
+        android:textSize="@dimen/dialog_recycler_item_text" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|top"
+        android:layout_margin="4dp"
+        android:layout_weight="1"
+        android:gravity="center">
+
+        <CheckBox
+            android:id="@+id/checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="end|center"
+            android:scaleX="2"
+            android:scaleY="2" />
+
+    </LinearLayout>
+
+
+</LinearLayout>

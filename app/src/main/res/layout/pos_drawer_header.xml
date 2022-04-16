@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:background="@color/black"
+    android:layout_height="match_parent">
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:id="@+id/nav_pos"
+        android:layout_marginStart="@dimen/drawer_button_margin"
+        android:layout_marginEnd="@dimen/drawer_button_margin"
+        android:layout_marginTop="@dimen/drawer_button_margin"
+        android:textSize="@dimen/drawer_button_size"
+        android:background="@drawable/drawer_btn_selector"
+        android:text="POS"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:id="@+id/nav_all_orders"
+        android:background="@drawable/drawer_btn_selector"
+        android:textAllCaps="false"
+        android:layout_marginStart="@dimen/drawer_button_margin"
+        android:layout_marginEnd="@dimen/drawer_button_margin"
+        android:layout_marginTop="@dimen/drawer_button_margin"
+        android:textSize="@dimen/drawer_button_size"
+        android:text="All Orders"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:id="@+id/nav_kitchen"
+        android:textSize="@dimen/drawer_button_size"
+        android:background="@drawable/drawer_btn_selector"
+        android:textAllCaps="false"
+        android:layout_marginStart="@dimen/drawer_button_margin"
+        android:layout_marginEnd="@dimen/drawer_button_margin"
+        android:layout_marginTop="@dimen/drawer_button_margin"
+        android:text="Kitchen Display"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:id="@+id/nav_counter"
+        android:background="@drawable/drawer_btn_selector"
+        android:textAllCaps="false"
+        android:textSize="@dimen/drawer_button_size"
+        android:layout_marginStart="@dimen/drawer_button_margin"
+        android:layout_marginEnd="@dimen/drawer_button_margin"
+        android:layout_marginTop="@dimen/drawer_button_margin"
+        android:text="Counter Display"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:id="@+id/nav_settings"
+        android:textSize="@dimen/drawer_button_size"
+        android:background="@drawable/drawer_btn_selector"
+        android:textAllCaps="false"
+        android:layout_marginStart="@dimen/drawer_button_margin"
+        android:layout_marginEnd="@dimen/drawer_button_margin"
+        android:layout_marginTop="@dimen/drawer_button_margin"
+        android:text="Settings"/>
+</LinearLayout>

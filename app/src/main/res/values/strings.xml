@@ -1,0 +1,41 @@
+<resources>
+    <string name="app_name">NentoPos</string>
+    <string name="pos_name">POS Screen</string>
+
+    <string name="discount">Discount</string>
+    <string name="pleaseWait">Please Wait…</string>
+    <string name="na">NA</string>
+    <string name="not_paid">UNPAID</string>
+    <string name="paid">PAID</string>
+    <string name="unknown">unknown</string>
+    <string name="time_over">Time Over</string>
+    <string name="driver">driver</string>
+    <string name="amount_prefix">CAD</string>
+    <string name="con_success">Connect success</string>
+    <string name="con_failed">Connection failed !! Please Connect your printer</string>
+    <string name="con_has_discon">connection has disconnected</string>
+    <string name="connect_first">please connet the printer first!</string>
+    <string name="barcodePrinter">barcode printer</string>
+    <string-array name="port">
+        <!--        <item>NET</item>-->
+        <item>BT</item>
+        <!--        <item>USB</item>-->
+    </string-array>
+
+    <string name="connect">Connect </string>
+    <string name="discon">disConnect</string>
+    <string name="please_device">please tap here to select a printer</string>
+    <string name="teminal">Ternimal Printer</string>
+    <string name="l58">58</string>
+    <string name="l80">80</string>
+    <string name="barcode_printer">Barcode Printer</string>
+    <string name="other_printer"> other printer</string>
+    <string name="sample">sample</string>
+    <string name="print_text">print text</string>
+    <string name="print_barcode">print barcode</string>
+    <string name="print_qrcode">print qrcode</string>
+    <string name="print_bitmap">print bitmap</string>
+    <string name="printer_76">76 printer</string>
+    <string name="none_ble_device">no device found</string>
+    <string name="usb_pre_con">present connected Usb dev:</string>
+</resources>
