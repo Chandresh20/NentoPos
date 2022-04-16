@@ -9,6 +9,6 @@ class SimpleResponse {
     @SerializedName("message")
     var message: String? = null
 
-    @SerializedName("data")
-    var menuData : Any? = null
+ /*   @SerializedName("data")
+    var menuData : Any? = null  */
 }

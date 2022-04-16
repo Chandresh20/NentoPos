@@ -15,7 +15,7 @@ abstract class ProductDatabase : RoomDatabase() {
     abstract fun getProductDao() : ProductDao
 
     companion object {
-        var instance : ProductDatabase? = null
+        private var instance : ProductDatabase? = null
         fun getDatabase(ctx : Context) : ProductDatabase {
             return if (instance == null) {
                 Room.databaseBuilder(ctx, ProductDatabase::class.java, "ProductDatabase").build()

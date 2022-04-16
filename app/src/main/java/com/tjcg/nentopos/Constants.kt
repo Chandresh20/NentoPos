@@ -33,7 +33,6 @@ class Constants {
         var loggedInSubUserId = -1
         var authorization = "-1"
         var firebaseToken = ""
-        var uniqueId = HashMap<Int, String>()
         var selectedOutletId = 1
         var clientId = "-1"
         var currencySign = "$"
@@ -56,7 +55,6 @@ class Constants {
         const val REJECT_ORDER = 2
 
         const val TAX_IN_PERCENT = "0"
-        const val TAX_IN_RATE = "1"
 
         const val FUTURE_ORDER_NULL = 0
         const val FUTURE_ORDER_FAR = 1
@@ -113,7 +111,6 @@ class Constants {
         const val PREF_IS_SYNC_REQUIRES = "isSyncRequired"
         const val PREF_IS_ALL_DATA = "isAllData"
         const val PREF_SELECTED_OUTLET = "selectedOutlet"
-        const val PREF_FIRST_INSTALLED = "firstInstalled_1.0Beta02"
         const val PREF_SUPER_USER_EMAIL = "superUserEmail"
         const val PREF_SUPER_USER_DOMAIN = "superUserDomain"
         const val PREF_HST_NUMBER = "hstNumber"

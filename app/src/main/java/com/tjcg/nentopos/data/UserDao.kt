@@ -2,32 +2,31 @@ package com.tjcg.nentopos.data
 
 import androidx.room.Dao
 import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.OnConflictStrategy.REPLACE
 import androidx.room.Query
 
 @Dao
 interface UserDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = REPLACE)
     fun insertAllOutletData(outlets: List<OutletData>)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = REPLACE)
     fun insertAllCustomerData(customers: List<CustomerData>)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = REPLACE)
     fun insertAllTablesData(tables: List<TableData>)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = REPLACE)
     fun insertSubUsersData(subUsers : List<SubUserData>)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = REPLACE)
     fun insertCustomerTypes(customerTypes : List<CustomerTypeData>)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = REPLACE)
     fun insertCardTerminalData(cardTerminalData: List<CardTerminalData>)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = REPLACE)
     fun insertOneCustomer(customerData: CustomerData)
 
     @Insert(onConflict = REPLACE)

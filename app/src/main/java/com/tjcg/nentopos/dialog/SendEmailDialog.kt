@@ -26,7 +26,7 @@ class SendEmailDialog(val orderId: Long) : DialogFragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = DialogSendEmailBinding.inflate(inflater, container, false)
-        binding.radioEmail.setOnCheckedChangeListener { radioGroup, i ->
+        binding.radioEmail.setOnCheckedChangeListener { _, i ->
             if (i == R.id.emailYesRadio) {
                 binding.emailEditText.visibility = View.VISIBLE
                 binding.sendEmailBtn.visibility = View.VISIBLE

@@ -187,10 +187,10 @@ class InvoiceFragment : Fragment() {
                 binding.textVieTip.text = "$prefixStr " + tipAmount.format()
                 binding.textVieStoreChargePackingExtra.text = "$prefixStr ${storeCharge?.format()}"
                 totalTax += storeCharge ?: 0f
-                amountPrints.put(PRINT_SUBTOTAL, subTotal)
-                amountPrints.put(PRINT_DISCOUNT, mainDiscount)
-                amountPrints.put(PRINT_TIP, tipAmount)
-                amountPrints.put(PRINT_STORE_CHARGE, storeCharge ?: 0f)
+                amountPrints[PRINT_SUBTOTAL] = subTotal
+                amountPrints[PRINT_DISCOUNT] = mainDiscount
+                amountPrints[PRINT_TIP] = tipAmount
+                amountPrints[PRINT_STORE_CHARGE] = storeCharge ?: 0f
                 updateGrandTotal(totalTax)
             }, 1000)
         }
@@ -216,13 +216,14 @@ class InvoiceFragment : Fragment() {
     @SuppressLint("SetTextI18n")
     fun updateGrandTotal(num: Float) {
         grandTotal += num
-        amountPrints.put(PRINT_GRAND_TOTAL, grandTotal)
+        amountPrints[PRINT_GRAND_TOTAL] = grandTotal
         val changeDue = (amountPrints[PRINT_CUSTOMER_PAID] ?: 0f) - grandTotal
         binding.textVieChangedue.text = "$prefixStr ${changeDue.format()}"
-        amountPrints.put(PRINT_CHANGE_DUE, changeDue)
+        amountPrints[PRINT_CHANGE_DUE] = changeDue
         binding.textVieGrandTotal.text = "$prefixStr ${grandTotal.format()}"
     }
 
+    @SuppressLint("SetTextI18n")
     private suspend fun setUpBillingToInfo(order : OrdersEntity) {
         if (order.customer_id == null || (order.customer_id ?: 0)  <= 0) {
             binding.textViewCustname.text = "Guest Customer"
@@ -249,7 +250,6 @@ class InvoiceFragment : Fragment() {
             } else {
                 "Email: ${customer.customerEmail}"
             }
-            //           binding.textViewCustnamefull.text = "Customer Full Name: Pending"
             binding.textViewAddress1.text = if (customer.customerAddress.isNullOrBlank()) {
                 ""
             } else {
@@ -266,15 +266,17 @@ class InvoiceFragment : Fragment() {
         } else {
             if (!reloadCustomerData) {
                 MainActivity.orderViewModel.newCustomersData.observe(
-                    ctx as MainActivity, { list ->
+                    ctx as MainActivity, {
                         CoroutineScope(Dispatchers.Main).launch {
                             setUpBillingToInfo(order)
                         }
                     })
                 val outletData = MainActivity.mainRepository.getOutletDataAsync(Constants.selectedOutletId).await()
                 if (outletData != null) {
-                    MainActivity.mainRepository.loadCustomerData(ctx, outletData.outletId, outletData.uniqueId ?: "NA",
-                        MainActivity.deviceID, 1, true)
+                    MainActivity.mainRepository.loadCustomerData(
+                        ctx, outletData.outletId, MainActivity.deviceID,
+                        1, true
+                    )
                 }
                 reloadCustomerData = true
             }
@@ -369,7 +371,7 @@ class InvoiceFragment : Fragment() {
 
         for (item in itemPrints) {
             val res = splitString(item.label, 25)
-            for (i in 0 until res!!.size) {
+            for (i in 0 until res.size) {
                 if (i == 0) {
                     fmt1.format("%-3s %-25s %-8s %9s\n", item.qty.toString(), res[i], item.price.toString(), item.total.toString())
                 } else {
@@ -399,10 +401,10 @@ class InvoiceFragment : Fragment() {
         return list
     }
 
-    private fun splitString(msg: String?, lineSize: Int): java.util.ArrayList<String>? {
+    private fun splitString(msg: String?, lineSize: Int): java.util.ArrayList<String> {
         val res = java.util.ArrayList<String>()
         val p: Pattern = Pattern.compile("\\b.{1," + (lineSize - 1) + "}\\b\\W?")
-        val m: Matcher = p.matcher(msg)
+        val m: Matcher = p.matcher(msg.toString())
         while (m.find()) {
             res.add(m.group())
         }
@@ -448,7 +450,7 @@ class InvoiceFragment : Fragment() {
             CoroutineScope(Dispatchers.Main).launch {
                 val productData = MainActivity.mainRepository.getProductDataAsync(item.productId ?: 0).await()
                 if (productData == null) {
-                    Toast.makeText(ctx, "An Error Occured", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(ctx, "An Error Occurred", Toast.LENGTH_SHORT).show()
                     (ctx as MainActivity).onBackPressed()
                     return@launch
                 }
@@ -614,7 +616,7 @@ class InvoiceFragment : Fragment() {
                                 }
                             }
                             modifiersAmount += removeIncluded3(subArray, (modifierDetails.modifiersIncluded ?: 0).toInt())
-                            Log.d("Total amonut ${modifierDetails.modifierName}", modifiersAmount.toString())
+                            Log.d("Total amount ${modifierDetails.modifierName}", modifiersAmount.toString())
                         }
                     }
                     productPrice += modifiersAmount
@@ -719,7 +721,7 @@ class InvoiceFragment : Fragment() {
                     }
                     // calculate each tax as per tax id
                     for (taxId in taxArray) {
-                        val taxDetail = MainActivity.mainRepository.getOneTaxDetailAsync(taxId.toInt()).await()
+                        val taxDetail = MainActivity.mainRepository.getOneTaxDetailAsync(taxId).await()
                         if (taxDetail != null) {
                             val taxValue = if (taxDetail.taxType == Constants.TAX_IN_PERCENT) {
                                     val mainDiscount = totalPrice * mainDiscountPrec / 100
@@ -778,7 +780,7 @@ class InvoiceFragment : Fragment() {
                     }
                     // calculate each tax as per tax id
                     for (taxId in taxArray) {
-                        val taxDetail = MainActivity.mainRepository.getOneTaxDetailAsync(taxId.toInt()).await()
+                        val taxDetail = MainActivity.mainRepository.getOneTaxDetailAsync(taxId).await()
                         if (taxDetail != null) {
                             val taxValue = if (taxDetail.taxType == Constants.TAX_IN_PERCENT) {
                                 (totalPrice * (taxDetail.taxPercentage ?: "0").toFloat() / 100)
@@ -810,7 +812,7 @@ class InvoiceFragment : Fragment() {
         @SuppressLint("SetTextI18n")
         override fun onBindViewHolder(holder: TaxHolder, position: Int) {
             val tax = taxes[position]
-            var taxPrintLabel = ""
+            val taxPrintLabel : String
             if (tax.type == Constants.TAX_IN_PERCENT) {
                 holder.binding.taxTitle.text = "${tax.label} (${tax.per}%)"
                 taxPrintLabel = "${tax.label}(${tax.per}%)"

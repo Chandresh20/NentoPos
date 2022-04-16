@@ -13,7 +13,7 @@ abstract class UserDatabase : RoomDatabase() {
 
     abstract fun getUserDao() : UserDao
     companion object {
-        var instance : UserDatabase? = null
+        private var instance : UserDatabase? = null
         fun getDatabase(ctx: Context) : UserDatabase {
             if (instance == null) {
                 instance = Room.databaseBuilder(ctx, UserDatabase::class.java, "UserDatabase")

@@ -103,7 +103,7 @@ class OngoingOrderAdapter(val ctx: Context, val list:List<OrdersEntity>, val nav
                     setView(dBinding.root)
                 }
                 alertDialog = builder.create()
-                alertDialog?.window?.setBackgroundDrawableResource(android.R.color.transparent)
+                alertDialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
                 alertDialog.show()
                 return@setOnClickListener
             }
@@ -209,7 +209,7 @@ class OngoingOrderAdapter(val ctx: Context, val list:List<OrdersEntity>, val nav
                                         OrderRepository1.completeOrderWithPayment(ctx, customerPaidAmount.toFloat(),
                                             ongoingOrder.order_id, (ongoingOrder.outlet_id ?: "1"))
                                     }
-                                }, if (ongoingOrder.totalamount.isNullOrBlank()) "0" else ongoingOrder.totalamount!!)
+                                }, if (ongoingOrder.totalAmount.isNullOrBlank()) "0" else ongoingOrder.totalAmount!!)
                                 calcDialog.show((ctx as AppCompatActivity).supportFragmentManager, "tag")
                                 val closeReceiver = object : BroadcastReceiver() {
                                     override fun onReceive(p0: Context?, p1: Intent?) {
@@ -252,7 +252,7 @@ class OngoingOrderAdapter(val ctx: Context, val list:List<OrdersEntity>, val nav
                             }
                             Constants.PAYMENT_METHOD_CREDIT -> {
                                 val cardDialog = CardTerminalDialog(object : CardTerminalDialog.creditCard {
-                                    override fun onCardselect(
+                                    override fun onCardSelect(
                                         orderId: String,
                                         selectedCardId: String
                                     ) {

@@ -65,6 +65,6 @@ class LoginResponse {
         var permissionCategoryList : Int? = null
 
         @SerializedName("reservation_access")
-        var permissionReservationAceess: Int? = null
+        var permissionReservationAccess: Int? = null
     }
 }

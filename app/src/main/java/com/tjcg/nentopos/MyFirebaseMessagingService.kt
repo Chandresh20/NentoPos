@@ -6,7 +6,6 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.media.RingtoneManager
 import android.os.Build
-import android.os.Handler
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -67,7 +66,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         val icon = BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher)
         val intent = Intent(this, MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT)
+        val pendingIntent = PendingIntent.getActivity(this, 0, intent,
+            PendingIntent.FLAG_ONE_SHOT)
         val notificationBuilder = NotificationCompat.Builder(this, "channel_id")
             .setContentTitle(notification!!.title)
             .setContentText(notification.body)
@@ -81,9 +81,9 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             .setDefaults(Notification.DEFAULT_VIBRATE)
             .setSmallIcon(R.mipmap.ic_launcher)
         try {
-            val picture_url = data["picture_url"]
-            if (picture_url != null && "" != picture_url) {
-                val url = URL(picture_url)
+            val pictureURL = data["picture_url"]
+            if (pictureURL != null && "" != pictureURL) {
+                val url = URL(pictureURL)
                 val bigPicture = BitmapFactory.decodeStream(url.openConnection().getInputStream())
                 notificationBuilder.setStyle(
                     NotificationCompat.BigPictureStyle().bigPicture(bigPicture).setSummaryText(

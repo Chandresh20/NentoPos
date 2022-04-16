@@ -17,7 +17,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation.findNavController
 import com.tjcg.nentopos.databinding.ActivityMainBinding
@@ -56,18 +55,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var allOrderBtn : Button
     private lateinit var settingsBtn : Button
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("SetTextI18n", "HardwareIds")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mainSharedPreferences = getSharedPreferences(Constants.PREFS_MAIN, MODE_PRIVATE)
-      /*  val firstUse = mainSharedPreferences.getBoolean(Constants.PREF_FIRST_INSTALLED, true)
-        if (firstUse) {
-            val activityManager = getSystemService(ACTIVITY_SERVICE) as ActivityManager
-            val cleared = activityManager.clearApplicationUserData()
-            Handler(mainLooper).postDelayed({
-                mainSharedPreferences.edit().putBoolean(Constants.PREF_FIRST_INSTALLED, false).apply()
-            }, 3000)
-        }  */
         mainDrawerBinding = DrowerMainBinding.inflate(layoutInflater)
         binding = mainDrawerBinding.mainLayout
         setContentView(mainDrawerBinding.root)
@@ -175,7 +166,7 @@ class MainActivity : AppCompatActivity() {
         registerReceiver(logoutReceiver, IntentFilter(Constants.LOG_OUT_NOW_BROADCAST))
         animator = Animator()
         mediaPlayer = MediaPlayer.create(this, R.raw.alarmtone)
-        orderViewModel.onlineWithFutureOrderCount.observe( this, Observer { count ->
+        orderViewModel.onlineWithFutureOrderCount.observe( this, { count ->
             binding.mainActionBar.onlineOrderText.text = "ONLINE ORDERS ( $count )"
             if (count > 0) {
                 if(mediaPlayer.isPlaying) {
@@ -194,7 +185,7 @@ class MainActivity : AppCompatActivity() {
                 animator.stopBlinking()
             }
         })
-        orderViewModel.ongoingOrdersCount.observe( this, Observer { count ->
+        orderViewModel.ongoingOrdersCount.observe( this, { count ->
             binding.mainActionBar.navOngoingOrders.text = "ONGOING ORDERS ( $count )"
         })
         val internetChangeReceiver = object : BroadcastReceiver() {
@@ -272,9 +263,13 @@ class MainActivity : AppCompatActivity() {
         lateinit var mainDrawerLayout: DrawerLayout
         lateinit var mainActionBar : BelowActionBarBinding
         lateinit var mainSharedPreferences: SharedPreferences
+        @SuppressLint("StaticFieldLeak")
         lateinit var progressDialogRepository: ProgressDialogRepository
+        @SuppressLint("StaticFieldLeak")
         lateinit var changeOutletBtn : ImageView
+        @SuppressLint("StaticFieldLeak")
         lateinit var dummyViewActionBar : View
+        @SuppressLint("StaticFieldLeak")
         lateinit var switchLocationBtn : ImageView
 
         var onPOSFragment = false

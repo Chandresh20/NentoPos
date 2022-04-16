@@ -151,7 +151,7 @@ class OnlineOrderAdapter(val ctx: Context, val list: List<OrdersEntity>, val nav
                                     OrderRepository1.completeOrderWithPayment(ctx, customerPaidAmount.toFloat(),
                                         onlineOrderData.order_id, (onlineOrderData.outlet_id ?: "1"))
                                 }
-                            }, if (onlineOrderData.totalamount.isNullOrBlank()) "0" else onlineOrderData.totalamount!!)
+                            }, if (onlineOrderData.totalAmount.isNullOrBlank()) "0" else onlineOrderData.totalAmount!!)
                             calcDialog.show((ctx as AppCompatActivity).supportFragmentManager, "tag")
                             val closeReceiver = object : BroadcastReceiver() {
                                 override fun onReceive(p0: Context?, p1: Intent?) {
@@ -194,7 +194,7 @@ class OnlineOrderAdapter(val ctx: Context, val list: List<OrdersEntity>, val nav
                         }
                         Constants.PAYMENT_METHOD_CREDIT -> {
                             val cardDialog = CardTerminalDialog(object : CardTerminalDialog.creditCard {
-                                override fun onCardselect(
+                                override fun onCardSelect(
                                     orderId: String,
                                     selectedCardId: String
                                 ) {
@@ -260,8 +260,10 @@ class OnlineOrderAdapter(val ctx: Context, val list: List<OrdersEntity>, val nav
                             }
                         })
                     val outletData = MainActivity.mainRepository.getOutletDataAsync(Constants.selectedOutletId).await()
-                    MainActivity.mainRepository.loadCustomerData(ctx, outletData?.outletId ?: 0, outletData?.uniqueId ?: "0",
-                        MainActivity.deviceID, 1, true)
+                    MainActivity.mainRepository.loadCustomerData(
+                        ctx, outletData?.outletId ?: 0, MainActivity.deviceID,
+                        1, true
+                    )
                     "loading"
                 }
             }
@@ -351,7 +353,7 @@ class OnlineOrderAdapter(val ctx: Context, val list: List<OrdersEntity>, val nav
                 if (!subUsers.isNullOrEmpty()) {
                     for (subUser in subUsers) {
                         if (subUser.role_name?.lowercase(Locale.ROOT) == getString(R.string.driver)) {
-                            driverArray.add(DriverClass(subUser.id.toInt(), (subUser.firstname ?: "NA"),
+                            driverArray.add(DriverClass(subUser.id, (subUser.firstname ?: "NA"),
                                     subUser.lastname ?: "NA"))
                         }
                     }
@@ -385,7 +387,7 @@ class OnlineOrderAdapter(val ctx: Context, val list: List<OrdersEntity>, val nav
                     Toast.makeText(ctx,
                         "Person not assigned", Toast.LENGTH_SHORT).show()
                 } else {
-                    MainActivity.orderRepository.assignDriverOnline(ctx, orderId, selectedDriverId ?: 0)
+                    MainActivity.orderRepository.assignDriverOnline(ctx, orderId, selectedDriverId)
                     val closeReceiver = object : BroadcastReceiver() {
                         override fun onReceive(p0: Context?, p1: Intent?) {
                             val dId = p1?.getIntExtra(Constants.ID_DIALOG, 0)
@@ -426,7 +428,7 @@ class OnlineOrderAdapter(val ctx: Context, val list: List<OrdersEntity>, val nav
             this.dialog?.window?.setBackgroundDrawableResource(android.R.color.transparent)
         }
 
-        class DriverClass(val userId: Int, val fName: String, val lName: String) {
+        class DriverClass(val userId: Int, private val fName: String, private val lName: String) {
             override fun toString(): String = "$fName $lName"
         }
 

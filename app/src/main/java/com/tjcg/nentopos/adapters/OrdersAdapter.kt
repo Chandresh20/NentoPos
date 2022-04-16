@@ -47,23 +47,6 @@ class OrdersAdapter(val ctx: Context, val list: List<OrdersEntity>, private val 
             holder.binding.gridLayout.removeView(holder.binding.cancelOrder)
             holder.binding.gridLayout.removeView(holder.binding.proccedPayment)
         }
-   /*     when (onlineOrderData.futureOrderType) {
-            Constants.FUTURE_ORDER_NULL -> {
-                holder.binding.orderDateTime.setTextColor(Color.BLUE)
-            }
-            Constants.FUTURE_ORDER_NEAR -> {
-                holder.binding.orderDateTime.setTextColor(Color.RED)
-            }
-            Constants.FUTURE_ORDER_FAR -> {
-                holder.binding.orderDateTime.setTextColor(Color.GREEN)
-                holder.binding.cancelOrder.visibility = View.GONE
-                holder.binding.acceptOrder.visibility = View.GONE
-                holder.binding.proccedPayment.visibility = View.GONE
-            }
-            else -> {
-                holder.binding.orderDateTime.setTextColor(Color.MAGENTA)
-            }
-        }  */
         holder.binding.orderDateTime.text = "${onlineOrderData.order_date} ${onlineOrderData.order_time}"
         holder.binding.futureOrderDate.text = if (onlineOrderData.future_order_date.isNullOrEmpty()
             && onlineOrderData.future_order_time.isNullOrEmpty()) {
@@ -104,12 +87,7 @@ class OrdersAdapter(val ctx: Context, val list: List<OrdersEntity>, private val 
 
 
         holder.binding.orderStatus.text = Constants.getOrderStatus(onlineOrderData.order_status ?: 11)
-//        holder.binding.paymentStatus.text = onlineOrderData.pis_payment_received
         holder.binding.totalAmount.text = "$ " + onlineOrderData.totalamount
-//        holder.binding.editOrder.visibility = View.VISIBLE
-//        holder.binding.acceptOrder.visibility = View.VISIBLE
-//        holder.binding.cancelOrder.visibility = View.VISIBLE
- //       holder.binding.proccedPayment.visibility = View.VISIBLE
         holder.binding.posInvoice.visibility = View.VISIBLE
         holder.binding.printInvoice.visibility = View.VISIBLE
         Log.d("AllOrderAdapter", "Order: ${onlineOrderData.order_id}, payment: ${onlineOrderData.bill_status}")
@@ -125,12 +103,11 @@ class OrdersAdapter(val ctx: Context, val list: List<OrdersEntity>, private val 
         }
         holder.binding.posInvoice.setOnClickListener {
             if (Constants.databaseBusy) {
-                var dialog : AlertDialog? = null
                 val builder = AlertDialog.Builder(ctx).apply {
                     setMessage("Database is busy, Please try again after few minutes")
                     setPositiveButton("Dismiss") { _, _ -> }
                 }
-                dialog = builder.create()
+                val dialog = builder.create()
                 dialog.show()
                 return@setOnClickListener
             }
@@ -162,31 +139,13 @@ class OrdersAdapter(val ctx: Context, val list: List<OrdersEntity>, private val 
                     holder.binding.acceptOrder.visibility = View.VISIBLE
                     holder.binding.cancelOrder.visibility = View.VISIBLE
                 }
-         /*       holder.binding.acceptOrder.visibility = View.GONE
-                holder.binding.cancelOrder.visibility = View.GONE
-                holder.binding.proccedPayment.visibility = View.GONE
-                holder.binding.editOrder.visibility = View.GONE
-                if (onlineOrderData.pis_frontend_order == "1") {
-                    holder.binding.acceptOrder.visibility = View.VISIBLE
-                    holder.binding.cancelOrder.visibility = View.VISIBLE
-                }
-                else{
-                    holder.binding.acceptOrder.visibility = View.GONE
-                }  */
             }
             Constants.ORDER_STATUS_PROCESSING -> {
-       //         holder.binding.acceptOrder.visibility = View.GONE
                 holder.binding.gridLayout.removeView(holder.binding.acceptOrder)
                 holder.binding.gridLayout.removeView(holder.binding.editOrder)
-           /*     if (onlineOrderData.billInfo?.billStatus == 1) {
-                    holder.binding.gridLayout.removeView(holder.binding.cancelOrder)
-          //          holder.binding.editOrder.visibility = View.GONE
-         //           holder.binding.cancelOrder.visibility = View.GONE
-                }  */
             }
             Constants.ORDER_STATUS_READY -> {
                 holder.binding.gridLayout.removeView(holder.binding.acceptOrder)
-      //          holder.binding.gridLayout.removeView(holder.binding.cancelOrder)
             }
         }
         holder.binding.editOrder.setOnClickListener {
@@ -223,7 +182,7 @@ class OrdersAdapter(val ctx: Context, val list: List<OrdersEntity>, private val 
                     setView(dBinding.root)
                 }
                 alertDialog = builder.create()
-                alertDialog?.window?.setBackgroundDrawableResource(android.R.color.transparent)
+                alertDialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
                 alertDialog.show()
                 return@setOnClickListener
             }
@@ -278,14 +237,4 @@ class OrdersAdapter(val ctx: Context, val list: List<OrdersEntity>, private val 
     }
 
     override fun getItemCount(): Int = list.size
-
-    // codes for printInvoice
- /*   fun getInvoiceData(outletId: String, orderId: String) {
-        val orderData = OrderRepository1.getSingleOrder(outletId, orderId)
-        val itemInfo = orderData.itemsInfo
-        val billInfo = orderData.billInfo
-        val customerInfo = OrderRepository1.getCustomer((orderData.customer_id ?: "0"))
-        val addOns = orderData.addOns
-    }  */
-
 }

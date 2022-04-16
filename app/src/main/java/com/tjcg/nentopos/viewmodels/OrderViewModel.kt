@@ -4,17 +4,13 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import com.tjcg.nentopos.Constants
 import com.tjcg.nentopos.MainActivity
 import com.tjcg.nentopos.data.CustomerData
 import com.tjcg.nentopos.data.OfflineOrder2
 import com.tjcg.nentopos.data.OrdersEntity
-import com.tjcg.nentopos.data.ProductModifier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.collections.ArrayList
@@ -22,13 +18,10 @@ import kotlin.collections.ArrayList
 class OrderViewModel : ViewModel() {
 
     private val mainScope = CoroutineScope(Dispatchers.Main)
-    private val orderRepository = MainActivity.orderRepository
+ //   private val orderRepository = MainActivity.orderRepository
 
     private val _outletName = MutableLiveData<String>()
     val outletName : LiveData<String> = _outletName
-
-    private val _todayOrders = MutableLiveData<List<OrdersEntity>>()
-    val todayOrders : LiveData<List<OrdersEntity>> = _todayOrders
 
     private val _allOrders = MutableLiveData<List<OrdersEntity>>()
     val allOrders : LiveData<List<OrdersEntity>> = _allOrders
@@ -51,6 +44,24 @@ class OrderViewModel : ViewModel() {
     private val _allFutureOrders = MutableLiveData<List<OrdersEntity>>()
     val allFutureOrders : LiveData<List<OrdersEntity>> = _allFutureOrders
 
+    private val _todayOrders = MutableLiveData<List<OrdersEntity>>()
+    val todayOrders : LiveData<List<OrdersEntity>> = _todayOrders
+
+    private val _completedOrders = MutableLiveData<List<OrdersEntity>>()
+    val completedOrders : LiveData<List<OrdersEntity>> = _completedOrders
+
+    private val _cancelledOrders = MutableLiveData<List<OrdersEntity>>()
+    val cancelledOrders : LiveData<List<OrdersEntity>> = _cancelledOrders
+
+    private val _onlineOrdersCount = MutableLiveData<Int>(0)
+    val onlineOrdersCount : LiveData<Int> = _onlineOrdersCount
+
+    private val _inProgress = MutableLiveData<Boolean>(false)
+    val inProgress : LiveData<Boolean> = _inProgress
+
+    private val _futureOrders = MutableLiveData<List<OrdersEntity>>()
+    val futureOrders : LiveData<List<OrdersEntity>> = _futureOrders
+
     private val _kitchenOrdersToday = MutableLiveData<List<OrdersEntity>>()
     val kitchenOrdersToday : LiveData<List<OrdersEntity>> = _kitchenOrdersToday
 
@@ -60,29 +71,15 @@ class OrderViewModel : ViewModel() {
     private val _onlineOrders = MutableLiveData<List<OrdersEntity>>()
     val onlineOrders : LiveData<List<OrdersEntity>> = _onlineOrders
 
-    private val _onlineOrdersCount = MutableLiveData<Int>(0)
-    val onlineOrdersCount : LiveData<Int> = _onlineOrdersCount
-
     private val _acceptedOrders = MutableLiveData<List<OrdersEntity>>()
     val acceptOrders : LiveData<List<OrdersEntity>> = _acceptedOrders
-
-    private val _completedOrders = MutableLiveData<List<OrdersEntity>>()
-    val completedOrders : LiveData<List<OrdersEntity>> = _completedOrders
-
-    private val _cancelledOrders = MutableLiveData<List<OrdersEntity>>()
-    val cancelledOrders : LiveData<List<OrdersEntity>> = _cancelledOrders
 
     private val _servedOrders = MutableLiveData<List<OrdersEntity>>()
     val servedOrders : LiveData<List<OrdersEntity>>  = _servedOrders
 
-    private val _futureOrders = MutableLiveData<List<OrdersEntity>>()
-    val futureOrders : LiveData<List<OrdersEntity>> = _futureOrders
 
     private val _ongoingOrdersCount = MutableLiveData<Int>(0)
     val ongoingOrdersCount : LiveData<Int> = _ongoingOrdersCount
-
-    private val _inProgress = MutableLiveData<Boolean>(false)
-    val inProgress : LiveData<Boolean> = _inProgress
 
     private val _onlineWithFutureOrderCount = MutableLiveData<Int>(0)
     val onlineWithFutureOrderCount : LiveData<Int> = _onlineWithFutureOrderCount

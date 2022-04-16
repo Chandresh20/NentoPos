@@ -14,5 +14,4 @@ class OfflineOrder {
     var id : Long = 0
 
     var outletId : Int? = null
-
 }

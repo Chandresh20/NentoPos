@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.tjcg.nentopos.MainActivity
@@ -33,14 +32,14 @@ class OngoingOrderFragment : Fragment() {
 
     private fun setupObservers() {
         MainActivity.orderViewModel.outletName.observe(
-            viewLifecycleOwner, Observer { name ->
+            viewLifecycleOwner, { name ->
                 binding.textViewOutlet.text = name
             })
         MainActivity.orderViewModel.readyOrdersToday.observe(
-            viewLifecycleOwner, Observer { updateList() }
+            viewLifecycleOwner, { updateList() }
         )
         MainActivity.orderViewModel.kitchenOrdersToday.observe(
-            viewLifecycleOwner, Observer { updateList() }
+            viewLifecycleOwner, { updateList() }
         )
     }
 

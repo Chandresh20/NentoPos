@@ -40,8 +40,8 @@ import com.tjcg.nentopos.dialog.PaymentDialog
 import com.tjcg.nentopos.fragments.POSFragment
 
 const val SUB_MODE_FULL = 0
-const val SUB_MODE_F_HALF = 1
-const val SUB_MODE_S_HALF = 2
+//  const val SUB_MODE_F_HALF = 1
+//  const val SUB_MODE_S_HALF = 2
 
 @SuppressLint("SetTextI18n")
 class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subBinding: IncludeCartModifierBinding) {
@@ -719,7 +719,7 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
         }
     }
 
-    private suspend fun saveCartDataAsync() =
+ /*   private suspend fun saveCartDataAsync() =
         coroutineScope {
             async(Dispatchers.IO) {
                 val cartFile = File(ctx.getExternalFilesDir(Constants.cartFile), Constants.cartFile)
@@ -732,7 +732,7 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                     close()
                 }
             }
-        }
+        }  */
 
     private suspend fun getCartDataAsync() : Deferred<ArrayList<ItemInCart>> =
         coroutineScope {
@@ -1283,7 +1283,7 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
             private var selected = 0f
             private var choosen = 0f
             private val subNames = ArrayList<SubModifierBrief>()
-            inner class SubModifierCalc(val id: Int?, val price: Float?, val qty: Float?, val is2xMod: Boolean)
+            inner class SubModifierCalc(val id: Int?, val price: Float?, val qty: Float?)
 
             private fun removeIncludedAmount(list: ArrayList<SubModifierCalc>) {
                 val sortedList = list.sortedWith(compareBy({it.price}, {it.qty}))
@@ -1307,9 +1307,9 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                 selected = 0f
                 val calItems = ArrayList<SubModifierCalc>()
                 for (item in list) {
-                    calItems.add(SubModifierCalc(item.id, item.price, item.qty, item.is2xMod))
+                    calItems.add(SubModifierCalc(item.id, item.price, item.qty))
                     if (item.is2xMod) {
-                        calItems.add(SubModifierCalc(item.id, item.price, item.qty, item.is2xMod))
+                        calItems.add(SubModifierCalc(item.id, item.price, item.qty))
                     }
                 }
                 removeIncludedAmount(calItems)
@@ -1393,7 +1393,7 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                 if (is2xMod == 1) {
                     check2x.visibility = View.VISIBLE
                     // other 2x related operations will be here
-                    check2x.setOnCheckedChangeListener { compoundButton, b ->
+                    check2x.setOnCheckedChangeListener { _, b ->
                         if (b) {
                             is2xApplied = true
                             when (currentSelection) {
@@ -1464,7 +1464,8 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                         }
                         addToSubList(SelectedSubModifierHalf(
                             subInfo.subModifierId, subInfo.subModifierName, subModPrice, 1f,
-                            is2xApplied, SUB_MODE_FULL))
+                            is2xApplied
+                        ))
                         holder.sBinding.finalPrice.visibility = View.VISIBLE
                         holder.sBinding.finalPrice.text =  Constants.currencySign + if (is2xApplied) {
                             ((subModPrice ?: 0f) * 2).format()
@@ -1482,7 +1483,7 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                         choosen -= 1f
                     }
                 }
-                check2.setOnCheckedChangeListener { compoundButton, b ->
+                check2.setOnCheckedChangeListener { _, b ->
                     if (b) {
                         if (currentSelection == 1 || currentSelection == 3) {
                             selectionActive = true
@@ -1522,8 +1523,7 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                                 subInfo.subModifierName,
                                 (subModPrice ?: 0f) / 2,
                                 0.5f,
-                                is2xApplied,
-                                SUB_MODE_F_HALF
+                                is2xApplied
                             )
                         )
                         holder.sBinding.finalPrice.visibility = View.VISIBLE
@@ -1546,7 +1546,7 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                         choosen -= 0.5f
                     }
                 }
-                check3.setOnCheckedChangeListener { compoundButton, b ->
+                check3.setOnCheckedChangeListener { _, b ->
                     if (b) {
                         if (currentSelection == 1 || currentSelection == 2) {
                             selectionActive = true
@@ -1584,7 +1584,7 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                             SelectedSubModifierHalf(
                                 subInfo.subModifierId, subInfo.subModifierName,
                                 (subModPrice ?: 0f) / 2, 0.5f,
-                                is2xApplied, SUB_MODE_S_HALF
+                                is2xApplied
                             )
                         )
                         holder.sBinding.finalPrice.visibility = View.VISIBLE
@@ -1731,7 +1731,7 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                     subMod.subModifierName, subModPrice, 0)
                 if (is2xMod == 1) {
                     holder.sBinding.check2x.visibility = View.VISIBLE
-                    holder.sBinding.check2x.setOnCheckedChangeListener { compoundButton, b ->
+                    holder.sBinding.check2x.setOnCheckedChangeListener { _, b ->
                         if (b) {
                             /*     if (choosen > (choosable ?: 1)) {
                                      Toast.makeText(ctx, "Sorry, Only $choosable is allowed", Toast.LENGTH_SHORT).show()
@@ -1796,6 +1796,12 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
     class SelectedModifierDetails(val name: String?, val subMods: ArrayList<SubModifierBrief>, val totalPrice: Float?)
     class VariantRadio(val id:Int?, val label: String?, val price: Float?)
     class SelectedSubModifier(val id:Int?, val name : String?, val price:Float?, var is2xMode: Int?)
-    class SelectedSubModifierHalf(val id:Int?, val name: String?, val price: Float?, val qty: Float?, var is2xMod: Boolean, val modeType: Int)
+    class SelectedSubModifierHalf(
+        val id: Int?,
+        val name: String?,
+        val price: Float?,
+        val qty: Float?,
+        var is2xMod: Boolean
+    )
     class SelectedSubModifierCalc(val id: Int?, val price: Float?, val qty: Float?)
 }

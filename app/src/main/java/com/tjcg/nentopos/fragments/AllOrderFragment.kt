@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tjcg.nentopos.Constants
@@ -15,10 +14,6 @@ import com.tjcg.nentopos.MainActivity
 import com.tjcg.nentopos.adapters.OrdersAdapter
 import com.tjcg.nentopos.data.OrdersEntity
 import com.tjcg.nentopos.databinding.FragmentAllOrdersBinding
-import com.tjcg.nentopos.repositories.OrderRepository
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class AllOrderFragment : Fragment() {
 
@@ -32,7 +27,7 @@ class AllOrderFragment : Fragment() {
     private var allReadyList = emptyList<OrdersEntity>()
     private var allCompletedList = emptyList<OrdersEntity>()
     private var allCancelledList = emptyList<OrdersEntity>()
-    private val orderRepository = MainActivity.orderRepository
+ //   private val orderRepository = MainActivity.orderRepository
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -94,7 +89,7 @@ class AllOrderFragment : Fragment() {
         MainActivity.orderViewModel.allOrders.observe(
             viewLifecycleOwner, { list ->
                 allOrderList = list.sortedByDescending { it.order_id }
-                Log.d("AllOrders", "AllORdes : ${list.size}")
+                Log.d("AllOrders", "AllOrders : ${list.size}")
                 selectTab()
             }
         )

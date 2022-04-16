@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.util.Log
-import android.view.LayoutInflater
 import android.widget.Toast
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -15,7 +14,6 @@ import com.tjcg.nentopos.MainActivity
 import com.tjcg.nentopos.adapters.KitchenAdapter
 import com.tjcg.nentopos.api.ApiService
 import com.tjcg.nentopos.data.*
-import com.tjcg.nentopos.databinding.DialogAlertBinding
 import com.tjcg.nentopos.dialog.SendEmailDialog
 import com.tjcg.nentopos.responses.*
 import kotlinx.coroutines.*
@@ -30,7 +28,6 @@ class OrderRepository(ctx : Context) {
     private var mainScope : CoroutineScope = CoroutineScope(Dispatchers.Main)
     private var ordersDatabase: OrdersDatabase = OrdersDatabase.getDatabase(ctx)
     private var oDao :OrdersDao = ordersDatabase.getOrdersDao()
-    private val todayString = getTodayString()
     var syncRequired = false
 
     init {
@@ -296,8 +293,6 @@ class OrderRepository(ctx : Context) {
                 Log.d("ReceivedBroadcast", "${p1?.action}")
                 if (p1?.action == Constants.SYNC_COMPLETE_BROADCAST) {
                     completeOrderWithPaymentOffline(ctx, customerPaid, orderId, outletId, 1)
-                } else {
-
                 }
                 MainActivity.progressDialogRepository.dismissDialog(dId)
             }
@@ -311,7 +306,7 @@ class OrderRepository(ctx : Context) {
             val closeIntent = Intent(Constants.CLOSE_DIALOG_BROADCAST)
             closeIntent.putExtra(Constants.ID_DIALOG, Constants.ID_DIALOG_COMPLETE_ORDER)
             if (isOfflineOrder(orderId)) {
-                val offOrder = getOneOffline2OrderAsyc(Constants.selectedOutletId, orderId).await()
+                val offOrder = getOneOffline2OrderAsync(Constants.selectedOutletId, orderId).await()
                 if (offOrder != null) {
                     offOrder.orderStatus = Constants.ORDER_STATUS_SERVED
                     offOrder.billStatus = 1
@@ -383,7 +378,7 @@ class OrderRepository(ctx : Context) {
         if (!MainActivity.isInternetAvailable(ctx)) {
             mainScope.launch {
                  if(isOfflineOrder(orderId)) {
-                    val offOrder = getOneOffline2OrderAsyc(Constants.selectedOutletId, orderId).await()
+                    val offOrder = getOneOffline2OrderAsync(Constants.selectedOutletId, orderId).await()
                      if (offOrder != null) {
                          if (!offOrder.cartItems.isNullOrEmpty()) {
                              for (item in offOrder.cartItems!!) {
@@ -433,10 +428,8 @@ class OrderRepository(ctx : Context) {
                 var allItemCompleted = true
                 val items = order.itemsInfo
                 if (!items.isNullOrEmpty()) {
-                    var finished = true
                     for (item in items) {
                         delay(200)
-                        finished = false
                         Log.d("API call to finish", "${item.rowId}")
                         ApiService.apiService?.changeKitchenOrderStatus(Constants.selectedOutletId,
                             order.order_id, item.menuId ?: 0,1, item.rowId, 0, Constants.authorization)
@@ -452,14 +445,12 @@ class OrderRepository(ctx : Context) {
                                         MainActivity.progressDialogRepository.showErrorDialog("Error changing status: ${response.body()?.message}")
                                         Log.e("ItemComplete", "failed: ${response.body()?.message}")
                                     }
-                                    finished = true
                                 }
 
                                 override fun onFailure(call: Call<SimpleResponse?>, t: Throwable) {
                                     allItemCompleted =  false
                                     MainActivity.progressDialogRepository.showErrorDialog("Error changing status ${t.message}")
                                     Log.e("ItemComplete", "failed: ${t.message}")
-                                    finished = true
                                 }
                             })
                     }
@@ -481,14 +472,12 @@ class OrderRepository(ctx : Context) {
                                             Log.e("AddOnComplete", "failed: ${response.body()?.message}")
                                             MainActivity.progressDialogRepository.showErrorDialog("Error changing status: ${response.body()?.message}")
                                         }
-                                        finished = true
                                     }
 
                                     override fun onFailure(call: Call<SimpleResponse?>, t: Throwable) {
                                         allItemCompleted =  false
                                         MainActivity.progressDialogRepository.showErrorDialog("Error changing status ${t.message}")
                                         Log.e("AddOnComplete", "failed: ${t.message}")
-                                        finished = true
                                     }
                                 })
                         }
@@ -524,11 +513,9 @@ class OrderRepository(ctx : Context) {
     private fun changeKitchenOrderStatusMultiOnline(
         ctx: Context, operations: ArrayList<KitchenAdapter.Companion.KitchenOperation>) {
         mainScope.launch {
-            var qFinished = true
             val dId = MainActivity.progressDialogRepository.getProgressDialog("Updating Status...")
             for (operation in operations) {
                 delay(200)
-                qFinished = false
                 val orderId = operation.orderId
                 if (isOfflineOrder(orderId)) {
                     MainActivity.progressDialogRepository.showSyncDialog()
@@ -557,14 +544,12 @@ class OrderRepository(ctx : Context) {
                             MainActivity.progressDialogRepository.showErrorDialog("Error Changing Order Status: ${response.body()?.message}")
                             Log.e("kitchenOrderChange", "error: ${response.body()?.message} , ${response.body()?.status}, $orderId, $menuId, $status, $rowId")
                         }
-                        qFinished = true
                     }
 
                     override fun onFailure(call: Call<SimpleResponse?>, t: Throwable) {
              //           Toast.makeText(ctx, "An Error Occurred, Please try again", Toast.LENGTH_SHORT).show()
                         Log.e("kitchenOrderChange", "error: ${t.message}")
                         MainActivity.progressDialogRepository.showErrorDialog("Error Changing Order Status: ${t.message}")
-                        qFinished = true
                     }
                 })
             }
@@ -585,7 +570,7 @@ class OrderRepository(ctx : Context) {
                 val status = operation.foodStatus
                 if (isOfflineOrder(orderId)) {
                     val offOrder =
-                        getOneOffline2OrderAsyc(Constants.selectedOutletId, orderId).await()
+                        getOneOffline2OrderAsync(Constants.selectedOutletId, orderId).await()
                     if (offOrder != null) {
                         var allFoodCompleted = true
                         if (!offOrder.cartItems.isNullOrEmpty()) {
@@ -656,56 +641,6 @@ class OrderRepository(ctx : Context) {
             }
             Log.d("KitchenUpdated", "Item status updated")
         }
-    }
-
-    fun changeKitchenOrderStatusOnline(ctx: Context, outletId: Int, orderId: Long,
-                                       menuId: Int, status: Int, rowId: String, addOnId: Int?, auth: String) {
-        if (!MainActivity.isInternetAvailable(ctx)) {
-        //    Toast.makeText(ctx, "Internet Not Available, update in offline", Toast.LENGTH_SHORT).show()
-            changeKitchenOrderStatusOffline2(ctx, outletId, orderId, status, 0, rowId)
-            return
-        }
-        if (syncRequired) {
-       //     Toast.makeText(ctx, "Sync Required", Toast.LENGTH_SHORT).show()
-            MainActivity.progressDialogRepository.showSyncDialog()
-            return
-        }
-        val dId = MainActivity.progressDialogRepository.getProgressDialog("Changing Order Status")
-        ApiService.apiService?.changeKitchenOrderStatus(outletId, orderId, menuId, status, rowId, addOnId, auth)
-            ?.enqueue(object : Callback<SimpleResponse?> {
-                override fun onResponse(call: Call<SimpleResponse?>,
-                                        response: Response<SimpleResponse?>) {
-                    Log.d("kitchenOrderChange", "response: ${response.raw()}")
-                    if (response.isSuccessful && response.body()?.status != null && response.body()?.status!!) {
-                        Log.d("KitchenOrder", "response: ${response.body()?.message}" )
-                 //       Toast.makeText(ctx, "Food Ready to serve", Toast.LENGTH_SHORT).show()
-                        changeKitchenOrderStatusOffline2(ctx, outletId, orderId, status, 1, rowId)
-                    } else {
-                        if (response.body()?.status != null && response.body()?.status!! &&
-                            (response.body()?.message?.contains("Invalid")!! ||
-                                    response.body()?.message?.contains("invalid")!!)) {
-                            MainActivity.logOutNow(ctx)
-                        }
-                        val closeIntent = Intent(Constants.CLOSE_DIALOG_BROADCAST)
-                        closeIntent.putExtra(Constants.ID_DIALOG, Constants.ID_DIALOG_KITCHEN_ITEM_DETAILS)
-                        ctx.sendBroadcast(closeIntent)
-               //         Toast.makeText(ctx, "An Error Occurred, Please try again", Toast.LENGTH_SHORT).show()
-                        MainActivity.progressDialogRepository.showErrorDialog("Error Changing Order Status: ${response.body()?.message}")
-                        Log.e("kitchenOrderChange", "error: ${response.body()?.message} , ${response.body()?.status} for $outletId, $orderId, $menuId, $status, $rowId")
-                    }
-                    MainActivity.progressDialogRepository.dismissDialog(dId)
-                }
-
-                override fun onFailure(call: Call<SimpleResponse?>, t: Throwable) {
-              //      Toast.makeText(ctx, "An Error Occurred, Please try again", Toast.LENGTH_SHORT).show()
-                    Log.e("kitchenOrderChange", "error: ${t.message}")
-                    MainActivity.progressDialogRepository.showErrorDialog("Error Changing Order Status: ${t.message}")
-                    MainActivity.progressDialogRepository.dismissDialog(dId)
-                    val closeIntent = Intent(Constants.CLOSE_DIALOG_BROADCAST)
-                    closeIntent.putExtra(Constants.ID_DIALOG, Constants.ID_DIALOG_KITCHEN_ITEM_DETAILS)
-                    ctx.sendBroadcast(closeIntent)
-                }
-            })
     }
 
     fun placeOrderOnline(ctx: Context,orderRequest: ProductOrderRequest) {
@@ -785,7 +720,7 @@ class OrderRepository(ctx : Context) {
                                   this.orderId = newId
                                   this.foodStatus = item.foodStatus
                                   this.menuQty = item.menuQty.toString()
-                                  this.varientId = if (item.variantId.isNullOrBlank()) 0 else item.variantId?.toInt()
+                                  this.variantId = if (item.variantId.isNullOrBlank()) 0 else item.variantId?.toInt()
                                   this.productId = item.productId
                                   this.taxId = item.taxIds
                                   this.taxPercentage = item.taxPercentages
@@ -873,7 +808,7 @@ class OrderRepository(ctx : Context) {
     fun startSync(ctx: Context) {
         // collect not sync orders
         mainScope.launch {
-            val unSyncOrders = getUnsyncOrders(Constants.selectedOutletId).await()
+            val unSyncOrders = getUnsyncOrdersAsync(Constants.selectedOutletId).await()
             val orderSyncEntity = OrderSyncEntity()
             val oList = ArrayList<OrderSyncEntity.OrderSync>()
             if (unSyncOrders == null) {
@@ -996,7 +931,7 @@ class OrderRepository(ctx : Context) {
     fun assignDriverOnline(ctx: Context, orderId: Long, userId: Int)  {
         if (!MainActivity.isInternetAvailable(ctx)) {
      //       Toast.makeText(ctx, "Internet Not Available, update in offline", Toast.LENGTH_SHORT).show()
-            assignDriverOffline(ctx, orderId, userId, 0)
+            assignDriverOffline(ctx, orderId, userId)
             return
         }
         if (syncRequired) {
@@ -1016,7 +951,7 @@ class OrderRepository(ctx : Context) {
                     if (response.isSuccessful && response.body()?.status != null &&
                         response.body()?.status!!) {
                         Log.d("AssignDriver", "${response.body()?.message}")
-                        assignDriverOffline(ctx, orderId, userId, 1)
+                        assignDriverOffline(ctx, orderId, userId)
                     } else {
                         Log.d("AssignDriver", "status false, ${response.body()?.message}")
                         val closeIntent = Intent(Constants.CLOSE_DIALOG_BROADCAST)
@@ -1038,7 +973,7 @@ class OrderRepository(ctx : Context) {
             })
     }
 
-    private fun assignDriverOffline(ctx: Context, orderId: Long, userId: Int, isSync: Int) {
+    private fun assignDriverOffline(ctx: Context, orderId: Long, userId: Int) {
         mainScope.launch {
             val order = getSingleOrderAsync(Constants.selectedOutletId, orderId).await()
             if (order != null) {
@@ -1096,7 +1031,7 @@ class OrderRepository(ctx : Context) {
 
     fun markAllOrdersAsSynchronized() {
         mainScope.launch {
-            val unSyncOrders = getUnsyncOrders(Constants.selectedOutletId).await()
+            val unSyncOrders = getUnsyncOrdersAsync(Constants.selectedOutletId).await()
             if (!unSyncOrders.isNullOrEmpty()) {
                 for (order in unSyncOrders) {
                     order.syncOrNot = 1
@@ -1142,7 +1077,7 @@ class OrderRepository(ctx : Context) {
             }
         }
 
-    suspend fun getUnsyncOrders(outletId: Int) =
+    private suspend fun getUnsyncOrdersAsync(outletId: Int) =
         coroutineScope {
             async(Dispatchers.IO) {
                 return@async oDao.getUnSyncOrders(outletId)
@@ -1170,7 +1105,7 @@ class OrderRepository(ctx : Context) {
             }
         }
 
-    suspend fun getAllOrdersByStatusAsync(outletId: Int, orderStatus: Int) =
+ /*   suspend fun getAllOrdersByStatusAsync(outletId: Int, orderStatus: Int) =
         coroutineScope {
             async(Dispatchers.IO) {
                 return@async oDao.getOrdersByStatus(outletId, orderStatus)
@@ -1238,7 +1173,7 @@ class OrderRepository(ctx : Context) {
             async(Dispatchers.IO) {
                 return@async oDao.getFutureOrders(outletId)
             }
-        }
+        } */
 
  /*   suspend fun getOfflineOrdersAsync(outletId: Int) =
         coroutineScope {
@@ -1254,7 +1189,7 @@ class OrderRepository(ctx : Context) {
             }
         }
 
-    suspend fun getOneOffline2OrderAsyc(outletId: Int, tmpId: Long) =
+    private suspend fun getOneOffline2OrderAsync(outletId: Int, tmpId: Long) =
         coroutineScope {
             async(Dispatchers.IO) {
                 return@async oDao.getOneOffline2Order(outletId, tmpId)
@@ -1319,7 +1254,7 @@ class OrderRepository(ctx : Context) {
         }
     }
 
-    fun changeKitchenOrderStatusOffline(ctx:Context, outletId: Int,
+  /*  fun changeKitchenOrderStatusOffline(ctx:Context, outletId: Int,
                                                      orderId: Long, status: Int,
                                                      isSync: Int, qRowId: String) {
         mainScope.launch {
@@ -1355,7 +1290,7 @@ class OrderRepository(ctx : Context) {
                 if (statusUpdated) {
                     // if all items are completed then change order status as ready
                     if (isOfflineOrder(order.order_id)) {
-                        val offOrder = getOneOffline2OrderAsyc(Constants.selectedOutletId, order.order_id).await()
+                        val offOrder = getOneOffline2OrderAsync(Constants.selectedOutletId, order.order_id).await()
                         if (offOrder != null) {
                             if (allFoodCompleted) {
                                 offOrder.orderStatus = Constants.ORDER_STATUS_READY
@@ -1402,7 +1337,7 @@ class OrderRepository(ctx : Context) {
 
     fun updateOfflineItemFoodStatus(outletId: Int, orderId: Long, productId: Int) {
         mainScope.launch {
-            val offOrder = getOneOffline2OrderAsyc(outletId, orderId).await()
+            val offOrder = getOneOffline2OrderAsync(outletId, orderId).await()
             if (offOrder != null && !offOrder.cartItems.isNullOrEmpty()) {
                 var orderCompleted = true
                 for (item in offOrder.cartItems!!) {
@@ -1423,7 +1358,7 @@ class OrderRepository(ctx : Context) {
 
 
         }
-    }
+    }   */
 
     private suspend fun updateSingleOfflineOrderAsync(offOrder : OfflineOrder2) =
         coroutineScope {
@@ -1440,14 +1375,14 @@ class OrderRepository(ctx : Context) {
             }
         }
 
-    suspend fun deleteAllOrdersAsync(outletId: Int) =
+    private suspend fun deleteAllOrdersAsync(outletId: Int) =
         coroutineScope {
             async(Dispatchers.IO) {
                 oDao.deleteAllOrders(outletId)
             }
         }
 
-    suspend fun deleteAllOrderDatabaseAsync() =
+ /*   suspend fun deleteAllOrderDatabaseAsync() =
         coroutineScope {
             async(Dispatchers.IO) {
                 oDao.deleteAllOrders()
@@ -1455,7 +1390,7 @@ class OrderRepository(ctx : Context) {
             }
         }
 
-/*    private suspend fun deleteAllOfflineOrdersAsync(outletId: Int) =
+    private suspend fun deleteAllOfflineOrdersAsync(outletId: Int) =
         coroutineScope {
             async (Dispatchers.IO) {
                 oDao.deleteAllOfflineOrders(outletId)
@@ -1469,12 +1404,12 @@ class OrderRepository(ctx : Context) {
             }
         }
 
-    private suspend fun deleteAllOffline2OrdersAsync(outletId: Int) =
+ /*   private suspend fun deleteAllOffline2OrdersAsync(outletId: Int) =
         coroutineScope {
             async (Dispatchers.IO) {
                 oDao.deleteAllOffline2Orders(outletId)
             }
-        }
+        }  */
 
     fun updateViewModel() {
         MainActivity.orderViewModel.setAllOrders()
@@ -1526,23 +1461,7 @@ class OrderRepository(ctx : Context) {
         return rNum100/100
     }
 
-    fun isOfflineOrder(orderId: Long) : Boolean {
+    private fun isOfflineOrder(orderId: Long) : Boolean {
         return orderId > 1647955400000
     }
-
-    private fun showAlertDialog(ctx:Context, text: String) {
-        var aDialog : AlertDialog? = null
-        val builder = AlertDialog.Builder(ctx).apply {
-            val dBind = DialogAlertBinding.inflate(LayoutInflater.from(ctx))
-            dBind.infoText.text = text
-            dBind.closeBtn.setOnClickListener {
-                aDialog?.dismiss()
-            }
-            setView(dBind.root)
-        }
-        aDialog = builder.create()
-        aDialog?.window?.setBackgroundDrawableResource(android.R.color.transparent)
-        aDialog.show()
-    }
-
 }

@@ -131,7 +131,7 @@ class POSFragment : Fragment() {
         binding.posBackground.setOnClickListener {
             hideSubCart()
         }
-        binding.productRecycler.setOnTouchListener { p0, p1 ->
+        binding.productRecycler.setOnTouchListener { _, p1 ->
             when (p1?.action) {
                 MotionEvent.ACTION_DOWN -> {
                     hideSubCart()
@@ -179,7 +179,7 @@ class POSFragment : Fragment() {
        //     MainActivity.orderRepository.getAllOrdersOnline(ctx, Constants.selectedOutletId, true)
         }
         binding.reloadAll.setOnClickListener {
-            MainActivity.mainSharedPreferences.edit()
+            mainSharedPreferences.edit()
                 .putInt(Constants.PREF_IS_ALL_DATA, 1).apply()
      //       MainActivity.orderRepository.getAllOrdersOnline(ctx, Constants.selectedOutletId, true)
         }
@@ -200,8 +200,7 @@ class POSFragment : Fragment() {
                 if (interval > 3600000) {
                     binding.syncText.text = "NA"
                 } else {
-                    val mins = interval / 60000
-                    val tx = when (mins) {
+                    val tx = when (val mins = interval / 60000) {
                         0L -> {
                             "few sec ago"
                         }
@@ -223,7 +222,7 @@ class POSFragment : Fragment() {
             syncTimingHandler.post(syncTimingR)
         })
         if (MainActivity.orderViewModel.lastSyncTiming.value == null) {
-            val lastSync = MainActivity.mainSharedPreferences.getLong(Constants.PREF_SYN_TIME, 0)
+            val lastSync = mainSharedPreferences.getLong(Constants.PREF_SYN_TIME, 0)
             MainActivity.orderViewModel.lastSyncTiming.value = lastSync
         }
         return binding.root
@@ -258,8 +257,10 @@ class POSFragment : Fragment() {
                         outlet.uniqueId ?: "NA", "0",
                         1, true)
                     Log.d("CustomerforDefault", "loding...")
-                    mainRepository.loadCustomerData(ctx, Constants.selectedOutletId,
-                        outlet.uniqueId ?: "NA", "0", 1, true)
+                    mainRepository.loadCustomerData(
+                        ctx, Constants.selectedOutletId,
+                        "0", 1, true
+                    )
                     Log.d("TablesforDefault", "loding...")
                     mainRepository.loadTableData(Constants.selectedOutletId,
                         outlet.uniqueId ?: "NA", "0", 1, true)
@@ -281,8 +282,10 @@ class POSFragment : Fragment() {
                                 cat.productSummaries ?: ArrayList()))
                         }
                     }
-                    menuList.add(MenuToShow(pro.menuId, pro.menuName ?: "NA",
-                        pro.position ?: 0, pro.onPos ?: 0,categoriesToShow))
+                    menuList.add(MenuToShow(
+                        pro.menuId, pro.menuName ?: "NA",
+                        pro.position ?: 0, categoriesToShow
+                    ))
                 }
             }
             menuList.sortBy { it.position }
@@ -312,7 +315,7 @@ class POSFragment : Fragment() {
                 binding.userSpinner.adapter = waiterAdapter
                 binding.userSpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
                     override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                        selectedWaiterId = waiterList[p2].id.toInt()
+                        selectedWaiterId = waiterList[p2].id
                     }
 
                     override fun onNothingSelected(p0: AdapterView<*>?) { }
@@ -333,7 +336,7 @@ class POSFragment : Fragment() {
     }
 
 
-    fun getCurrentDiscounts() {
+    private fun getCurrentDiscounts() {
         CoroutineScope(Dispatchers.Main).launch {
             val discounts = mainRepository.getAllDiscountsAsync().await()
             val discountCategory = HashMap<Int,ArrayList<DiscountData>>()
@@ -350,7 +353,7 @@ class POSFragment : Fragment() {
                                         discountArray = ArrayList()
                                     }
                                     discountArray.add(discount)
-                                    discountCategory.put(ids.toInt(), discountArray)
+                                    discountCategory[ids.toInt()] = discountArray
                                 }
                                 if (discount.discountOn == 2) {
                                     var discountArray = discountProduct[ids.toInt()]
@@ -358,7 +361,7 @@ class POSFragment : Fragment() {
                                         discountArray = ArrayList()
                                     }
                                     discountArray.add(discount)
-                                    discountProduct.put(ids.toInt(), discountArray)
+                                    discountProduct[ids.toInt()] = discountArray
                                 }
                             }
                         }
@@ -381,7 +384,7 @@ class POSFragment : Fragment() {
         }
     }
 
-    fun isDiscountNow(discount: DiscountData) : Boolean {
+    private fun isDiscountNow(discount: DiscountData) : Boolean {
         var available = false
         if (discount.discountApplyService == 1 || discount.discountApplyService == 3) {
             if (discount.discountSchedule == 1) {
@@ -411,8 +414,11 @@ class POSFragment : Fragment() {
         }
     }
 
-    class MenuToShow(val Id: Int, val label: String, val position: Int, val inPOS :Int,
-        val categories : List<CategoriesToShow>) {
+    class MenuToShow(
+        val Id: Int,
+        private val label: String,
+        val position: Int,
+        val categories: List<CategoriesToShow>) {
         override fun toString(): String {
             return label
         }

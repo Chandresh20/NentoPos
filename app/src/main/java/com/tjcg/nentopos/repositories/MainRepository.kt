@@ -69,7 +69,7 @@ class MainRepository(ctx : Context) {
                                     putInt(Constants.PREF_PERMISSION_DASHBOARD, permissions?.permissionDashboard ?: 0)
                                     putInt(Constants.PREF_PERMISSION_KITCHEN, permissions?.permissionKitchenDisplay ?: 0)
                                     putInt(Constants.PREF_PERMISSION_COUNTER, permissions?.permissionCounterDisplay ?: 0)
-                                    putInt(Constants.PREF_PERMISSION_RESERVATION, permissions?.permissionReservationAceess ?: 0)
+                                    putInt(Constants.PREF_PERMISSION_RESERVATION, permissions?.permissionReservationAccess ?: 0)
                                     putInt(Constants.PREF_PERMISSION_CUSTOMER_LIST, permissions?.permissionCategoryList ?: 0)
                                     putInt(Constants.PREF_PERMISSION_REPORT_LIST, 1)
                                     putInt(Constants.PREF_PERMISSION_TABLE, 1)
@@ -95,7 +95,7 @@ class MainRepository(ctx : Context) {
                                 putInt(Constants.PREF_PERMISSION_DASHBOARD, permissions?.permissionDashboard ?: 0)
                                 putInt(Constants.PREF_PERMISSION_KITCHEN, permissions?.permissionKitchenDisplay ?: 0)
                                 putInt(Constants.PREF_PERMISSION_COUNTER, permissions?.permissionCounterDisplay ?: 0)
-                                putInt(Constants.PREF_PERMISSION_RESERVATION, permissions?.permissionReservationAceess ?: 0)
+                                putInt(Constants.PREF_PERMISSION_RESERVATION, permissions?.permissionReservationAccess ?: 0)
                                 putInt(Constants.PREF_PERMISSION_CUSTOMER_LIST, permissions?.permissionCategoryList ?: 0)
                                 putInt(Constants.PREF_PERMISSION_REPORT_LIST, 1)
                                 putInt(Constants.PREF_PERMISSION_TABLE, 1)
@@ -132,7 +132,7 @@ class MainRepository(ctx : Context) {
             val isDefault = outlet.sDefault == 1
             Log.d("FirstLogin", "Loading data for default outlet ${outlet.outletId}")
             loadProductData(ctx, outlet.outletId, outlet.uniqueId ?: "NA", MainActivity.deviceID, 1, isDefault)
-            loadCustomerData(ctx, outlet.outletId, outlet.uniqueId ?: "NA", MainActivity.deviceID, 1, isDefault)
+            loadCustomerData(ctx, outlet.outletId, MainActivity.deviceID, 1, isDefault)
             loadSubUsersData(ctx, outlet.outletId, outlet.uniqueId ?: "NA", MainActivity.deviceID, 1)
             loadTableData(outlet.outletId, outlet.uniqueId ?: "NA", MainActivity.deviceID, 1, isDefault)
             loadDiscountData(ctx ,MainActivity.deviceID, 1, outlet.outletId, isDefault)
@@ -144,7 +144,7 @@ class MainRepository(ctx : Context) {
 
     fun loginSubUser(ctx: Context, superEmail: String, pin: String, domainName: String) {
         val subUserIntent = Intent(Constants.SUB_USER_LOGIN_BROADCAST)
-        var dialogId = 0
+        val dialogId: Int
         if (MainActivity.isInternetAvailable(ctx)) {
             dialogId = MainActivity.progressDialogRepository.getProgressDialog("Logging in....")
             ApiService.apiService?.loginSubUser(superEmail, pin, domainName, Constants.firebaseToken, "android")
@@ -155,7 +155,7 @@ class MainRepository(ctx : Context) {
                     ) {
                         if (response.isSuccessful && response.body()?.status != null &&
                                 response.body()?.status!!) {
-                            Log.d("SubUserLogin", "Login Successfull")
+                            Log.d("SubUserLogin", "Login Successful")
                             Constants.authorization = response.body()?.userData?.Authorization ?: "NA"
                             val subUPermissions = response.body()?.userData?.sub_user_permission
                             val subUserDataFromApi = response.body()?.userData
@@ -274,7 +274,6 @@ class MainRepository(ctx : Context) {
                                     }
                                 }
                             }
-                            var d2Id = 0
                             if (defaultOutlet) {
                                 MainActivity.progressDialogRepository.dismissDialog(dialogId)
                                 ctx.sendBroadcast(Intent(Constants.PRODUCT_UPDATE_BROADCAST))
@@ -302,9 +301,6 @@ class MainRepository(ctx : Context) {
                             insertSubModifiersInDatabaseAsync(subModifiers).await()
                             Log.d("AllProduct", "SubModifiers: ${subModifiers.size}")
                             Constants.databaseBusy = false
-                            if (defaultOutlet) {
-                         //       MainActivity.progressDialogRepository.dismissDialog(d2Id)
-                            }
                         }
                     }
                 } else {
@@ -345,8 +341,10 @@ class MainRepository(ctx : Context) {
         })
     }
 
-    fun loadCustomerData(ctx: Context, outletId: Int, uniqueId: String, deviceId: String,
-                         isAllData: Int, defaultOutlet: Boolean) {
+    fun loadCustomerData(
+        ctx: Context, outletId: Int, deviceId: String, isAllData: Int,
+        defaultOutlet: Boolean
+    ) {
         if (!MainActivity.isInternetAvailable(ctx)) {
             return
         }
@@ -429,10 +427,6 @@ class MainRepository(ctx : Context) {
                             Log.d("Tables", "Inserted: ${tables2.size} for Id: $outletId")
                         }
                     }
-                } else {
-                    //                  showErrorDialog(ctx, "Error Loading Table Data: ${response.body()?.message}")
-               /*     MainActivity.progressDialogRepository.showErrorDialog(
-                        "Error loading table data for outlet: $outletId\n${response.body()?.message}")  */
                 }
                 if (defaultOutlet) {
                     MainActivity.progressDialogRepository.dismissDialog(dialogId)
@@ -455,7 +449,7 @@ class MainRepository(ctx : Context) {
         })
     }
 
-    fun loadCustomerTypes() {
+    private fun loadCustomerTypes() {
         ApiService.apiService?.getCustomerTypes(Constants.authorization)
             ?.enqueue(object : Callback<CustomerTypeResponse> {
                 override fun onResponse(
@@ -509,7 +503,7 @@ class MainRepository(ctx : Context) {
             })
     }
 
-    fun loadDiscountData(ctx: Context, deviceId: String, isAllData: Int,outletId: Int, defaultOutlet: Boolean) {
+    private fun loadDiscountData(ctx: Context, deviceId: String, isAllData: Int, outletId: Int, defaultOutlet: Boolean) {
         var dialogId = 0
         if (defaultOutlet) {
             dialogId =
@@ -563,7 +557,7 @@ class MainRepository(ctx : Context) {
             })
     }
 
-    fun loadCardTerminalData(outletId: Int, deviceId: String, isAllData: Int) {
+    private fun loadCardTerminalData(outletId: Int, deviceId: String, isAllData: Int) {
         ApiService.apiService?.getCardTerminals(outletId, deviceId, isAllData, Constants.authorization)
             ?.enqueue(object : Callback<CardTerminalResponse> {
                 override fun onResponse(
@@ -636,7 +630,7 @@ class MainRepository(ctx : Context) {
                                                 Log.d("comparingMenuId", "${menu1.menuId} : ${menu.menuId}")
                                                 if (menu1.menuId == menu.menuId) {
                                                     Log.d("NewProduct",
-                                                        "Found Menu: ${menu1?.menuId}")
+                                                        "Found Menu: ${menu1.menuId}")
                                                     for (cat1 in (menu1.categories
                                                         ?: emptyList())) {
                                                         if (cat.categoryId == cat1.categoryId) {
@@ -827,12 +821,12 @@ class MainRepository(ctx : Context) {
             }
         }
 
-    suspend fun getAllProductFromCategoryAsync(catId: Int) : Deferred<CategoryData?> =
+/*    suspend fun getAllProductFromCategoryAsync(catId: Int) : Deferred<CategoryData?> =
         coroutineScope {
             async (Dispatchers.IO) {
                 return@async productDao.getAllProductFromCategory(catId)
             }
-        }
+        }  */
 
     suspend fun getAllProductDataAsync(outletId: Int) : Deferred<List<MenuData>?> =
         coroutineScope {
@@ -933,12 +927,12 @@ class MainRepository(ctx : Context) {
             }
         }
 
-    suspend fun getCustomerDetailsAsync(id: Int) : Deferred<CustomerData?> =
+ /*   suspend fun getCustomerDetailsAsync(id: Int) : Deferred<CustomerData?> =
         coroutineScope {
             async(Dispatchers.IO) {
                 return@async userDao.getOneCustomerDetails(id)
             }
-        }
+        }  */
 
     suspend fun getAllSubUsersAsync(outletId: Int) : Deferred<List<SubUserData>?> =
         coroutineScope {

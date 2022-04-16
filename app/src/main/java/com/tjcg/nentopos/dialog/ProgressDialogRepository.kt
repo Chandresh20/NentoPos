@@ -30,7 +30,7 @@ class ProgressDialogRepository(private val ctx: Context, private val fManager: F
 
     fun dismissDialog(id: Int) {
         try {
-            val pDialog = dialogs.get(id)
+            val pDialog = dialogs[id]
             if (pDialog.isVisible) {
                 pDialog.dismiss()
             }
@@ -64,11 +64,6 @@ class ProgressDialogRepository(private val ctx: Context, private val fManager: F
             syncDialog = SyncDialog.getDialog(ctx)
             syncDialog.show(fManager, "$currentId:Sync")
         }
-    }
-
-    fun dismissSyncDialog() {
-        if (syncDialog.isVisible)
-            syncDialog.dismiss()
     }
 
     fun showAlertDialog(msg : String) {

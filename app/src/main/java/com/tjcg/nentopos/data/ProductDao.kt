@@ -39,7 +39,7 @@ interface ProductDao {
     @Query("select * from Menus where outletId=:outletId")
     fun getAllMenuData(outletId: Int?) : List<MenuData>?
 
-    @Update()
+    @Update
     fun updateMenuData(menuData: MenuData)
 
     @Query("select menuName from Menus where menuId=:id")

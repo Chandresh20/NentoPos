@@ -39,7 +39,7 @@ class CounterDisplayFragment : Fragment() {
             binding.noaccess.visibility = View.VISIBLE
             binding.recyclerViewCounterDisplay.visibility = View.GONE
             MainActivity.orderViewModel.outletName.observe(viewLifecycleOwner,
-                androidx.lifecycle.Observer { name ->
+                { name ->
                     binding.textViewOutlet.text = name
                 })
         }
@@ -47,8 +47,7 @@ class CounterDisplayFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        MainActivity.orderViewModel.outletName.observe(viewLifecycleOwner,
-            androidx.lifecycle.Observer { name ->
+        MainActivity.orderViewModel.outletName.observe(viewLifecycleOwner, { name ->
                 binding.textViewOutlet.text = name
             })
         MainActivity.orderViewModel.kitchenOrdersToday.observe(viewLifecycleOwner,
@@ -81,8 +80,7 @@ class CounterDisplayFragment : Fragment() {
                      binding.recyclerViewCounterDisplay.layoutManager = LinearLayoutManager(ctx)
                      binding.recyclerViewCounterDisplay.adapter = CounterAdapter1(ctx, sortedList)*/
             })
-        MainActivity.orderViewModel.readyOrdersToday.observe(viewLifecycleOwner,
-            androidx.lifecycle.Observer { readyList ->
+        MainActivity.orderViewModel.readyOrdersToday.observe(viewLifecycleOwner, { readyList ->
                 this.readyList = readyList
                 updateRecyclers(inProcessingList, this.readyList)
             })

@@ -259,8 +259,8 @@ class OrdersEntity {
         @SerializedName("item_discount")
         var itemDiscount: String? = null
 
-        @SerializedName("ProductPrice")
-        var productPrice : String? = null
+   /*     @SerializedName("ProductPrice")
+        var productPrice : String? = null  */
 
         @SerializedName("modifier_info")
         var modifierInfo : List<ModifierInfo>? = null
@@ -378,8 +378,8 @@ class OrdersEntity {
         @SerializedName("sub_mod_id")
         var subModifierId : String? = null
 
-        @SerializedName("submodifier_price")
-        var subModifierPrice : String? = null
+   /*     @SerializedName("submodifier_price")
+        var subModifierPrice : String? = null  */
 
         @SerializedName("service_charge")
         var serviceCharge : String? = null
@@ -402,7 +402,7 @@ class OrdersEntity {
         @SerializedName("total_amount")
         var totalAmount : String? = null
 
-        @SerializedName("discount")
-        var discountAmount : String? = null
+    /*    @SerializedName("discount")
+        var discountAmount : String? = null  */
     }
 }

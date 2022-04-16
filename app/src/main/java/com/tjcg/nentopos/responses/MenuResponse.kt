@@ -1,7 +1,5 @@
 package com.tjcg.nentopos.responses
 
-import androidx.annotation.NonNull
-import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 import com.tjcg.nentopos.data.MenuData
 

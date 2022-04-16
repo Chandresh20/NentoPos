@@ -20,9 +20,9 @@ import java.util.ArrayList;
 public class DeviceReceiver extends BroadcastReceiver {
 
 
-    private ArrayList<String> deviceList_found=new ArrayList<String>();
-    private ArrayAdapter<String> adapter;
-    private ListView listView;
+    private final ArrayList<String> deviceList_found;
+    private final ArrayAdapter<String> adapter;
+    private final ListView listView;
 
     public DeviceReceiver(ArrayList<String> deviceList_found, ArrayAdapter<String> adapter, ListView listView) {
         this.deviceList_found = deviceList_found;

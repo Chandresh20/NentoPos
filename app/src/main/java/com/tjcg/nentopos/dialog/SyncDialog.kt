@@ -55,7 +55,7 @@ class SyncDialog : DialogFragment() {
         }
         CoroutineScope(Dispatchers.Main).launch {
             val offlineOrders = MainActivity.orderRepository.getOffline2OrdersAsync(Constants.selectedOutletId).await()
-            Log.d("OfflineOrders", "Avaialble: ${offlineOrders?.size}")
+            Log.d("OfflineOrders", "Available: ${offlineOrders?.size}")
         }
         syncBinding.closeBtn.setOnClickListener {
             isShowing = false

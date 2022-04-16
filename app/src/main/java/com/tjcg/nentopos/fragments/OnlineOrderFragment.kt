@@ -2,24 +2,16 @@ package com.tjcg.nentopos.fragments
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.tjcg.nentopos.Constants
 import com.tjcg.nentopos.MainActivity
 import com.tjcg.nentopos.adapters.OnlineOrderAdapter
 import com.tjcg.nentopos.data.OrdersEntity
 import com.tjcg.nentopos.databinding.FragmentOnlineOrderBinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import java.util.*
 import kotlin.collections.ArrayList
 
 class OnlineOrderFragment : Fragment() {
@@ -27,10 +19,8 @@ class OnlineOrderFragment : Fragment() {
     private lateinit var binding : FragmentOnlineOrderBinding
     private lateinit var ctx: Context
     private var currentTab = 0
-    private var currentFutureOrders = 0
     private var activeFutureOrders = emptyList<OrdersEntity>()
     private var onlineOrders = emptyList<OrdersEntity>()
-  //  private val todayFutureOrders = ArrayList<OrdersEntity>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,11 +29,6 @@ class OnlineOrderFragment : Fragment() {
     ): View {
         ctx = findNavController().context
         MainActivity.orderViewModel.setAllOrders()
-  /*      CoroutineScope(Dispatchers.Main).launch {
-            val allOrders = MainActivity.orderRepository
-                .getAllOrdersOfflineAsync(Constants.selectedOutletId).await()
-
-        } */
         binding = FragmentOnlineOrderBinding.inflate(inflater)
         binding.newOrder.setOnClickListener {
             currentTab = 0
@@ -83,7 +68,7 @@ class OnlineOrderFragment : Fragment() {
             }
         )
         MainActivity.orderViewModel.acceptOrders.observe(
-            viewLifecycleOwner, Observer { list ->
+            viewLifecycleOwner, { list ->
                 val sortedList= list.sortedByDescending { it.order_id.toInt() }
                 binding.productRecyclerViewAccept.layoutManager = LinearLayoutManager(ctx)
                 binding.productRecyclerViewAccept.adapter = OnlineOrderAdapter(ctx, sortedList, findNavController())
@@ -113,7 +98,7 @@ class OnlineOrderFragment : Fragment() {
             }
         )
         MainActivity.orderViewModel.steadyFutureOrders.observe(
-            viewLifecycleOwner, Observer { list ->
+            viewLifecycleOwner, { list ->
                 val filteredList= list.sortedByDescending { it.order_id }
                 binding.productRecyclerFuture.layoutManager = LinearLayoutManager(ctx)
                 binding.productRecyclerFuture.adapter = OnlineOrderAdapter(ctx, filteredList, findNavController())

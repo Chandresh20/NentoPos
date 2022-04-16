@@ -14,7 +14,7 @@ class OrdersTypeConverter {
     }
 
     @TypeConverter
-    fun toItemsInfo(string: String) : List<OrdersEntity.ItemInfo>? {
+    fun toItemsInfo(string: String) : List<OrdersEntity.ItemInfo> {
         val gson = Gson()
         val typeT = object : TypeToken<List<OrdersEntity.ItemInfo>>() {}
         val list = gson.fromJson<List<OrdersEntity.ItemInfo>>(string, typeT.type)

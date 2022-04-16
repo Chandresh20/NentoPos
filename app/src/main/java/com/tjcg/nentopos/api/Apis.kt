@@ -1,6 +1,5 @@
 package com.tjcg.nentopos.api
 
-import com.google.errorprone.annotations.ForOverride
 import com.tjcg.nentopos.responses.*
 import retrofit2.Call
 import retrofit2.http.*
@@ -55,7 +54,7 @@ interface Apis {
 
     /*  @POST("getEditOrderDetail")
       @FormUrlEncoded
-      fun getSingleOredr(@Field("outlet_id") outlet_id: String?,
+      fun getSingleOrder(@Field("outlet_id") outlet_id: String?,
                           @Field("order_id") order_id: String?) : Call<OrdersResponse>  */
 
 /*    @POST("getEditOrderDetail")
@@ -82,12 +81,12 @@ interface Apis {
                                 @Field("reason") reason: String?,
                                 @Header("Authorization") authHeader: String): Call<OrderAcceptResponse>
 
-    @POST("changeOrderStatus")
+  /*  @POST("changeOrderStatus")
     @FormUrlEncoded
     fun changeOrderStatus(@Field("outlet_id") outlet_id: String?,
                           @Field("order_id") order_id: String?,
                           @Field("status") status: String?,
-                          @Header("Authorization") authHeader: String?) : Call<SimpleResponse>
+                          @Header("Authorization") authHeader: String?) : Call<SimpleResponse>  */
 
     @POST("changeKitchenOrderStatus")
     @FormUrlEncoded

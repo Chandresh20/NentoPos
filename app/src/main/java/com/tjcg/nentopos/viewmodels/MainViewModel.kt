@@ -6,11 +6,11 @@ import androidx.lifecycle.ViewModel
 
 class MainViewModel : ViewModel() {
 
-    private val _showProgress = MutableLiveData(false)
-    val showProgress : LiveData<Boolean> = _showProgress
-
     private val _progressText = MutableLiveData<String>()
     val progressText : LiveData<String> = _progressText
+
+ /*   private val _showProgress = MutableLiveData(false)
+    val showProgress : LiveData<Boolean> = _showProgress
 
     private val _showBackgroundProcess = MutableLiveData(false)
     val showBackgroundProcess : LiveData<Boolean> = _showBackgroundProcess
@@ -32,7 +32,7 @@ class MainViewModel : ViewModel() {
 
     fun backgroundProgressText(text: String) {
         _backgroundProgressText.value = text
-    }
+    }  */
 
 
 }

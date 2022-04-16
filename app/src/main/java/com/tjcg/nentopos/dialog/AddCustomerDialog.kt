@@ -112,12 +112,12 @@ class AddCustomerDialog(val ctx: Context) : DialogFragment() {
                             }
                             var alertDialog : AlertDialog? = null
                             val builder = AlertDialog.Builder(ctx).apply {
-                                val dbinding = DialogAlertBinding.inflate(LayoutInflater.from(ctx))
-                                dbinding.infoText.text = "Customer Added successfully"
-                                dbinding.closeBtn.setOnClickListener {
+                                val dBinding = DialogAlertBinding.inflate(LayoutInflater.from(ctx))
+                                dBinding.infoText.text = "Customer Added successfully"
+                                dBinding.closeBtn.setOnClickListener {
                                     alertDialog?.dismiss()
                                 }
-                                setView(dbinding.root)
+                                setView(dBinding.root)
                             }
                             alertDialog = builder.create()
                             alertDialog.window?.setBackgroundDrawableResource(android.R.color.transparent)

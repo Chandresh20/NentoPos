@@ -20,15 +20,14 @@ import com.tjcg.nentopos.databinding.DialogNewOrderStatusBinding
 import com.tjcg.nentopos.databinding.DialogPaymentMethodsBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
 class PaymentDialog(private val ctx: Context, private val totalAmount: Float, private val shownFrom : Int) : DialogFragment() {
 
-    lateinit var paymentBinding : DialogPaymentMethodsBinding
-    lateinit var calcBinding : DialogCalculatorBinding
-    lateinit var orderBinding : DialogNewOrderStatusBinding
-    lateinit var cardTerminalBinding : DialogCardTerminalBinding
+    private lateinit var paymentBinding : DialogPaymentMethodsBinding
+    private lateinit var calcBinding : DialogCalculatorBinding
+    private lateinit var orderBinding : DialogNewOrderStatusBinding
+    private lateinit var cardTerminalBinding : DialogCardTerminalBinding
     private var cashString = ""
     private var isPointTaken = false
 
@@ -131,7 +130,7 @@ class PaymentDialog(private val ctx: Context, private val totalAmount: Float, pr
                 val cash = cashString.toFloat()
                 if (cash < totalAmount) {
                     Log.d("CalcDialog", "Invalid Amount")
-                    Toast.makeText(ctx, "Invalide Amount", Toast.LENGTH_LONG).show()
+                    Toast.makeText(ctx, "Invalid Amount", Toast.LENGTH_LONG).show()
                 } else {
                     if (shownFrom == FROM_ONGOING_ORDERS) {
                         val intent = Intent(Constants.PAYMENT_DONE_BROADCAST)
@@ -249,7 +248,7 @@ class PaymentDialog(private val ctx: Context, private val totalAmount: Float, pr
     }
 
     private fun addToCash(amount : Int) {
-        var cash = if (!cashString.isBlank()) {
+        var cash = if (cashString.isNotBlank()) {
             cashString.toFloat()
         } else 0f
         cash += amount

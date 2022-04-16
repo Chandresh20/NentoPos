@@ -17,9 +17,6 @@ import com.tjcg.nentopos.Constants
 import com.tjcg.nentopos.MainActivity
 import com.tjcg.nentopos.R
 import com.tjcg.nentopos.databinding.ActivityLoginBinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class LoginFragment : Fragment() {
 

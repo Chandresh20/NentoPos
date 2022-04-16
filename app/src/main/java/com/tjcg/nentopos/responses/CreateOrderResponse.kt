@@ -18,7 +18,7 @@ class CreateOrderResponse {
         @SerializedName("order_id")
         var orderId : Int? = null
 
-        @SerializedName("tokenno")
-        var tokenNo : String? = null
+  /*      @SerializedName("tokenno")
+        var tokenNo : String? = null  */
     }
 }
