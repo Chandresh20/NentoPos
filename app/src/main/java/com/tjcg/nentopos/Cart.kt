@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Paint
+import android.graphics.Typeface
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
@@ -18,6 +19,7 @@ import android.view.animation.ScaleAnimation
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.marginTop
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.LiveData
@@ -1086,6 +1088,11 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
             if (!product.productVariants.isNullOrEmpty()) {
                 binding.variantLayout.visibility = View.VISIBLE
                 val sortedVariants = product.productVariants?.sortedBy { it.variantId }
+                val layoutParams1 = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+                val px = 6.5 * ctx.resources.displayMetrics.density  // margin for variant name text
+                layoutParams1.setMargins(0,px.toInt(),0,px.toInt())
+                val typeFace = Typeface.createFromAsset(ctx.assets, "montserrat.ttf")
                 for (variant in sortedVariants!!) {
                     variantArray.add(
                         VariantRadio(
@@ -1094,10 +1101,17 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                             variant.variantPrice?.toFloat()
                         )
                     )
+                    val textView = TextView(ctx).apply {
+                        text = variant.variantName
+                        layoutParams = layoutParams1
+                        typeface = typeFace
+                    }
                     val variantRadioBtn = RadioButton(ctx).apply {
                         id = variant.variantId
-                        text = "${variant.variantName} - ${variant.variantPrice}"
+                        text = "${variant.variantPrice} ${Constants.currencySign}"
+                        typeface = typeFace
                     }
+                    binding.variantNames.addView(textView)
                     binding.variantRadio.addView(variantRadioBtn)
                 }
      //           selectedVariantPrice = variantArray[0].price ?: 0f
