@@ -43,22 +43,26 @@
         <entry key="app/src/main/res/drawable/refresh_order_bg.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/rounded_black.xml" value="0.2125" />
         <entry key="app/src/main/res/drawable/spiner_selector.xml" value="0.155" />
+        <entry key="app/src/main/res/drawable/spinner_background_light.xml" value="0.21302083333333333" />
+        <entry key="app/src/main/res/drawable/square_btn_selected.xml" value="0.21302083333333333" />
+        <entry key="app/src/main/res/drawable/square_btn_selector.xml" value="0.21302083333333333" />
+        <entry key="app/src/main/res/drawable/squre_btn.xml" value="0.21302083333333333" />
         <entry key="app/src/main/res/drawable/sub_card_shape.xml" value="0.17314814814814813" />
         <entry key="app/src/main/res/drawable/waiting_btn_bg.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/white_card.xml" value="0.162109375" />
-        <entry key="app/src/main/res/layout/activity_login.xml" value="0.22" />
+        <entry key="app/src/main/res/layout/activity_login.xml" value="0.17" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.22" />
         <entry key="app/src/main/res/layout/activity_main_setting.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_r80.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_test.xml" value="0.25" />
         <entry key="app/src/main/res/layout/below_action_bar.xml" value="0.22" />
         <entry key="app/src/main/res/layout/dialog_accept_order.xml" value="0.25" />
-        <entry key="app/src/main/res/layout/dialog_add_customer.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/dialog_add_customer.xml" value="0.25" />
         <entry key="app/src/main/res/layout/dialog_add_discount.xml" value="0.22" />
         <entry key="app/src/main/res/layout/dialog_alert.xml" value="0.33" />
         <entry key="app/src/main/res/layout/dialog_asign_driver.xml" value="0.33" />
         <entry key="app/src/main/res/layout/dialog_calculator.xml" value="0.33" />
-        <entry key="app/src/main/res/layout/dialog_cancel_order.xml" value="0.18" />
+        <entry key="app/src/main/res/layout/dialog_cancel_order.xml" value="0.25" />
         <entry key="app/src/main/res/layout/dialog_card_terminal.xml" value="0.2" />
         <entry key="app/src/main/res/layout/dialog_complete_order.xml" value="0.33" />
         <entry key="app/src/main/res/layout/dialog_discount.xml" value="0.22" />
@@ -70,7 +74,7 @@
         <entry key="app/src/main/res/layout/dialog_progress.xml" value="0.18" />
         <entry key="app/src/main/res/layout/dialog_repear_cart.xml" value="0.25" />
         <entry key="app/src/main/res/layout/dialog_send_email.xml" value="0.67" />
-        <entry key="app/src/main/res/layout/dialog_send_sms.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/dialog_send_sms.xml" value="0.22" />
         <entry key="app/src/main/res/layout/dialog_send_to_kitchen.xml" value="0.25" />
         <entry key="app/src/main/res/layout/dialog_sync.xml" value="0.22" />
         <entry key="app/src/main/res/layout/dialog_tip.xml" value="0.33" />
@@ -83,9 +87,9 @@
         <entry key="app/src/main/res/layout/fragment_ongoing_order.xml" value="0.22" />
         <entry key="app/src/main/res/layout/fragment_online_order.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_pos.xml" value="0.33" />
-        <entry key="app/src/main/res/layout/fragment_subuser_login.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/fragment_subuser_login.xml" value="0.22" />
         <entry key="app/src/main/res/layout/fragmet_subuser_login.xml" value="0.22" />
-        <entry key="app/src/main/res/layout/include_cart_layout.xml" value="0.22" />
+        <entry key="app/src/main/res/layout/include_cart_layout.xml" value="0.45746691871455575" />
         <entry key="app/src/main/res/layout/include_cart_modifier.xml" value="0.22" />
         <entry key="app/src/main/res/layout/item_all_order.xml" value="0.25" />
         <entry key="app/src/main/res/layout/item_all_orders.xml" value="0.5" />
