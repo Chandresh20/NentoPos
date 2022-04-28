@@ -1,21 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:orientation="horizontal"
     android:weightSum="1"
-    android:padding="4dp"
-    android:layout_gravity="center"
-    android:gravity="center"
     android:layout_height="wrap_content">
 
     <TextView
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:id="@+id/itemLabel"
-        android:layout_weight="0.55"
-        android:textStyle="bold"
-        android:text="ItemName"/>
+        android:text="AddOnName"
+        android:id="@+id/addOnName"
+        android:layout_weight="0.4"
+        android:fontFamily="@font/montserrat"/>
 
     <ImageView
         android:layout_width="0dp"
@@ -30,9 +26,9 @@
         android:layout_height="wrap_content"
         android:text="1"
         android:gravity="center"
-        android:layout_weight="0.05"
+        android:layout_weight="0.1"
         android:textStyle="bold"
-        android:id="@+id/itemQty"/>
+        android:id="@+id/addOnQty"/>
 
     <ImageView
         android:layout_width="0dp"
@@ -42,30 +38,18 @@
         android:layout_gravity="center"
         android:src="@drawable/icon_plus"/>
 
-    <LinearLayout
+    <TextView
         android:layout_width="0dp"
-        android:orientation="vertical"
+        android:layout_height="wrap_content"
+        android:id="@+id/addOnPrice"
         android:layout_weight="0.2"
-        android:layout_gravity="center"
-        android:layout_height="wrap_content">
+        android:gravity="end"
+        android:text="$000"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/itemPriceStrike"
-            android:layout_gravity="end"
-            android:gravity="end"
-            android:textColor="#AAA"
-            android:text="$0.0"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/itemPrice"
-            android:gravity="end"
-            android:textStyle="bold"
-            android:text="$0.0"/>
-
-    </LinearLayout>
-
+    <CheckBox
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.1"
+        android:text="@null"
+        android:id="@+id/addOnCheck"/>
 </LinearLayout>

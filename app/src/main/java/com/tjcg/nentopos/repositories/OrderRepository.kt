@@ -805,13 +805,13 @@ class OrderRepository(ctx : Context) {
     }
 
 
-    fun startSync(ctx: Context) {
+    private fun startSync(ctx: Context, unSyncOrders: List<OrdersEntity>) {
         // collect not sync orders
         mainScope.launch {
-            val unSyncOrders = getUnsyncOrdersAsync(Constants.selectedOutletId).await()
+            Log.d("Sync", "started")
             val orderSyncEntity = OrderSyncEntity()
             val oList = ArrayList<OrderSyncEntity.OrderSync>()
-            if (unSyncOrders == null) {
+            if (unSyncOrders.isNullOrEmpty()) {
                 Log.d("Unsync", "Unsync Orders not found")
                 return@launch
             }
@@ -876,9 +876,46 @@ class OrderRepository(ctx : Context) {
         }
     }
 
-    fun startUploadingOfflineOrders(ctx: Context) {
+    fun mapOfflineCustomers(ctx: Context, mapping: List<CustomerSyncResponse.CustomerMap>?) {
         mainScope.launch {
+            Log.d("Mapping", "started")
+            val unsyncOrders = getUnsyncOrdersAsync(Constants.selectedOutletId).await()
+            if (unsyncOrders != null) {
+                if (mapping == null) {
+                    startSync(ctx, unsyncOrders)
+                } else {
+                    for (offOrder in unsyncOrders) {
+                        if (isOfflineOrder(offOrder.customer_id ?: 0L)) {
+                            val map = mapping?.find { it.customerTmpId==offOrder.customer_id }
+                            if (map != null) {
+                                offOrder.customer_id = map.customerOriginalId
+                            }
+                        }
+                    }
+                    startSync(ctx, unsyncOrders)
+                }
+            }
             val offlineOrders = getOffline2OrdersAsync(Constants.selectedOutletId).await()
+            if (!offlineOrders.isNullOrEmpty()) {
+                if (mapping == null) {
+                    startUploadingOfflineOrders(ctx, offlineOrders)
+                } else {
+                    for (offOrder in offlineOrders) {
+                        if (isOfflineOrder(offOrder.customerId ?: 0L)) {
+                            val map = mapping.find { it.customerTmpId == offOrder.customerId }
+                            if (map != null) {
+                                offOrder.customerId = map.customerOriginalId
+                            }
+                        }
+                    }
+                    startUploadingOfflineOrders(ctx, offlineOrders)
+                }
+            }
+        }
+    }
+
+    private fun startUploadingOfflineOrders(ctx: Context, offlineOrders: List<OfflineOrder2>?) {
+        mainScope.launch {
             Log.d("OfflineOrders", "${offlineOrders?.size} offline orders to upload")
             val createMultipleOrderRequest = convertOfflineOrdersToJson(offlineOrders ?: emptyList())
             Log.d("MultiOrderRequest", createMultipleOrderRequest ?: "NA")
@@ -897,6 +934,9 @@ class OrderRepository(ctx : Context) {
                                         if (syncData.status == true) {
                                             // delete offline record from database
                                             deleteOneOfflineOrderAsync(syncData.tmpOrderId ?: 0L).await()
+                                            val intent = Intent(Constants.SYNC_COMPLETE_BROADCAST)
+                                            intent.putExtra(Constants.IS_SUCCESS, true)
+                                            ctx.sendBroadcast(intent)
                                         } else {
                                             MainActivity.progressDialogRepository.showErrorDialog(
                                                 "Error uploading record with tmpId: ${syncData.tmpOrderId}," +
@@ -1461,7 +1501,7 @@ class OrderRepository(ctx : Context) {
         return rNum100/100
     }
 
-    private fun isOfflineOrder(orderId: Long) : Boolean {
+    private fun isOfflineOrder(orderId: Long) : Boolean { //can also be used to checkoffline customer
         return orderId > 1647955400000
     }
 }

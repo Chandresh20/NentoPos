@@ -47,6 +47,10 @@ interface UserDao {
     @Query("select * from Customers where customerId=:id")
     fun getOneCustomer(id : Long) : CustomerData?
 
+    @Query("select * from CustomerOffline")
+    fun getAllOfflineCustomer() : List<CustomerOffline>?
+
+
     @Query("select * from CustomerType")
     fun getCustomerTypes() : List<CustomerTypeData>?
 
@@ -64,6 +68,9 @@ interface UserDao {
 
     @Query("select * from CardTerminals where outletId=:outletId")
     fun getCardTerminals(outletId: Int) : List<CardTerminalData>?
+
+    @Query("delete from CustomerOffline")
+    fun deleteAllOfflineCustomers()
 
     @Query("delete from Outlets")
     fun deleteAllOutletData()

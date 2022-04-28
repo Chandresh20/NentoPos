@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.util.Log
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.tjcg.nentopos.Constants
 import com.tjcg.nentopos.MainActivity
 import com.tjcg.nentopos.api.ApiService
@@ -676,6 +678,49 @@ class MainRepository(ctx : Context) {
             })
     }
 
+    fun startCustomerSync(ctx: Context) {
+        mainScope.launch {
+            val allOffCustomer = getAllOfflineCustomersAsync().await()
+            Log.d("CustomerSyn","Available: ${allOffCustomer?.size}")
+            if (allOffCustomer.isNullOrEmpty()) {
+                MainActivity.orderRepository.mapOfflineCustomers(ctx, null)
+                return@launch
+            }
+            val req = convertCustomerReqToJson(allOffCustomer ?: emptyList())
+            Log.d("customerReq", req)
+            ApiService.apiService?.syncOfflineCustomers(req, Constants.authorization)
+                ?.enqueue(object : Callback<CustomerSyncResponse> {
+                    override fun onResponse(
+                        call: Call<CustomerSyncResponse>,
+                        response: Response<CustomerSyncResponse>
+                    ) {
+                        if (response.isSuccessful && response.body()?.status != null &&
+                                response.body()?.status!!) {
+                            val mapping = response.body()?.customersMap
+                            Log.d("CustomerSyn","Mapping : ${mapping?.size}")
+                            if (!mapping.isNullOrEmpty()) {
+                                MainActivity.orderRepository.mapOfflineCustomers(ctx, mapping)
+                            }
+                        }
+                    }
+
+                    override fun onFailure(call: Call<CustomerSyncResponse>, t: Throwable) {
+                        Log.e("CustomerSyn", "API error: ${t.message}")
+                        val intent = Intent(Constants.SYNC_COMPLETE_BROADCAST)
+                        intent.putExtra(Constants.IS_SUCCESS, false)
+                        ctx.sendBroadcast(intent)
+                    }
+                })
+        }
+    }
+
+
+    private fun convertCustomerReqToJson(allCustomer: List<CustomerOffline>) : String {
+        val gson = Gson()
+        val typeT = object : TypeToken<List<CustomerOffline>>() { }
+        return gson.toJson(allCustomer, typeT.type)
+    }
+
     //user database operations
     suspend fun insertOutletsInDatabaseAsync(outlets : List<OutletData>) =
         coroutineScope {
@@ -913,6 +958,13 @@ class MainRepository(ctx : Context) {
             }
         }
 
+    private suspend fun getAllOfflineCustomersAsync() : Deferred<List<CustomerOffline>?> =
+        coroutineScope {
+            async(Dispatchers.IO) {
+                return@async userDao.getAllOfflineCustomer()
+            }
+        }
+
     suspend fun getOneTableDataAsync(id: Int) : Deferred<TableData?> =
         coroutineScope {
             async(Dispatchers.IO) {
@@ -967,6 +1019,13 @@ class MainRepository(ctx : Context) {
         coroutineScope {
             async(Dispatchers.IO) {
                 return@async productDao.getAllDiscounts()
+            }
+        }
+
+    suspend fun deleteOfflineCustomersAsync() =
+        coroutineScope {
+            async(Dispatchers.IO) {
+                userDao.deleteAllOfflineCustomers()
             }
         }
 

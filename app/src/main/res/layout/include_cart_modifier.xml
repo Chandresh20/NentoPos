@@ -97,10 +97,10 @@
                         android:layout_height="2dp"
                         android:src="@color/black"/>
 
-                    <GridLayout
+                    <androidx.recyclerview.widget.RecyclerView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:id="@+id/addOnGrid"/>
+                        android:id="@+id/addOnRecycler"/>
                 </LinearLayout>
 
                 <androidx.recyclerview.widget.RecyclerView

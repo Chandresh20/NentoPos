@@ -22,6 +22,7 @@ import com.tjcg.nentopos.data.CustomerTypeData
 
 import com.tjcg.nentopos.databinding.DialogAddCustomerBinding
 import com.tjcg.nentopos.databinding.DialogAlertBinding
+import com.tjcg.nentopos.fragments.POSFragment
 import com.tjcg.nentopos.responses.AddCustomerResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -160,6 +161,8 @@ class AddCustomerDialog(val ctx: Context) : DialogFragment() {
                     MainActivity.mainRepository.insertOneCustomerDataAsync(
                         customerData).await()
                     val offlineCustomer = CustomerOffline().apply {
+                        this.outletId = Constants.selectedOutletId
+                        this.menuId = POSFragment.selectedMenuId
                         this.customerTmpId = tmpId
                         this.customerName = customerName
                         this.customerEmail = customerEmail
@@ -171,6 +174,8 @@ class AddCustomerDialog(val ctx: Context) : DialogFragment() {
                     }
                     MainActivity.mainRepository.insertOneOfflineCustomerAsync(offlineCustomer).await()
                     ctx.sendBroadcast(Intent(Constants.CUSTOMER_ADDED_BROADCAST))
+                    MainActivity.mainSharedPreferences.edit().putBoolean(
+                        Constants.PREF_IS_SYNC_REQUIRES, true).apply()
                     this@AddCustomerDialog.dialog?.dismiss()
                 }
             }

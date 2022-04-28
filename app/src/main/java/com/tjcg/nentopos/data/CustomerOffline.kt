@@ -36,4 +36,10 @@ class CustomerOffline {
 
     @SerializedName("customer_category")
     var customerCategory : String? = null
+
+    @SerializedName("outlet_id")
+    var outletId: Int? = null
+
+    @SerializedName("menu_id")
+    var menuId: Int? = null
 }

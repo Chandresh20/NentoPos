@@ -295,6 +295,7 @@ class POSFragment : Fragment() {
                 override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                     cart.clearTheCart()
                     categorySelected = 0
+                    selectedMenuId = menuList[p2].Id
                     binding.noProductText.visibility = View.VISIBLE
                     binding.categoryRecycler.layoutManager = LinearLayoutManager(ctx, RecyclerView.HORIZONTAL, false)
                     binding.categoryRecycler.recycledViewPool.setMaxRecycledViews(0,0)
@@ -400,6 +401,7 @@ class POSFragment : Fragment() {
     companion object{
 
         var directLogin = true
+        var selectedMenuId = 0
         lateinit var currentDiscount : CurrentDiscounts
         var selectedWaiterId = 0
         var selectCustomerId = 0L

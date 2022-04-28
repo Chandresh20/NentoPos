@@ -19,7 +19,6 @@ import android.view.animation.ScaleAnimation
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.marginTop
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.LiveData
@@ -1093,6 +1092,7 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                 val px = 6.5 * ctx.resources.displayMetrics.density  // margin for variant name text
                 layoutParams1.setMargins(0,px.toInt(),0,px.toInt())
                 val typeFace = Typeface.createFromAsset(ctx.assets, "montserrat.ttf")
+                binding.variantNames.removeAllViews()
                 for (variant in sortedVariants!!) {
                     variantArray.add(
                         VariantRadio(
@@ -1136,8 +1136,13 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                 binding.variantLayout.visibility = View.GONE
             }
             if (!product.productAddOns.isNullOrEmpty()) {
+                binding.addOnLayout.visibility = View.VISIBLE
                 addOnArray.clear()
-                binding.addOnGrid.removeAllViews()
+                binding.addOnRecycler.layoutManager = LinearLayoutManager(ctx)
+                binding.addOnRecycler.recycledViewPool.setMaxRecycledViews(0,0)
+                binding.addOnRecycler.adapter = AddOnAdapter(product.productAddOns ?: emptyList())
+
+          /*      binding.addOnGrid.removeAllViews()
                 binding.addOnLayout.visibility = View.VISIBLE
                 for (addOns in product.productAddOns!!) {
                     addOnArray.add(
@@ -1162,7 +1167,7 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                         setTotalAmount()
                     }
                     binding.addOnGrid.addView(checkbox)
-                }
+                }  */
             } else {
                 binding.addOnLayout.visibility = View.GONE
             }
@@ -1282,6 +1287,86 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                         modifier.choosableModifiers?.toFloat() ,modifier.available2x)
                 }
             }
+
+        inner class AddOnAdapter(private val addonList: List<ProductAddOns>) :
+            RecyclerView.Adapter<AddOnAdapter.MyHolder>() {
+
+            inner class MyHolder(val binding: ItemCartAddonBinding) : RecyclerView.ViewHolder(binding.root)
+
+            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyHolder {
+                return MyHolder(ItemCartAddonBinding.inflate(LayoutInflater.from(ctx), parent, false))
+            }
+
+            override fun onBindViewHolder(holder: MyHolder, position: Int) {
+                val addon = addonList[position]
+                var isSelected = false
+                holder.binding.addOnName.text = addon.addOnName
+                holder.binding.addOnQty.text = "1"
+                holder.binding.addOnPrice.text = Constants.currencySign +" "+ addon.addonPrice
+                addOnArray.add(ItemInCart(addon.addOnId, addon.addOnName, null, ArrayList(),
+                    1, addon.addonPrice?.toFloat(), categoryDiscounts, productDiscounts, addon.addOnTaxes,
+                    "" ,true))
+                holder.binding.addOnCheck.setOnCheckedChangeListener { compoundButton, b ->
+                    if (b) {
+                        selectedAddOns.add(addon.addOnId)
+                        selectedAddOnPrice += if (addon.addonPrice.isNullOrBlank()) {
+                            0f
+                        } else {
+                            (addon.addonPrice ?: "0").toFloat()
+                        }
+                        isSelected = true
+                    } else {
+                        selectedAddOns.remove(addon.addOnId)
+                        selectedAddOnPrice -= if (addon.addonPrice.isNullOrBlank()) {
+                            0f
+                        } else {
+                                val currentAdd = addOnArray.find { it.id == addon.addOnId }
+                            (addon.addonPrice ?: "0").toFloat()  * (currentAdd?.qty ?: 0)
+                        }
+                        holder.binding.addOnQty.text = "1"
+                        holder.binding.addOnPrice.text = Constants.currencySign +" "+ addon.addonPrice
+                        isSelected = false
+                    }
+                    setTotalAmount()
+                }
+                holder.binding.itemAdd.setOnClickListener {
+                    if (isSelected) {
+                        val addOnInArray = addOnArray.find { it.id == addon.addOnId }
+                        addOnInArray?.qty = (addOnInArray?.qty ?: 0) + 1
+                        holder.binding.addOnQty.text = addOnInArray?.qty.toString()
+                        selectedAddOnPrice += if (addon.addonPrice.isNullOrBlank()) {
+                            0f
+                        } else {
+                            (addon.addonPrice ?: "0").toFloat()
+                        }
+                        holder.binding.addOnPrice.text = Constants.currencySign + " "+
+                            ((addon.addonPrice ?: "0").toFloat() * (addOnInArray?.qty ?: 0)).toString()
+                        setTotalAmount()
+                    }
+                }
+                holder.binding.itemRemove.setOnClickListener {
+                    if (isSelected) {
+                        val addOnInArray = addOnArray.find { it.id == addon.addOnId }
+                        val addOnQty = addOnInArray?.qty ?: 0
+                        if (addOnQty > 1) {
+                            addOnInArray?.qty = (addOnInArray?.qty ?: 0) - 1
+                            holder.binding.addOnQty.text = addOnInArray?.qty.toString()
+                            selectedAddOnPrice -= if (addon.addonPrice.isNullOrBlank()) {
+                                0f
+                            } else {
+                                (addon.addonPrice ?: "0").toFloat()
+                            }
+                            holder.binding.addOnPrice.text = Constants.currencySign + " "+
+                                ((addon.addonPrice ?: "0").toFloat() * (addOnInArray?.qty ?: 0)).toString()
+                            setTotalAmount()
+                        }
+                    }
+                }
+            }
+
+            override fun getItemCount(): Int = addonList.size
+
+        }
 
 
         inner class SubModHalfAndHalfAdapter2(
@@ -1729,7 +1814,11 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                 if (!subMod.variantModifierPrice.isNullOrEmpty() && !variantArray.isNullOrEmpty()) {
                     for (varMod in subMod.variantModifierPrice!!) {
                         if (varMod.variantId == cartViewModel.selectedVariantId.value) {
-                            subModPrice = (varMod.modifierPrice ?: "0").toFloat()
+                            subModPrice = if (varMod.modifierPrice.isNullOrBlank()) {
+                                0f
+                            } else {
+                                varMod.modifierPrice?.toFloat()
+                            }
                             break
                         }
                     }

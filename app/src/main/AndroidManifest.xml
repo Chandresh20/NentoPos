@@ -40,6 +40,7 @@
             </intent-filter>
 
         </activity>
+        <service android:name="net.posprinter.service.PosprinterService" />
         <service
             android:name="MyFirebaseMessagingService"
             android:exported="false">

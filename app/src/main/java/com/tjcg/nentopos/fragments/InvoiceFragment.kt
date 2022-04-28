@@ -1,10 +1,7 @@
 package com.tjcg.nentopos.fragments
 
 import android.annotation.SuppressLint
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
+import android.content.*
 import android.graphics.Paint
 import android.os.Bundle
 import android.os.Handler
@@ -286,7 +283,10 @@ class InvoiceFragment : Fragment() {
     class SubMod(val name:String, val price:Float, val weight:Float)
 
     private fun initializePrinting() {
-        val btAddress: String = MainActivity.mainSharedPreferences.getString("address", "").toString().trim { it <= ' ' }
+        val sharedPreferences: SharedPreferences = requireContext().getSharedPreferences("com.tjcg.nentopos",Context.MODE_PRIVATE)
+
+        val btAddress: String = sharedPreferences.getString("address", "").toString()
+
         if (btAddress.isBlank()) {
             Toast.makeText(ctx.applicationContext, ctx.getString(R.string.con_failed), Toast.LENGTH_SHORT).show()
         } else {
@@ -364,7 +364,6 @@ class InvoiceFragment : Fragment() {
             list.add(StringUtils.strTobytes("Date: NULL" ))
         }
         list.add(DataForSendToPrinterPos80.printAndFeedLine())
-
         val fmt1 = Formatter()
         fmt1.format("%-3s %-25s %-8s %9s\n", "Q", "Item", "Price", "Total")
         fmt1.format("%-48s\n", "================================================")
@@ -373,9 +372,9 @@ class InvoiceFragment : Fragment() {
             val res = splitString(item.label, 25)
             for (i in 0 until res.size) {
                 if (i == 0) {
-                    fmt1.format("%-3s %-25s %-8s %9s\n", item.qty.toString(), res[i], item.price.toString(), item.total.toString())
+                    fmt1.format("%-3s %-25s %-8s %9s\n", item.qty.toString(), res[i].trim(), item.price.toString(), item.total.toString())
                 } else {
-                    fmt1.format("%-3s %-25s %-8s %9s\n", "", res[i], "", "")
+                    fmt1.format("%-3s %-25s %-8s %9s\n", "", res[i].trim(), "", "")
                 }
             }
         }

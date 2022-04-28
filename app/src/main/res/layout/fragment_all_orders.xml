@@ -348,8 +348,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/header_layout"
-        android:paddingBottom="100dp"
         android:clipToPadding="false"
+        android:paddingBottom="100dp"
         android:visibility="visible" />
 
     <LinearLayout

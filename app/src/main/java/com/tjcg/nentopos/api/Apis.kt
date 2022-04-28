@@ -106,6 +106,9 @@ interface Apis {
     fun createMultipleOrders(@Body multipleOrderJson : String?,
                              @Header("Authorization") authHeader: String?) : Call<OfflineSyncResponse>
 
+    @POST("createSyncCustomer")
+    fun syncOfflineCustomers(@Body offlineCustomersJson: String,
+        @Header("Authorization") authHeader: String) : Call<CustomerSyncResponse>
 /*    @POST("getAllCustomerList")
     @FormUrlEncoded
     fun getAllCustomerList(@Field("outlet_id") outlet_id: String?,

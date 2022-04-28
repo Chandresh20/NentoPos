@@ -14,6 +14,7 @@ import androidx.fragment.app.DialogFragment
 import com.tjcg.nentopos.Constants
 import com.tjcg.nentopos.MainActivity
 import com.tjcg.nentopos.databinding.DialogSyncBinding
+import com.tjcg.nentopos.fragments.POSFragment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -45,6 +46,10 @@ class SyncDialog : DialogFragment() {
                             .putBoolean(Constants.PREF_IS_SYNC_REQUIRES, false).apply()
                         MainActivity.orderRepository.syncRequired = false
                         MainActivity.orderRepository.markAllOrdersAsSynchronized()
+                        POSFragment.selectCustomerId = 0L
+                        CoroutineScope(Dispatchers.Main).launch {
+                            MainActivity.mainRepository.deleteOfflineCustomersAsync().await()
+                        }
                     } else {
                         syncBinding.synText.text = "An Error Occurred, Please try again"
                     }
@@ -62,8 +67,10 @@ class SyncDialog : DialogFragment() {
             this.dismiss()
         }
         syncBinding.synNowBtn.setOnClickListener {
-            MainActivity.orderRepository.startSync(ctx)
-            MainActivity.orderRepository.startUploadingOfflineOrders(ctx)
+      //      MainActivity.orderRepository.startSync(ctx)
+      //      MainActivity.orderRepository.startUploadingOfflineOrders(ctx)
+            MainActivity.mainRepository.startCustomerSync(ctx)
+//      first customerSync -> mapCustomerToOfflineOrders -> All Orders Sync
             pDialogId = MainActivity.progressDialogRepository.getProgressDialog("Sync in progress")
             ctx.registerReceiver(synCompleteReceiver, IntentFilter(Constants.SYNC_COMPLETE_BROADCAST))
         }
