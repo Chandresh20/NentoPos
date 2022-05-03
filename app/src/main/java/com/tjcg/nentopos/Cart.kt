@@ -41,7 +41,7 @@ import com.tjcg.nentopos.dialog.PaymentDialog
 import com.tjcg.nentopos.fragments.POSFragment
 
 const val SUB_MODE_FULL = 0
-//  const val SUB_MODE_F_HALF = 1
+// const val SUB_MODE_F_HALF = 1
 //  const val SUB_MODE_S_HALF = 2
 
 @SuppressLint("SetTextI18n")
@@ -1385,6 +1385,7 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
             inner class SubModifierCalc(val id: Int?, val price: Float?, val qty: Float?)
 
             private fun removeIncludedAmount(list: ArrayList<SubModifierCalc>) {
+                subNames.clear()
                 val sortedList = list.sortedWith(compareBy({it.price}, {it.qty}))
                 var payableModifierPrice = 0f
                 var freeModifier1 = (included ?: 0).toFloat()
@@ -1398,6 +1399,11 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                     } else {
                         payableModifierPrice += product.price ?: 0f
                     }
+                }
+                for (subMod in subList) {
+                    subNames.add(
+                        SubModifierBrief(subMod.id ?: 0, subMod.name ?: "NA",
+                            if (subMod.is2xMod) 1 else 0, if (subMod.qty == 0.5f) 1 else 0))
                 }
                 Log.d("payablePrice", "$payableModifierPrice")
                 addModifierDetails(mId ?: 0, SelectedModifierDetails(name, subNames, payableModifierPrice))
