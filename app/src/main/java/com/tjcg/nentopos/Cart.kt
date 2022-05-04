@@ -211,6 +211,10 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                 MainActivity.progressDialogRepository.showErrorDialog("Cart is Empty..")
                 return@setOnClickListener
             }
+            if (selectedTable == 0) {
+                MainActivity.progressDialogRepository.showErrorDialog("Please select Table...")
+                return@setOnClickListener
+            }
             customerPaid = 0f
             paymentMethod = 0
             newOrderStatus = Constants.ORDER_STATUS_SERVED
@@ -233,6 +237,10 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
         binding.sendToKitchenBtn.setOnClickListener {
             if (items.isNullOrEmpty()) {
                 MainActivity.progressDialogRepository.showErrorDialog("Cart is Empty..")
+                return@setOnClickListener
+            }
+            if (selectedTable == 0) {
+                MainActivity.progressDialogRepository.showErrorDialog("Please select Table...")
                 return@setOnClickListener
             }
             var kDialog : AlertDialog? = null
@@ -1255,6 +1263,11 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                     "${modifier.modifiersIncluded} included / ${modifier.choosableModifiers} available"
                 CoroutineScope(Dispatchers.Main).launch {
                     if (modifier.halfAndHalf == "1") {
+                        if(modifier.available2x == 0) {
+                            holder.mBinding.twoXTitle.visibility = View.INVISIBLE
+                        } else {
+                            holder.mBinding.twoXTitle.visibility = View.VISIBLE
+                        }
                         holder.mBinding.recyclerSubModifier.layoutManager = LinearLayoutManager(ctx)
                         val adp1 = createSubModifierHalfAdapterAsync(modifier).await()
                         holder.mBinding.recyclerSubModifier.adapter = adp1
@@ -1306,7 +1319,7 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                 addOnArray.add(ItemInCart(addon.addOnId, addon.addOnName, null, ArrayList(),
                     1, addon.addonPrice?.toFloat(), categoryDiscounts, productDiscounts, addon.addOnTaxes,
                     "" ,true))
-                holder.binding.addOnCheck.setOnCheckedChangeListener { compoundButton, b ->
+                holder.binding.addOnCheck.setOnCheckedChangeListener { _, b ->
                     if (b) {
                         selectedAddOns.add(addon.addOnId)
                         selectedAddOnPrice += if (addon.addonPrice.isNullOrBlank()) {
@@ -1856,17 +1869,14 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                             } else {
                                 holder.sBinding.subModCheck.isChecked = true
                             }
-                            /*        holder.sBinding.subModCheck.isChecked = true
-                                    removeFromList(subMod.subModifierId)
-                                    holder.sBinding.subModPrice.text = Constants.currencySign +
-                                        ((subModPrice ?: 0f) * 2f).format()
-                                    addToList(subModItem)  */
                         } else {
                             subModItem.is2xMode = 0
-                            /*       holder.sBinding.subModPrice.text = Constants.currencySign +
-                                           subModPrice?.format()
-                                   removeFromList(subModItem.id)
-                                   addToList(subModItem)  */
+                            if (holder.sBinding.subModCheck.isChecked) {
+                                removeFromList(subMod.subModifierId)
+                                holder.sBinding.subModPrice.text = Constants.currencySign +
+                                        ((subModPrice ?: 0f)).format()
+                                addToList(subModItem)
+                            }
                         }
                     }
                 }
@@ -1882,6 +1892,13 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                             holder.sBinding.check2x.visibility = View.VISIBLE
                         }
                         holder.sBinding.subModPrice.visibility = View.VISIBLE
+                        if (subModItem.is2xMode == 0) {
+                            holder.sBinding.subModPrice.text = Constants.currencySign +
+                                    (subModItem.price ?: 0f).format()
+                        } else {
+                            holder.sBinding.subModPrice.text = Constants.currencySign +
+                                    ((subModItem.price ?: 0f) * 2).format()
+                        }
                         addToList(subModItem)
                     } else {
                 //        holder.sBinding.check2x.visibility = View.INVISIBLE

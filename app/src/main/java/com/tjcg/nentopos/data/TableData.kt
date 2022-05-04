@@ -22,7 +22,25 @@ class TableData {
     @SerializedName("table_icon")
     var tableIcon : String? = null
 
+    @SerializedName("icon_position")
+    var iconPosition : String? = null
+
+    @SerializedName("is_assign_customer")
+    var assignedOrNot: Int? = null
+
+    @SerializedName("related_orders")
+    var relatedOrders : List<RelatedOrderInfo>? = null
+
     var outletId : Int? = null
+
+    class RelatedOrderInfo {
+
+        @SerializedName("order_id")
+        var orderId : Long? = null
+
+        @SerializedName("order_status")
+        var orderStatus : Int? = null
+    }
 
     override fun toString(): String {
         return tableName ?: "NA"

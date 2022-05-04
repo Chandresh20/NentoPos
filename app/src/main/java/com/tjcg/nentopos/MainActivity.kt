@@ -41,6 +41,7 @@ const val NAV_KITCHEN = 2
 const val NAV_COUNTER = 3
 const val NAV_ONLINE = 4
 const val NAV_ONGOING = 5
+const val NAV_TABLES = 6
 
 class MainActivity : AppCompatActivity() {
 
@@ -158,6 +159,9 @@ class MainActivity : AppCompatActivity() {
         binding.mainActionBar.navOngoingOrders.setOnClickListener {
             navigateTo(NAV_ONGOING)
         }
+        binding.mainActionBar.navTables.setOnClickListener {
+            navigateTo(NAV_TABLES)
+        }
         val logoutReceiver = object : BroadcastReceiver() {
             override fun onReceive(p0: Context?, p1: Intent?) {
                 findNavController(binding.fragmentContainerView).navigate(R.id.navigation_login)
@@ -240,6 +244,10 @@ class MainActivity : AppCompatActivity() {
             }
             NAV_ONGOING -> {
                 navController.navigate(R.id.navigation_ongoing_orders)
+                expandActionBar()
+            }
+            NAV_TABLES -> {
+                navController.navigate(R.id.navigation_table)
                 expandActionBar()
             }
         }
