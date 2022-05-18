@@ -166,4 +166,8 @@ interface Apis {
         @Field("is_all_data") isAllData: Int,
         @Header("Authorization") authHeader: String) : Call<CardTerminalResponse>
 
+    @POST("addToCartUpdate")
+    fun updateOrder(
+        @Body updateOrderRequest : String,
+        @Header("Authorization") authHeader: String) : Call<SimpleResponse>
 }

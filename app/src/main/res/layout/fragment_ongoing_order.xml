@@ -17,6 +17,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:text="Ongoing Orders"
+        android:textStyle="bold"
         android:layout_marginTop="15dp"
         android:textColor="@color/black"
         android:textSize="@dimen/header_text" />

@@ -167,7 +167,6 @@
             android:padding="8dp"
             android:layout_margin="4dp"
             android:src="@drawable/ic_edit"
-            android:visibility="gone"
             app:tint="@color/white" />
 
         <ImageView

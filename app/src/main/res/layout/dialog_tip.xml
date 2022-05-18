@@ -35,6 +35,7 @@
                 android:id="@+id/close_button"
                 android:layout_width="@dimen/dialog_cancel_button_size"
                 android:layout_height="@dimen/dialog_cancel_button_size"
+                app:tint="@color/black"
                 android:src="@drawable/ic_close" />
         </LinearLayout>
 

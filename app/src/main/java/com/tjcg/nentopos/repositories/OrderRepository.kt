@@ -202,6 +202,7 @@ class OrderRepository(ctx : Context) {
                 val minutes = cal.get(Calendar.MINUTE)
                 val secs = cal.get(Calendar.SECOND)
                 order.order_accept_date = "$year-$month-$day $hour:$minutes:$secs"
+                order.editTime = System.currentTimeMillis()
                 updateSingleOrderAsync(order).await()
                 // sync will required after this changes..
                 if (isSync == 0) {
@@ -251,6 +252,7 @@ class OrderRepository(ctx : Context) {
                     order_status = Constants.ORDER_STATUS_SERVED
                     pis_driver_assigned = order.pis_driver_assigned
                     driver_user_id = order.driver_user_id
+                    editTime = System.currentTimeMillis()
                 }
                 // collect item info
                 val itemInfo = order.itemsInfo
@@ -324,6 +326,7 @@ class OrderRepository(ctx : Context) {
                     val billInfo = order.billInfo
                     billInfo?.billStatus = 1
                     order.billInfo = billInfo
+                    order.editTime = System.currentTimeMillis()
                     updateSingleOrderAsync(order).await()
                     updateViewModel()
                     if (isSync == 0) {
@@ -357,6 +360,8 @@ class OrderRepository(ctx : Context) {
                         } else if (response.body()?.status!= null && !response.body()?.status!! &&
                             (response.body()?.message?.contains("Invalid")!! ||
                                     response.body()?.message?.contains("invalid")!! )) {
+                                        syncIntent.putExtra(Constants.IS_SUCCESS, false)
+                            ctx.sendBroadcast(syncIntent)
                             MainActivity.logOutNow(ctx)
                         }
                     }
@@ -402,6 +407,7 @@ class OrderRepository(ctx : Context) {
                              }
                          }
                          order.order_status = Constants.ORDER_STATUS_READY
+                         order.editTime = System.currentTimeMillis()
                          updateSingleOrderAsync(order).await()
                      }
                  }
@@ -484,6 +490,7 @@ class OrderRepository(ctx : Context) {
                     }
                 }
                 if(allItemCompleted) {
+                    order.editTime = System.currentTimeMillis()
                     order.order_status = Constants.ORDER_STATUS_READY
                 }
                 updateSingleOrderAsync(order).await()
@@ -624,6 +631,7 @@ class OrderRepository(ctx : Context) {
                                 order.order_status = Constants.ORDER_STATUS_READY
                                 Log.d("KitchenUpdated", "All Items Ready")
                             }
+                            order.editTime = System.currentTimeMillis()
                             updateSingleOrderAsync(order).await()
                         }
                     }
@@ -834,6 +842,7 @@ class OrderRepository(ctx : Context) {
                     order_status = order.order_status
                     pis_driver_assigned = order.pis_driver_assigned
                     driver_user_id = order.driver_user_id
+                    editTime = order.editTime
                 }
                 // collect item info
                 val itemInfo = order.itemsInfo
@@ -948,7 +957,13 @@ class OrderRepository(ctx : Context) {
                                 }
                             }
                         } else {
-                            Log.e("MultiOrder", "Error: ${response.body()?.status}, ${response.body()?.message      }")
+                            Log.e("MultiOrder", "Error: ${response.body()?.status}, ${response.body()?.message}")
+                            if (response.body()?.message?.lowercase()?.contains("invalid") == true) {
+                                val intent = Intent(Constants.SYNC_COMPLETE_BROADCAST)
+                                intent.putExtra(Constants.IS_SUCCESS, false)
+                                ctx.sendBroadcast(intent)
+                                MainActivity.logOutNow(ctx)
+                            }
                         }
                     }
 
@@ -1019,6 +1034,7 @@ class OrderRepository(ctx : Context) {
             if (order != null) {
                 order.pis_driver_assigned = 1
                 order.driver_user_id = userId
+                order.editTime = System.currentTimeMillis()
                 updateSingleOrderAsync(order).await()
                 updateViewModel()
             }
@@ -1069,6 +1085,82 @@ class OrderRepository(ctx : Context) {
             })
     }
 
+    fun updateOrder(ctx: Context, oRequest: OrderUpdateRequest) {
+        if (MainActivity.isInternetAvailable(ctx)) {
+            val pId = MainActivity.progressDialogRepository.getProgressDialog("Updating Order")
+            val gson = Gson()
+            val typeT = object : TypeToken<OrderUpdateRequest>() { }
+            val requestJson = gson.toJson(oRequest, typeT.type)
+            Log.d("updateRequest", requestJson)
+            ApiService.apiService?.updateOrder(requestJson, Constants.authorization)
+                ?.enqueue(object : Callback<SimpleResponse> {
+                    override fun onResponse(
+                        call: Call<SimpleResponse>,
+                        response: Response<SimpleResponse>
+                    ) {
+                        if (response.isSuccessful && response.body()?.status != null
+                            && response.body()?.status!!) {
+                            MainActivity.progressDialogRepository.showAlertDialog(
+                                "Updated Successfully")
+                            updateOrderOffline(ctx, oRequest, 1)
+                            ctx.sendBroadcast(Intent(Constants.CLEAR_CART_BROADCAST))
+                        } else {
+                            MainActivity.progressDialogRepository.showErrorDialog(
+                                "Error Updating Order: ${response.body()?.message}")
+                        }
+                        MainActivity.progressDialogRepository.dismissDialog(pId)
+                    }
+
+                    override fun onFailure(call: Call<SimpleResponse>, t: Throwable) {
+                        MainActivity.progressDialogRepository.dismissDialog(pId)
+                        MainActivity.progressDialogRepository.showErrorDialog(
+                            "Error Updating Order: ${t.message}"
+                        )
+                    }
+
+                })
+        }
+    }
+
+    fun updateOrderOffline(ctx: Context, oRequest: OrderUpdateRequest, isSync : Int) {
+        mainScope.launch {
+            val orderEntity = getSingleOrderAsync(oRequest.outletId ?: Constants.selectedOutletId,
+                oRequest.orderID ?: 0).await()
+            if (orderEntity != null) {
+                orderEntity.customer_id = oRequest.customerId
+                orderEntity.waiter_id = oRequest.waiterId
+                orderEntity.cookedtime = oRequest.cookedTime
+                orderEntity.table_no = oRequest.table
+                orderEntity.discount = oRequest.discount.toString()
+                orderEntity.tip_type = oRequest.tipType
+                orderEntity.tip_value = oRequest.tipValue.toString()
+                orderEntity.tip_amount = oRequest.tipAmount.toString()
+                orderEntity.totalamount = oRequest.totalAmount
+                orderEntity.customerpaid = oRequest.customerPaid.toString()
+                orderEntity.order_status = oRequest.orderStatus
+                orderEntity.account_number = oRequest.accountNo
+                orderEntity.payment_method_id = oRequest.paymentMethodId
+                orderEntity.syncOrNot = isSync
+                orderEntity.editTime = System.currentTimeMillis()
+            }
+            val itemsInfo = orderEntity?.itemsInfo
+            for (newItem in (oRequest.cartItems ?: emptyList())) {
+                val newItemInEntity = OrdersEntity.ItemInfo().apply {
+                    this.rowId = "Unknown"
+                    this.orderId = orderEntity?.order_id
+                    this.foodStatus = 0
+                   // this.menuId
+                    this.menuQty = newItem.qty.toString()
+                    this.varientId = newItem.sizeId
+                    this.productId = newItem.productId
+              //      this.taxId = newItem.
+               //     this.taxPercentage
+                    this.isHalfAndHalf = newItem.sHalfAndHalf
+                }
+            }
+        }
+    }
+
     fun markAllOrdersAsSynchronized() {
         mainScope.launch {
             val unSyncOrders = getUnsyncOrdersAsync(Constants.selectedOutletId).await()
@@ -1082,6 +1174,7 @@ class OrderRepository(ctx : Context) {
         }
 
     }
+
     suspend fun insertAllOrdersAsync(orders: List<OrdersEntity>) =
         coroutineScope {
             async(Dispatchers.IO) {
@@ -1277,6 +1370,7 @@ class OrderRepository(ctx : Context) {
                             order.order_status = Constants.ORDER_STATUS_READY
                             Log.d("KitchenUpdated", "All Items Ready")
                         }
+                        order.editTime = System.currentTimeMillis()
                         updateSingleOrderAsync(order).await()
                     }
                 }

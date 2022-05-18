@@ -151,7 +151,9 @@ class POSFragment : Fragment() {
         val updateReceiver = object : BroadcastReceiver() {
             override fun onReceive(p0: Context?, p1: Intent?) {
                 if (p1?.action == Constants.CLEAR_CART_BROADCAST) {
-                    binding.includedCart.cartClearBtn.performClick()
+                    if (orderToUpdate == null) {
+                        binding.includedCart.cartClearBtn.performClick()
+                    }
                     binding.posAutoComplete.setText("")
                     binding.userSpinner.setSelection(0, true)
                 }
@@ -225,6 +227,9 @@ class POSFragment : Fragment() {
             val lastSync = mainSharedPreferences.getLong(Constants.PREF_SYN_TIME, 0)
             MainActivity.orderViewModel.lastSyncTiming.value = lastSync
         }
+        if (orderToUpdate != null) {
+            cart.insertProductToUpdate(orderToUpdate!!)
+        }
         return binding.root
     }
 
@@ -262,7 +267,7 @@ class POSFragment : Fragment() {
                         "0", 1, true
                     )
                     Log.d("TablesforDefault", "loding...")
-                    mainRepository.loadTableData(Constants.selectedOutletId,
+                    mainRepository.loadTableData(ctx, Constants.selectedOutletId,
                         outlet.uniqueId ?: "NA", "0", 1, true)
                     mainRepository.loadSubUsersData(ctx, Constants.selectedOutletId,
                         outlet.uniqueId ?: "NA", MainActivity.deviceID, 1)
@@ -293,7 +298,11 @@ class POSFragment : Fragment() {
             binding.menuSpinner.adapter = arrayAdapter
             binding.menuSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                    cart.clearTheCart()
+                    if (orderToUpdate == null) {
+                        cart.clearTheCart()
+                    } else {
+                        orderToUpdate = null
+                    }
                     categorySelected = 0
                     selectedMenuId = menuList[p2].Id
                     binding.noProductText.visibility = View.VISIBLE
@@ -405,6 +414,7 @@ class POSFragment : Fragment() {
         lateinit var currentDiscount : CurrentDiscounts
         var selectedWaiterId = 0
         var selectCustomerId = 0L
+        var orderToUpdate : OrdersEntity? = null
 
         class CurrentDiscounts(val discountOnCategory : HashMap<Int,ArrayList<DiscountData>>,
                                val discountOnProduct : HashMap<Int,ArrayList<DiscountData>>)

@@ -279,6 +279,11 @@ class OngoingOrderAdapter(val ctx: Context, val list:List<OrdersEntity>, val nav
             val dialog = OrderCancelDialog.getInstance(ctx, ongoingOrder)
             dialog.show(MainActivity.fManager, "cancelDialog")
         }
+        holder.binding.invoicePrint.setOnClickListener {
+            InvoiceFragment.directPrint = true
+            InvoiceFragment.orderId = ongoingOrder.order_id
+            navController.navigate(R.id.navigation_invoice)
+        }
         holder.binding.getInvoice.setOnClickListener {
             InvoiceFragment.orderId = ongoingOrder.order_id
             navController.navigate(R.id.navigation_invoice)

@@ -68,6 +68,9 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
     private var productDiscounts : List<DiscountData> = emptyList()
     private var categoryDiscount = 0f
     private var productDiscount = 0f
+    private var inEditingMode = false
+    private val removedRawsInEditing = ArrayList<String>()
+    private var orderToUpdate : OrdersEntity? = null
 /*    private var categoryDiscountPercentage = false
     private var categoryDiscount = 0f
     private var productDiscountPercentage = false
@@ -103,47 +106,20 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                 isTaxesShowing = true
             }
         }
-        binding.tableBtn.setOnClickListener {
-            CoroutineScope(Dispatchers.Main).launch {
-                val tables = mainRepository
-                    .getTablesForOutletAsync(Constants.selectedOutletId).await()
-                Log.d("Available Tables for ${Constants.selectedOutletId}", "${tables?.size}")
-                if (!tables.isNullOrEmpty()) {
-                    val arrayAdapter = ArrayAdapter(ctx, R.layout.item_light_spinner, R.id.light_spinner_text, tables)
-                    binding.tableSpinner.adapter = arrayAdapter
-                    binding.tableSpinner.visibility = View.VISIBLE
-                    binding.tableSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                        override fun onItemSelected(
-                            p0: AdapterView<*>?,
-                            p1: View?,
-                            p2: Int,
-                            p3: Long
-                        ) {
-                            selectedTable = tables[p2].tableId
-                            Log.d("Selected Table", "${tables[p2].tableId}")
-                        }
-
-                        override fun onNothingSelected(p0: AdapterView<*>?) { }
-                    }
-                    binding.tableBtn.visibility = View.GONE
-                } else {
-                    Toast.makeText(ctx, "Tables data not found", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
         binding.addTipBtn.setOnClickListener {
             var tipDialog : AlertDialog? = null
             val builder = AlertDialog.Builder(ctx).apply {
                 val tipBinding = DialogTipBinding.inflate(LayoutInflater.from(ctx))
                 var tipAmount1 = 0f
                 var inPercentage = false
+                tipBinding.tipEd.setText(tipAmount.toString())
                 tipBinding.radioTipType.setOnCheckedChangeListener { _, i ->
                     when (i) {
                         R.id.radioAmount -> {
                             inPercentage = false
                             if (!tipBinding.tipEd.text.isNullOrBlank()) {
                                 tipAmount1 = tipBinding.tipEd.text.toString().toFloat()
-                                tipBinding.totalTip.text = "Tip ( ${Constants.currencySign} ${tipBinding.tipEd.text} )"
+                                tipBinding.totalTip.text = "Tip ( ${Constants.currencySign}${tipBinding.tipEd.text} )"
                             }
                             tipBinding.tipType.text = "$"
                         }
@@ -151,7 +127,7 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                             inPercentage = true
                             if (!tipBinding.tipEd.text.isNullOrBlank()) {
                                 tipAmount1 = (grandTotal * tipBinding.tipEd.text.toString().toFloat() / 100)
-                                tipBinding.totalTip.text = "Tip ( ${Constants.currencySign} ${tipAmount1.format()} )"
+                                tipBinding.totalTip.text = "Tip ( ${Constants.currencySign}${tipAmount1.format()} )"
                             }
                             tipBinding.tipType.text = "%"
                         }
@@ -166,11 +142,11 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                     }
                     if (inPercentage) {
                         tipAmount1 = grandTotal * text.toString().toFloat() / 100
-                        tipBinding.totalTip.text = "Tip ( ${Constants.currencySign} ${tipAmount1.format()} )"
+                        tipBinding.totalTip.text = "Tip ( ${Constants.currencySign}${tipAmount1.format()} )"
                         return@doOnTextChanged
                     }
                     tipAmount1 = text.toString().toFloat()
-                    tipBinding.totalTip.text = "Tip ( ${Constants.currencySign} ${tipAmount1.format()} )"
+                    tipBinding.totalTip.text = "Tip ( ${Constants.currencySign}${tipAmount1.format()} )"
                 }
                 tipBinding.closeButton.setOnClickListener {
                     tipDialog?.dismiss()
@@ -263,7 +239,7 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
             kDialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
             kDialog.show()
         }
-
+        updateTableList()
         cartViewModel.discountPer.observe( ctx, {   percent ->
             binding.addDiscountBtn.text = "$percent%"
             updateTotalAmounts(false)
@@ -283,17 +259,222 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
         ctx.registerReceiver(outletChangeReceiver, IntentFilter(Constants.OUTLET_CHANGE_BROADCAST))
     }
 
+    fun updateTableList() {
+        CoroutineScope(Dispatchers.Main).launch {
+            val tables = mainRepository
+                .getTablesForOutletAsync(Constants.selectedOutletId).await()
+            Log.d("Available Tables for ${Constants.selectedOutletId}", "${tables?.size}")
+            if (!tables.isNullOrEmpty()) {
+                val arrayAdapter = ArrayAdapter(ctx, R.layout.item_light_spinner, R.id.light_spinner_text, tables)
+                binding.tableSpinner.adapter = arrayAdapter
+    //            binding.tableSpinner.visibility = View.VISIBLE
+                binding.tableSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(
+                        p0: AdapterView<*>?,
+                        p1: View?,
+                        p2: Int,
+                        p3: Long
+                    ) {
+                        selectedTable = tables[p2].tableId
+                        Log.d("Selected Table", "${tables[p2].tableId}")
+                    }
+
+                    override fun onNothingSelected(p0: AdapterView<*>?) { }
+                }
+         //       binding.tableBtn.visibility = View.GONE
+                binding.tableBtn.setOnClickListener {
+                    binding.tableSpinner.visibility = View.VISIBLE
+                    it.visibility = View.GONE
+                }
+            } else {
+                Log.d( "Tables","waiting for table data...")
+                delay(2000)
+                updateTableList()
+            }
+        }
+    }
+
     fun clearTheCart() {
         tipAmount = 0f
         binding.cookingTimeSeek.progress = 5
         binding.tipText.text = Constants.currencySign +"0"
         items.clear()
         itemAdapter.notifyDataSetChanged()
-        cartViewModel.setDiscount(0)
+        cartViewModel.setDiscount(0f)
         updateTotalAmounts(false)
     }
 
     fun checkoutCart(items: List<ItemInCart>) {
+        if (inEditingMode) {
+            if (orderToUpdate == null) {
+                Log.e("Checkout", "OrderToUpdate is nulll")
+                return
+            }
+            val updateRequest = OrderUpdateRequest().apply {
+                this.driverUserId = orderToUpdate?.driver_user_id
+                this.customerId = orderToUpdate?.customer_id
+                this.orderID = orderToUpdate?.order_id
+                this.tipType = orderToUpdate?.tip_type
+                this.tipValue = this@Cart.tipAmount
+                this.paymentReceivedOrNot = 0
+                this.billDate = null
+                this.cardType = null
+                this.cookedTime = mainRepository.formatCookingTime(this@Cart.cookingTimeInMin)
+                this.discount = cartViewModel.discountPer.value
+                this.orderDeliveredOrNot = orderToUpdate?.pis_order_delivered
+                this.receivedPaymentAmount =  orderToUpdate?.received_payment_amount?.toFloat()
+                this.billStatus = this@Cart.billStatus
+                this.outletId = orderToUpdate?.outlet_id
+                this.deviceId = MainActivity.deviceID
+                this.paymentMethodId = paymentMethod.toString()
+                this.accountNo = if (orderToUpdate?.account_number.isNullOrBlank()
+                    || orderToUpdate?.account_number.equals("NA")) {
+                    null
+                } else {
+                    orderToUpdate?.account_number
+                }
+                this.selectedCard = null
+                this.selectedCardType = null
+                this.driverAssigned = orderToUpdate?.pis_driver_assigned
+                this.totalAmount = this@Cart.grandTotal
+                this.customerPaid = (orderToUpdate?.customerpaid ?: "0").toFloat()
+                this.waiterId = orderToUpdate?.waiter_id
+                this.orderDate = orderToUpdate?.order_date
+                this.orderStatus = this@Cart.newOrderStatus
+                this.table = this@Cart.selectedTable
+                this.customerType = if (orderToUpdate?.customer_type.isNullOrBlank()
+                    || orderToUpdate?.customer_type.equals("NA")) {
+                    "0"
+                } else {
+                    orderToUpdate?.customer_type
+                }
+                this.tipAmount = this@Cart.tipAmount
+                this.orderTime = orderToUpdate?.order_time
+                this.billTime = null
+            }
+            updateRequest.deletedRows // needs to add row ids of delete items
+            val addOnsId = ArrayList<Int>()
+            val addOnsPrice = ArrayList<Float>()
+            val addOnsQty = ArrayList<Int>()
+            val addOnsName = ArrayList<String>()
+            val itemsInRequest = ArrayList<OrderUpdateRequest.CartItem>()
+            CoroutineScope(Dispatchers.Main).launch {
+                for (item in items) {
+                    if (item.fromEdit) continue
+                    if (item.isAddOn) {
+                        val addOnData = mainRepository.getOneAddOnDataAsync(item.id ?: 0).await()
+                        if (addOnData != null) {
+                            addOnsId.add(addOnData.addOnId)
+                            val addPrice : Float = if (addOnData.addonPrice.isNullOrBlank()) {
+                                0f
+                            } else {
+                                (addOnData.addonPrice ?: "0").toFloat()
+                            }
+                            addOnsPrice.add(addPrice)
+                            addOnsQty.add(item.qty ?: 0)
+                            addOnsName.add(item.name ?: "NA")
+                        }
+                        continue
+                    }
+                    val productData = mainRepository.getProductDataAsync(item.id ?: 0).await()
+                    val variantData =
+                        mainRepository.getOneVariantDataAsync(item.variantId ?: 0).await()
+                    if (productData != null) {
+                        val itemInRequest = OrderUpdateRequest.CartItem().apply {
+                            this.productId = item.id
+                            this.variantName = (variantData?.variantName ?: "")
+                            this.qty = item.qty
+                            this.price = item.price
+                            this.catId = productData.categoryId
+                            this.sizeId = (variantData?.variantId ?: 0)
+                            this.addOnIds = null
+                            this.addOnPrice = null
+                            this.addOnUnitPrice = null
+                            this.addOnQty = null
+                            this.addOnName = null
+                            val modifiers = ArrayList<Int>()
+                            val modifierNames = ArrayList<String>()
+                            val modifiersQty = ArrayList<Int>()
+                            val subModIds = ArrayList<Int>()
+                            val subModNames = ArrayList<String>()
+                            val subModTypeNames = ArrayList<String>()
+                            val subModTypeInt = ArrayList<Int>()
+                            val mainModTotalPriceStr = ArrayList<Float>()
+                            val modifiersHalfAndHalf = ArrayList<String>()
+                            val subMod2xIds = ArrayList<Int>()
+                            for (modf in item.modifiers) {
+                                modifiers.add(modf.modId ?: 0)
+                                modifiersQty.add(1)
+                       //         modifierPrices.add(modf.modPrice ?: 0f)
+                                val oneModData =
+                                    mainRepository.getOneModifierDataAsync(modf.modId ?: 0).await()
+                                if (oneModData != null) {
+                                    modifierNames.add(oneModData.modifierName ?: "NA")
+                                    modifiersHalfAndHalf.add(oneModData.halfAndHalf ?: "0")
+                                    var modPrice = 0f
+                                    for (subModf in modf.subMods) {
+                                        val subData = mainRepository.getOneSubModifierDataAsync(subModf.id).await()
+                                        if (subModf.is2xMod == 1) {
+                                            subMod2xIds.add(subModf.id)
+                                        }
+                                        if (subData != null) {
+                                            subModIds.add(subModf.id)
+                                            subModNames.add(subData.subModifierName ?: "NA")
+                                            when (subModf.modeType) {
+                                                0 -> {
+                                                    subModTypeNames.add("Whole")
+                                                    subModTypeInt.add(0)
+                                                }
+                                                1 -> {
+                                                    subModTypeNames.add("First Half")
+                                                    subModTypeInt.add(1)
+                                                }
+                                                2 -> {
+                                                    subModTypeNames.add("Secound Half")
+                                                    subModTypeInt.add(2)
+                                                }
+                                            }
+                                            modPrice += if (subData.normalModifierPrice.isNullOrBlank()) {
+                                            0f
+                                        } else {
+                                            (subData.normalModifierPrice ?: "0").toFloat()
+                                        }
+                                        }
+                                    }
+                                    mainModTotalPriceStr.add(modPrice)
+                                }
+                            }
+                            this.mainModifierId = modifiers.joinToString()
+                   //         this.modifierPrice = modifierPrices.joinToString()
+                            this.mainModifierName = modifierNames.joinToString()
+                            this.mainModifierQty = modifiersQty.joinToString()
+                            this.subModIds = subModIds.joinToString()
+                            this.subModNames = subModNames.joinToString()
+                            this.subModeTypeName = subModTypeNames.joinToString()
+                            this.subModeTypeInt = subModTypeInt.joinToString()
+                            this.mainModTotalPrices = mainModTotalPriceStr.joinToString()
+                            this.sHalfAndHalf = modifiersHalfAndHalf.joinToString()
+                            this.subMod2x = subMod2xIds.joinToString()
+                            this.price = item.price
+                        }
+                        itemsInRequest.add(itemInRequest)
+                    } else {
+                        Log.d("ProductNotFound", "${item.id}")
+                        Toast.makeText(ctx, "Error getting data", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                itemsInRequest[0].apply {
+                    this.addOnIds = addOnsId.joinToString()
+                    this.addOnPrice = addOnsPrice.joinToString()
+                    this.addOnUnitPrice = addOnsPrice.joinToString()
+                    this.addOnQty = addOnsQty.joinToString()
+                    this.addOnName = addOnsName.joinToString()
+                }
+                updateRequest.cartItems = itemsInRequest
+                MainActivity.orderRepository.updateOrder(ctx, updateRequest)
+            }
+            return
+        }
         val orderRequest = ProductOrderRequest()
         val cal = Calendar.getInstance()
         var hour = cal.get(Calendar.HOUR_OF_DAY).toString()
@@ -322,7 +503,7 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
         orderRequest.accountNo = ""
         orderRequest.driverAssigned = 0
         orderRequest.cardType = 1
-        orderRequest.discount = cartViewModel.discountPer.value?.toFloat()
+        orderRequest.discount = cartViewModel.discountPer.value
         orderRequest.billStatus = billStatus
         orderRequest.cookedTime = mainRepository.formatCookingTime(cookingTimeInMin)
         orderRequest.orderTime = "$hour:$minute:$seconds"
@@ -621,6 +802,101 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
         updateTotalAmounts(true)
     }
 
+    fun insertProductToUpdate(order: OrdersEntity) {
+        binding.updateLayout.visibility = View.VISIBLE
+        binding.updateOrderText.text = "Updating Order No. ${order.order_id}"
+        binding.updateCancelBtn.setOnClickListener {
+            clearTheCart()
+            binding.updateLayout.visibility = View.GONE
+        }
+        CoroutineScope(Dispatchers.Main).launch {
+            val products = order.itemsInfo
+            for (pro in (products ?: emptyList())) {
+                val id = pro.productId ?: 0
+                val prodInfo = mainRepository.getProductDataAsync(id).await()
+                val prodName = prodInfo?.productName
+                val variantId = pro.varientId
+                var productPrice = (prodInfo?.productPrice ?: "0").toFloat()
+                if (variantId != null && variantId > 0) {
+                    val variantData = mainRepository.getOneVariantDataAsync(variantId).await()
+                    if (variantData != null) {
+                        productPrice = (variantData.variantPrice ?: "0").toFloat()
+                    }
+                }
+                // generate product tax list
+                val taxIdList = pro.taxId?.split(",")
+                val taxList = ArrayList<ProductTax>()
+                for (tId in (taxIdList ?: emptyList())) {
+                    val alr : ProductTax? = taxList.find { it.id == tId.toInt() }
+                    if (alr == null) {
+                        val taxData = mainRepository.getOneTaxDetailAsync(tId.toInt()).await()
+                        if (taxData != null) {
+                            taxList.add(taxData)
+                        }
+                    }
+
+                }
+                items.add(ItemInCart(id, prodName, variantId, ArrayList(),
+                    (pro.menuQty ?: "0").toInt(), productPrice,
+                    emptyList(), emptyList(), taxList, order.customer_note, false, fromEdit = true, foodStatus = (pro.foodStatus ?: 0)
+                ))
+                itemAdapter.notifyItemInserted(items.size - 1)
+            }
+            val addOns = order.addOns
+            for (addOn in (addOns ?: emptyList())) {
+                val id = addOn.addOnId ?: 0
+                val qty : Int = if (addOn.addOnQty.isNullOrBlank() || addOn.addOnQty.equals("NA")) {
+                    0
+                } else {
+                    (addOn.addOnQty ?: "0").toInt()
+                }
+                val addOnInfo = mainRepository.getOneAddOnDataAsync(id).await()
+                val productName = addOnInfo?.addOnName
+                val productPrice: Float = if (addOnInfo?.addonPrice.isNullOrBlank() || addOnInfo?.addonPrice.equals("NA")) {
+                    0f
+                } else {
+                    (addOnInfo?.addonPrice ?: "0").toFloat()
+                }
+                // generate addon Tax List
+                val taxList = addOnInfo?.addOnTaxes
+                items.add(ItemInCart(id, productName, null, ArrayList(), qty, productPrice, emptyList(), emptyList(),
+                    taxList, order.customer_note, true, fromEdit = true
+                ))
+                itemAdapter.notifyItemInserted(items.size - 1)
+            }
+            // set up table
+            selectedTable = order.table_no ?: 0
+            val tableAdapter = binding.tableSpinner.adapter
+            for (i in 0 until tableAdapter.count) {
+                val tableData = tableAdapter.getItem(i) as TableData
+                if (tableData.tableId == selectedTable) {
+                    binding.tableSpinner.setSelection(i)
+                    binding.tableBtn.performClick()
+                    break
+                }
+            }
+            // set up discount
+            cartViewModel.setDiscount((order.discount ?: "0").toFloat())
+            // set up TipAmount
+            tipAmount = if (order.tip_value.isNullOrBlank()) {
+                0f
+            } else {
+                (order.tip_value ?: "0").toFloat()
+            }
+            binding.tipText.text = Constants.currencySign + tipAmount
+            // set up cooking time
+            Log.d("UpdateCookingTime", order.cookedtime.toString())
+            val cookingHour = (order.cookedtime ?: "00:05:00").split(":")[0].toInt()
+            val cookingMinute = (order.cookedtime ?: "00:05:00").split(":")[1].toInt()
+            val totalMinutes = (cookingHour * 60) + cookingMinute
+            binding.cookingTimeSeek.progress = totalMinutes
+            binding.cookingTimeText.text = "$totalMinutes\nMin"
+            inEditingMode = true
+            orderToUpdate = order
+            updateTotalAmounts(false)
+        }
+    }
+
     private fun getItemPriceWithDiscount(item: ItemInCart) : Float {
         val itemTotal = ((item.qty ?: 0) * (item.price ?: 0f))
         var catDiscount = 0f
@@ -665,7 +941,7 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
         return (itemTotal - catDiscount - prodDiscount)
     }
 
-    private fun addTax(discountPercentage : Int) : Float {
+    private fun addTax(discountPercentage : Float) : Float {
         taxMap.clear()
         for (item in items) {
             if (!item.taxes.isNullOrEmpty()) {
@@ -709,13 +985,13 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
             categoryDiscount = subtotal * categoryDiscount / 100
             subtotal -= categoryDiscount
         }  */
-        val discountAmount = subtotal * (cartViewModel.discountPer.value ?: 0)  / 100
+        val discountAmount = subtotal * (cartViewModel.discountPer.value ?: 0f)  / 100
         grandTotal += subtotal
         grandTotal -= discountAmount
         grandTotal += tipAmount
         binding.discountText.text = Constants.currencySign +" "+discountAmount.format()
         binding.subTotalText.text = Constants.currencySign +" " +subtotal.format()
-        val tax = addTax(cartViewModel.discountPer.value ?: 0)
+        val tax = addTax(cartViewModel.discountPer.value ?: 0f)
         binding.taxTotalText.text = Constants.currencySign +" "+tax.format()
         grandTotal += tax
         if (grandTotal>0f && playSound) {
@@ -791,6 +1067,9 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
             itemToReplace.qty = (itemToReplace.qty ?: 0) - 1
             if ((itemToReplace.qty ?: 0) <= 0) {
                 items.remove(itemToReplace)
+                if (itemToReplace.fromEdit) {
+
+                }
                 itemAdapter.notifyDataSetChanged()
             } else {
       //          items.add(itemToReplace)
@@ -860,10 +1139,21 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
             holder.cBinding.itemPrice.text = Constants.currencySign + " " +
                     (itemPrice - (catDiscount+prodDiscount)).toString()
             holder.cBinding.itemAdd.setOnClickListener {
-                incrementQty(item.id)
+                if (item.foodStatus == 1) {
+                    MainActivity.progressDialogRepository.showErrorDialog(
+                        "This item is served, Can not change this"
+                    )
+                } else {
+                    incrementQty(item.id)
+                }
             }
             holder.cBinding.itemRemove.setOnClickListener {
-                decrementQty(item.id)
+                if (item.foodStatus == 1) {
+                    MainActivity.progressDialogRepository.showErrorDialog(
+                        "This item is served, Can not change this")
+                } else {
+                    decrementQty(item.id)
+                }
             }
         }
 
@@ -894,7 +1184,7 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
     class ItemInCart(
         val id:Int?, val name:String?, val variantId: Int?, val modifiers: ArrayList<ModifierInCart>,
         var qty: Int?, val price: Float?,val catDiscounts : List<DiscountData>, val prodDiscount : List<DiscountData>,
-        val taxes: List<ProductTax>?, val orderNote: String?, val isAddOn : Boolean,
+        val taxes: List<ProductTax>?, val orderNote: String?, val isAddOn : Boolean, val fromEdit: Boolean= false, val foodStatus:Int = 0,
         var holderPosition:Int = 0)
     // missing field in cart modifierIds, orderNotes, SubModIds
     class ModifierInCart(val modId: Int?, val modPrice: Float?, val subMods : ArrayList<SubModifierBrief>)
@@ -916,6 +1206,7 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
         ): View {
             dBinding = DialogAddDiscountBinding.inflate(
                 inflater, container, false)
+            dBinding.editText.setText(cartViewModel.discountPer.value.toString())
             dBinding.cancelBtn.setOnClickListener {
                 this.dialog?.dismiss()
             }
@@ -927,7 +1218,7 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                     dBinding.editText.error = "value not set"
                     return@setOnClickListener
                 }
-                cartViewModel.setDiscount(dBinding.editText.text.toString().toInt())
+                cartViewModel.setDiscount(dBinding.editText.text.toString().toFloat())
                 this.dialog?.dismiss()
             }
             return dBinding.root
@@ -950,13 +1241,13 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
 
     class CartViewModel : ViewModel() {
 
-        private val _discountPer = MutableLiveData(0)
-        val discountPer : LiveData<Int> = _discountPer
+        private val _discountPer = MutableLiveData(0f)
+        val discountPer : LiveData<Float> = _discountPer
 
         private val _selectedVariantId = MutableLiveData(0)
         val selectedVariantId : LiveData<Int> = _selectedVariantId
 
-        fun setDiscount(per : Int) {
+        fun setDiscount(per : Float) {
             _discountPer.value = per
         }
         fun setVariantId(vId: Int) {

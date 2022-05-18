@@ -19,6 +19,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="15dp"
         android:text="Countdown Board"
+        android:textStyle="bold"
         android:textColor="@color/black"
         android:textSize="@dimen/header_text" />
 

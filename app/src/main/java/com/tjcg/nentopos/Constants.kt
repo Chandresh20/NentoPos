@@ -20,6 +20,7 @@ class Constants {
         const val SYNC_COMPLETE_BROADCAST = "com.tjcg.nentopos.sync-completed"
         const val SUB_USER_LOGIN_BROADCAST = "com.tjcg.nentopos.subuserlogin"
         const val CUSTOMER_ADDED_BROADCAST = "com.tjcg.nentopos.customer-added"
+        const val TABLE_LOADED_BROADCAST = "com.tjcg.nentopos.tables-loaded"
 
         const val IS_SUCCESS = "IsSuccess"
 

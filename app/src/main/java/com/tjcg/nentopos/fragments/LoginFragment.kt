@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -38,6 +40,9 @@ class LoginFragment : Fragment() {
             Constants.clientId = MainActivity.mainRepository.sharedPreferences.getString(Constants.PREF_CLIENT_ID, "-1") ?: "-1"
             POSFragment.directLogin = true
             findNavController().navigate(R.id.action_navigation_login_to_navigation_pos)
+            Handler(Looper.getMainLooper()).postDelayed( {
+                ctx.sendBroadcast(Intent(Constants.TABLE_LOADED_BROADCAST))
+            }, 2000)
             return binding.root
         }
         val isNewLogin = MainActivity.mainSharedPreferences.getBoolean(Constants.PREF_IS_NEW_LOGIN, false)

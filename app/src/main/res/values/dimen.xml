@@ -82,7 +82,7 @@
 
     <!-- common -->
     <dimen name="small_btn_corners">5dp</dimen>
-    <dimen name="header_text">25sp</dimen>
+    <dimen name="header_text">30sp</dimen>
 
     <!-- All Orders -->
     <dimen name="search_icon_size">40dp</dimen>

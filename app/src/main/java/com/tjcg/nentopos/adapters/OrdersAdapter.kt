@@ -22,6 +22,7 @@ import com.tjcg.nentopos.dialog.OrderAcceptDialog
 import com.tjcg.nentopos.dialog.OrderCancelDialog
 import com.tjcg.nentopos.dialog.PaymentDialog
 import com.tjcg.nentopos.fragments.InvoiceFragment
+import com.tjcg.nentopos.fragments.POSFragment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -40,7 +41,7 @@ class OrdersAdapter(val ctx: Context, val list: List<OrdersEntity>, private val 
     override fun onBindViewHolder(holder: OrdersAdapter.MyHolder, position: Int) {
         val onlineOrderData = list[position]
         holder.binding.orderId.text = onlineOrderData.order_id.toString()
-        holder.binding.gridLayout.removeView(holder.binding.editOrder)
+    //    holder.binding.gridLayout.removeView(holder.binding.editOrder)
         if (onlineOrderData.futureOrderType == Constants.FUTURE_ORDER_FAR) {
             holder.binding.gridLayout.removeView(holder.binding.editOrder)
             holder.binding.gridLayout.removeView(holder.binding.acceptOrder)
@@ -115,7 +116,9 @@ class OrdersAdapter(val ctx: Context, val list: List<OrdersEntity>, private val 
             navController.navigate(R.id.navigation_invoice)
         }
         holder.binding.printInvoice.setOnClickListener {
-
+            InvoiceFragment.directPrint = true
+            InvoiceFragment.orderId = onlineOrderData.order_id
+            navController.navigate(R.id.navigation_invoice)
         }
         when (onlineOrderData.order_status) {
             Constants.ORDER_STATUS_CANCELED -> {
@@ -142,7 +145,7 @@ class OrdersAdapter(val ctx: Context, val list: List<OrdersEntity>, private val 
             }
             Constants.ORDER_STATUS_PROCESSING -> {
                 holder.binding.gridLayout.removeView(holder.binding.acceptOrder)
-                holder.binding.gridLayout.removeView(holder.binding.editOrder)
+             //   holder.binding.gridLayout.removeView(holder.binding.editOrder)
             }
             Constants.ORDER_STATUS_READY -> {
                 holder.binding.gridLayout.removeView(holder.binding.acceptOrder)
@@ -150,6 +153,8 @@ class OrdersAdapter(val ctx: Context, val list: List<OrdersEntity>, private val 
         }
         holder.binding.editOrder.setOnClickListener {
             //    ctx?.setFragment(PosTabFragment.newInstance())
+            POSFragment.orderToUpdate = onlineOrderData
+            navController.navigate(R.id.navigation_pos)
         }
         holder.binding.acceptOrder.setOnClickListener {
             val dialog = OrderAcceptDialog.getInstance(ctx, onlineOrderData)

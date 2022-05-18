@@ -6,6 +6,7 @@ import android.graphics.Paint
 import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -75,6 +76,7 @@ class InvoiceFragment : Fragment() {
     }
 
     companion object {
+        var directPrint = false
         var orderId: Long = -1
     }
 
@@ -190,6 +192,15 @@ class InvoiceFragment : Fragment() {
                 amountPrints[PRINT_STORE_CHARGE] = storeCharge ?: 0f
                 updateGrandTotal(totalTax)
             }, 1000)
+        }
+        if (directPrint) {
+            val prepareDialogId = MainActivity.progressDialogRepository.getProgressDialog(
+                "Please Wait")
+            Handler(Looper.getMainLooper()).postDelayed( {
+                MainActivity.progressDialogRepository.dismissDialog(prepareDialogId)
+                binding.printBtn.performClick()
+                directPrint = false
+            }, 3000)
         }
         return binding.root
     }
@@ -713,10 +724,14 @@ class InvoiceFragment : Fragment() {
                             val sepIndex = taxIds.indexOf(",")
                             val tId = taxIds.substring(0, sepIndex)
                             taxIds = taxIds.substring(sepIndex+1)
-                            taxArray.add(tId.toInt())
+                            if (!taxArray.contains(tId.toInt())) {
+                                taxArray.add(tId.toInt())
+                            }
                         }
                         // for last id
-                        taxArray.add(taxIds.toInt())
+                        if (!taxArray.contains(taxIds.toInt())) {
+                            taxArray.add(taxIds.toInt())
+                        }
                     }
                     // calculate each tax as per tax id
                     for (taxId in taxArray) {
@@ -726,6 +741,7 @@ class InvoiceFragment : Fragment() {
                                     val mainDiscount = totalPrice * mainDiscountPrec / 100
                                 ((totalPrice - mainDiscount) * (taxDetail.taxPercentage ?: "0").toFloat() / 100)
                             } else {
+                                Log.d("TAX ${taxDetail.taxPercentage}", "${item.menuId}")
                                 (taxDetail.taxPercentage ?: "0").toFloat() * (item.menuQty ?: "0").toFloat()
                             }
                             val currentTax = manageTaxes.getTaxValue(taxId)
@@ -784,6 +800,7 @@ class InvoiceFragment : Fragment() {
                             val taxValue = if (taxDetail.taxType == Constants.TAX_IN_PERCENT) {
                                 (totalPrice * (taxDetail.taxPercentage ?: "0").toFloat() / 100)
                             } else {
+                                    Log.d("TAXADD ${taxDetail.taxPercentage}", "${addOn.addOnId}")
                                 (taxDetail.taxPercentage ?: "0").toFloat() * (addOn.addOnQty ?: "0").toFloat()
                             }
                             val currentTax = manageTaxes.getTaxValue(taxId)

@@ -66,6 +66,10 @@ class OrderSyncEntity {
 
         @SerializedName("billinfo")
         var billInfoSyn : BillInfoSyn? = null
+
+        // new parameter to solve sync
+        @SerializedName("edit_time")
+        var editTime : Long? = null
     }
 
     class ItemInfoSyn {

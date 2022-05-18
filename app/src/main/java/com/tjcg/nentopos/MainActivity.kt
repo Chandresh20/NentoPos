@@ -247,8 +247,8 @@ class MainActivity : AppCompatActivity() {
                 expandActionBar()
             }
             NAV_TABLES -> {
-                navController.navigate(R.id.navigation_table)
-                expandActionBar()
+           /*     navController.navigate(R.id.navigation_table)
+                expandActionBar()  */
             }
         }
     }

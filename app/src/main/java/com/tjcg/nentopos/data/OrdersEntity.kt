@@ -203,6 +203,9 @@ class OrdersEntity {
     var remainedTime:Long = 0L
     // added for futureOrderType (changes as per time)
     var futureOrderType : Int? = null
+    // added for sync
+    var editTime : Long? = null
+
 
     // added after AllOrder API update
 

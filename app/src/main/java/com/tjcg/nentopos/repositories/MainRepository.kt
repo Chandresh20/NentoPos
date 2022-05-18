@@ -16,6 +16,7 @@ import kotlinx.coroutines.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.time.LocalDate
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -131,12 +132,21 @@ class MainRepository(ctx : Context) {
 
     fun loadOnFirstLogin(ctx: Context, outlets: List<OutletData>) {
         for (outlet in outlets) {
-            val isDefault = outlet.sDefault == 1
+            val isDefault : Boolean = if (outlets.size == 1) {
+                Constants.selectedOutletId = outlet.outletId
+                true
+            } else {
+                outlet.sDefault == 1
+            }
+            Log.d("Outlet", "${outlet.outletId} is default= $isDefault")
             Log.d("FirstLogin", "Loading data for default outlet ${outlet.outletId}")
+            if (isDefault) {
+                Constants.databaseBusy = true
+            }
             loadProductData(ctx, outlet.outletId, outlet.uniqueId ?: "NA", MainActivity.deviceID, 1, isDefault)
             loadCustomerData(ctx, outlet.outletId, MainActivity.deviceID, 1, isDefault)
             loadSubUsersData(ctx, outlet.outletId, outlet.uniqueId ?: "NA", MainActivity.deviceID, 1)
-            loadTableData(outlet.outletId, outlet.uniqueId ?: "NA", MainActivity.deviceID, 1, isDefault)
+            loadTableData(ctx, outlet.outletId, outlet.uniqueId ?: "NA", MainActivity.deviceID, 1, isDefault)
             loadDiscountData(ctx ,MainActivity.deviceID, 1, outlet.outletId, isDefault)
             loadCardTerminalData(outlet.outletId, MainActivity.deviceID, 1)
             MainActivity.orderRepository.getAllOrdersOnline(ctx, outlet.outletId, 1,isDefault)
@@ -400,7 +410,7 @@ class MainRepository(ctx : Context) {
         })
     }
 
-    fun loadTableData(outletId: Int, uniqueId: String, deviceId: String,
+    fun loadTableData(ctx: Context, outletId: Int, uniqueId: String, deviceId: String,
                       isAllData: Int, defaultOutlet: Boolean) {
         var dialogId = 0
         if (defaultOutlet) {
@@ -426,6 +436,7 @@ class MainRepository(ctx : Context) {
                         }
                         CoroutineScope(Dispatchers.Main).launch {
                             insertTableDataAsync(tables2).await()
+                            ctx.sendBroadcast(Intent(Constants.TABLE_LOADED_BROADCAST))
                             Log.d("Tables", "Inserted: ${tables2.size} for Id: $outletId")
                         }
                     }

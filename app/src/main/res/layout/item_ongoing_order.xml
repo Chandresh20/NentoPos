@@ -117,6 +117,15 @@
             <!--                />-->
 
             <ImageView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:background="@drawable/image_bg"
+                android:src="@drawable/ic_print"
+                android:padding="2dp"
+                android:id="@+id/invoice_print"
+                android:layout_marginStart="10dp"
+                android:layout_height="match_parent"/>
+            <ImageView
                 android:id="@+id/get_invoice"
                 android:layout_width="0dp"
                 android:layout_weight="1"
@@ -125,8 +134,7 @@
                 android:layout_marginStart="10dp"
                 android:padding="2dp"
                 android:src="@drawable/ic_file"
-                app:tint="@color/white"
-                />
+                app:tint="@color/white" />
 
             <ImageView
                 android:id="@+id/send_sms"

@@ -294,7 +294,7 @@
                 android:background="@drawable/order_item_bg"
                 android:gravity="center"
                 android:padding="10dp"
-                android:text="Accept \n Order "
+                android:text="Accept Order "
                 android:textColor="@color/green"
                 android:textSize="@dimen/order_text" />
 
@@ -309,7 +309,7 @@
                 android:gravity="center"
                 android:padding="10dp"
                 android:visibility="gone"
-                android:text="Complete\n Order"
+                android:text="Complete Order"
                 android:textColor="@color/green"
                 android:textSize="@dimen/order_text" />
 
@@ -323,7 +323,7 @@
                 android:background="@drawable/red_bg2"
                 android:gravity="center"
                 android:padding="10dp"
-                android:text="Cancel \n Order"
+                android:text="Cancel Order"
                 android:textColor="@color/red"
                 android:textSize="@dimen/order_text" />
             <TextView
@@ -336,7 +336,7 @@
                 android:background="@drawable/blue_bg"
                 android:gravity="center"
                 android:padding="10dp"
-                android:text="POS\nInvoice"
+                android:text="POS Invoice"
                 android:textColor="@color/app_primary"
                 android:textSize="@dimen/order_text" />
             <TextView
@@ -349,7 +349,7 @@
                 android:background="@drawable/blue_bg"
                 android:gravity="center"
                 android:padding="10dp"
-                android:text="View\nInvoice"
+                android:text="View Invoice"
                 android:textColor="@color/app_primary"
                 android:textSize="@dimen/order_text" />
             <TextView
@@ -362,7 +362,7 @@
                 android:background="@drawable/grey_bg"
                 android:gravity="center"
                 android:padding="10dp"
-                android:text="Assign \n Driver"
+                android:text="Assign Driver"
                 android:textColor="@color/button"
                 android:textSize="@dimen/order_text" />
         </TableRow>
