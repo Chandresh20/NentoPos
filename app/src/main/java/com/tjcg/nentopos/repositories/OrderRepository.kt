@@ -343,6 +343,7 @@ class OrderRepository(ctx : Context) {
 
     private fun updateOrdersOnline(ctx: Context, ordersInJson: String)  {
         val syncIntent = Intent(Constants.SYNC_COMPLETE_BROADCAST)
+        Log.d("OrderSyncRequest", ordersInJson)
         ApiService.apiService?.syncOrders(ordersInJson, Constants.authorization)
             ?.enqueue(object : Callback<SimpleResponse> {
                 override fun onResponse(
@@ -1103,7 +1104,8 @@ class OrderRepository(ctx : Context) {
                             MainActivity.progressDialogRepository.showAlertDialog(
                                 "Updated Successfully")
                             updateOrderOffline(ctx, oRequest, 1)
-                            ctx.sendBroadcast(Intent(Constants.CLEAR_CART_BROADCAST))
+                            MainActivity.orderRepository.getAllOrdersOnline(ctx, Constants.selectedOutletId,1, true)
+                            ctx.sendBroadcast(Intent(Constants.EXIT_EDITING_MODE_BROADCAST))
                         } else {
                             MainActivity.progressDialogRepository.showErrorDialog(
                                 "Error Updating Order: ${response.body()?.message}")
@@ -1143,7 +1145,7 @@ class OrderRepository(ctx : Context) {
                 orderEntity.syncOrNot = isSync
                 orderEntity.editTime = System.currentTimeMillis()
             }
-            val itemsInfo = orderEntity?.itemsInfo
+            val itemsInfo = orderEntity?.itemsInfo as ArrayList<OrdersEntity.ItemInfo>
             for (newItem in (oRequest.cartItems ?: emptyList())) {
                 val newItemInEntity = OrdersEntity.ItemInfo().apply {
                     this.rowId = "Unknown"
@@ -1153,10 +1155,15 @@ class OrderRepository(ctx : Context) {
                     this.menuQty = newItem.qty.toString()
                     this.varientId = newItem.sizeId
                     this.productId = newItem.productId
-              //      this.taxId = newItem.
-               //     this.taxPercentage
-                    this.isHalfAndHalf = newItem.sHalfAndHalf
+                  //  this.taxId
+                  //  this.taxPercentage
+                  //  this.isHalfAndHalf
+                  //  this.is2xMod
+                 //   this.discountType
+                  //  this.itemDiscount
+                 //   this.orderNote
                 }
+                itemsInfo.add(newItemInEntity)
             }
         }
     }

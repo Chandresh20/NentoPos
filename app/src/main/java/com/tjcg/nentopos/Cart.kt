@@ -38,6 +38,7 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import com.tjcg.nentopos.MainActivity.Companion.mainRepository
 import com.tjcg.nentopos.dialog.PaymentDialog
+import com.tjcg.nentopos.fragments.InvoiceFragment
 import com.tjcg.nentopos.fragments.POSFragment
 
 const val SUB_MODE_FULL = 0
@@ -69,7 +70,6 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
     private var categoryDiscount = 0f
     private var productDiscount = 0f
     private var inEditingMode = false
-    private val removedRawsInEditing = ArrayList<String>()
     private var orderToUpdate : OrdersEntity? = null
 /*    private var categoryDiscountPercentage = false
     private var categoryDiscount = 0f
@@ -256,7 +256,14 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                 binding.cartClearBtn.performClick()
             }
         }
+        val editExitReceiver = object : BroadcastReceiver() {
+            override fun onReceive(p0: Context?, p1: Intent?) {
+                exitEditingMode()
+            }
+        }
         ctx.registerReceiver(outletChangeReceiver, IntentFilter(Constants.OUTLET_CHANGE_BROADCAST))
+        ctx.registerReceiver(outletChangeReceiver, IntentFilter(Constants.OUTLET_CHANGE_BROADCAST))
+        ctx.registerReceiver(editExitReceiver, IntentFilter(Constants.EXIT_EDITING_MODE_BROADCAST))
     }
 
     fun updateTableList() {
@@ -410,7 +417,9 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                                     mainRepository.getOneModifierDataAsync(modf.modId ?: 0).await()
                                 if (oneModData != null) {
                                     modifierNames.add(oneModData.modifierName ?: "NA")
-                                    modifiersHalfAndHalf.add(oneModData.halfAndHalf ?: "0")
+                                    if (oneModData.halfAndHalf == "1") {
+                                        modifiersHalfAndHalf.add(oneModData.modifierId.toString())
+                                    }
                                     var modPrice = 0f
                                     for (subModf in modf.subMods) {
                                         val subData = mainRepository.getOneSubModifierDataAsync(subModf.id).await()
@@ -430,7 +439,7 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                                                     subModTypeInt.add(1)
                                                 }
                                                 2 -> {
-                                                    subModTypeNames.add("Secound Half")
+                                                    subModTypeNames.add("Second Half")
                                                     subModTypeInt.add(2)
                                                 }
                                             }
@@ -444,17 +453,17 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                                     mainModTotalPriceStr.add(modPrice)
                                 }
                             }
-                            this.mainModifierId = modifiers.joinToString()
-                   //         this.modifierPrice = modifierPrices.joinToString()
-                            this.mainModifierName = modifierNames.joinToString()
-                            this.mainModifierQty = modifiersQty.joinToString()
-                            this.subModIds = subModIds.joinToString()
-                            this.subModNames = subModNames.joinToString()
-                            this.subModeTypeName = subModTypeNames.joinToString()
-                            this.subModeTypeInt = subModTypeInt.joinToString()
-                            this.mainModTotalPrices = mainModTotalPriceStr.joinToString()
-                            this.sHalfAndHalf = modifiersHalfAndHalf.joinToString()
-                            this.subMod2x = subMod2xIds.joinToString()
+                            this.mainModifierId = modifiers.joinToString(separator = ",")
+                   //         this.modifierPrice = modifierPrices.joinToString(separator = ",")
+                            this.mainModifierName = modifierNames.joinToString(separator = ",")
+                            this.mainModifierQty = modifiersQty.joinToString(separator = ",")
+                            this.subModIds = subModIds.joinToString(separator = ",")
+                            this.subModNames = subModNames.joinToString(separator = ",")
+                            this.subModeTypeName = subModTypeNames.joinToString(separator = ",")
+                            this.subModeTypeInt = subModTypeInt.joinToString(separator = ",")
+                            this.mainModTotalPrices = mainModTotalPriceStr.joinToString(separator = ",")
+                            this.sHalfAndHalf = modifiersHalfAndHalf.joinToString(separator = ",")
+                            this.subMod2x = subMod2xIds.joinToString(separator = ",")
                             this.price = item.price
                         }
                         itemsInRequest.add(itemInRequest)
@@ -806,22 +815,196 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
         binding.updateLayout.visibility = View.VISIBLE
         binding.updateOrderText.text = "Updating Order No. ${order.order_id}"
         binding.updateCancelBtn.setOnClickListener {
-            clearTheCart()
-            binding.updateLayout.visibility = View.GONE
+            exitEditingMode()
         }
         CoroutineScope(Dispatchers.Main).launch {
             val products = order.itemsInfo
             for (pro in (products ?: emptyList())) {
                 val id = pro.productId ?: 0
                 val prodInfo = mainRepository.getProductDataAsync(id).await()
-                val prodName = prodInfo?.productName
+                if (POSFragment.currentDiscount.discountOnCategory.containsKey(prodInfo?.categoryId)) {
+                    categoryDiscounts = POSFragment.currentDiscount.discountOnCategory[prodInfo?.categoryId] as List<DiscountData>
+                }
+                if (POSFragment.currentDiscount.discountOnProduct.containsKey(id)) {
+                    productDiscounts = POSFragment.currentDiscount.discountOnProduct[id] as List<DiscountData>
+                }
+                var prodName = prodInfo?.productName
                 val variantId = pro.varientId
                 var productPrice = (prodInfo?.productPrice ?: "0").toFloat()
                 if (variantId != null && variantId > 0) {
                     val variantData = mainRepository.getOneVariantDataAsync(variantId).await()
                     if (variantData != null) {
+                        prodName += " ${variantData.variantName}"
                         productPrice = (variantData.variantPrice ?: "0").toFloat()
                     }
+                }
+                val modifiers = ArrayList<ModifierInCart>()
+                for (modif in (pro.modifierInfo ?: emptyList())) {
+                    val modifData = mainRepository.getOneModifierDataAsync((modif.modifierId ?: 0)).await()
+                    if (modifData != null) {
+                        prodName += "\n${modifData.modifierName}:"
+                    }
+                    val subModifPriceList = ArrayList<InvoiceFragment.SubMod>()
+                    val subModifierList = ArrayList<SubModifierBrief>()
+                    for (subModWhole in (modif.subModifier?.subModifierList ?: emptyList())) {
+                        val subModInfo = mainRepository
+                            .getOneSubModifierDataAsync(subModWhole.subModifierId ?: 0).await()
+                        if (subModInfo != null) {
+                            prodName += "(${subModInfo.subModifierName})"
+                            subModifierList.add(SubModifierBrief(
+                                subModWhole.subModifierId ?: 0, subModInfo.subModifierName ?: "NA",
+                                if (subModWhole.is2xMode.isNullOrBlank()) 0 else (subModWhole.is2xMode ?: "0").toInt(),
+                                0))
+                            val subModPrice : Float = if (subModInfo.normalModifierPrice.isNullOrBlank()) {
+                                    0f
+                                } else {
+                                    if ((pro.varientId ?: 0) > 0) {
+                                        var subVariantPrice = 0f
+                                        for (subVarPriceObj in (subModInfo.variantModifierPrice ?: emptyList())) {
+                                            if (subVarPriceObj.variantId == pro.varientId) {
+                                                subVariantPrice = if (subVarPriceObj.modifierPrice.isNullOrBlank()) 0f else
+                                                    (subVarPriceObj.modifierPrice ?: "0").toFloat()
+                                            }
+                                        }
+                                        subVariantPrice
+                                    } else {
+                                        (subModInfo.normalModifierPrice ?: "0").toFloat()
+                                    }
+                                }
+                            subModifPriceList.add(
+                                InvoiceFragment.SubMod(subModInfo.subModifierName ?: "NA",
+                                subModPrice, 1f))
+                            if (subModWhole.is2xMode == "1") {
+                                subModifPriceList.add(
+                                    InvoiceFragment.SubMod(subModInfo.subModifierName ?: "NA",
+                                        subModPrice, 1f))
+                            }
+                        }
+                    }
+                    for (subModWhole in (modif.subModifier?.subModifierWhole ?: emptyList())) {
+                        val subModInfo = mainRepository
+                            .getOneSubModifierDataAsync(subModWhole.subModifierId ?: 0).await()
+                        if (subModInfo != null) {
+                            prodName += "(${subModInfo.subModifierName})"
+                            subModifierList.add(SubModifierBrief(
+                                subModWhole.subModifierId ?: 0, subModInfo.subModifierName ?: "NA",
+                                if (subModWhole.is2xMode.isNullOrBlank()) 0 else (subModWhole.is2xMode ?: "0").toInt(),
+                                0))
+                            val subModPrice : Float = if (subModInfo.normalModifierPrice.isNullOrBlank()) {
+                                0f
+                            } else {
+                                if ((pro.varientId ?: 0) > 0) {
+                                    var subVariantPrice = 0f
+                                    for (subVarPriceObj in (subModInfo.variantModifierPrice ?: emptyList())) {
+                                        if (subVarPriceObj.variantId == pro.varientId) {
+                                            subVariantPrice = if (subVarPriceObj.modifierPrice.isNullOrBlank()) 0f else
+                                                (subVarPriceObj.modifierPrice ?: "0").toFloat()
+                                        }
+                                    }
+                                    subVariantPrice
+                                } else {
+                                    (subModInfo.normalModifierPrice ?: "0").toFloat()
+                                }
+                            }
+                            subModifPriceList.add(
+                                InvoiceFragment.SubMod(subModInfo.subModifierName ?: "NA",
+                                    subModPrice, 1f))
+                            if (subModWhole.is2xMode == "1") {
+                                subModifPriceList.add(
+                                    InvoiceFragment.SubMod(subModInfo.subModifierName ?: "NA",
+                                        subModPrice, 1f))
+                            }
+                        }
+                    }
+                    for (subModFHalf in (modif.subModifier?.subModifierFirstHalf ?: emptyList())) {
+                        val subModInfo = mainRepository
+                            .getOneSubModifierDataAsync(subModFHalf.subModifierId ?: 0).await()
+                        if (subModInfo != null) {
+                            prodName += "(${subModInfo.subModifierName} - Half)"
+                            subModifierList.add(SubModifierBrief(
+                                subModFHalf.subModifierId ?: 0, subModInfo.subModifierName ?: "NA",
+                                if (subModFHalf.is2xMode.isNullOrBlank()) 0 else (subModFHalf.is2xMode ?: "0").toInt(),
+                                0))
+                            val subModPrice : Float = if (subModInfo.normalModifierPrice.isNullOrBlank()) {
+                                0f
+                            } else {
+                                if ((pro.varientId ?: 0) > 0) {
+                                    var subVariantPrice = 0f
+                                    for (subVarPriceObj in (subModInfo.variantModifierPrice ?: emptyList())) {
+                                        if (subVarPriceObj.variantId == pro.varientId) {
+                                            subVariantPrice = (if (subVarPriceObj.modifierPrice.isNullOrBlank()) 0f else
+                                                (subVarPriceObj.modifierPrice ?: "0").toFloat()) /2
+                                        }
+                                    }
+                                    subVariantPrice
+                                } else {
+                                    (subModInfo.normalModifierPrice ?: "0").toFloat() /2
+                                }
+                            }
+                            subModifPriceList.add(
+                                InvoiceFragment.SubMod(subModInfo.subModifierName ?: "NA",
+                                    subModPrice, 0.5f))
+                            if (subModFHalf.is2xMode == "1") {
+                                subModifPriceList.add(
+                                    InvoiceFragment.SubMod(subModInfo.subModifierName ?: "NA",
+                                        subModPrice, 0.5f))
+                            }
+                        }
+                    }
+                    for (subModSHalf in (modif.subModifier?.subModifierSecondHalf ?: emptyList())) {
+                        val subModInfo = mainRepository
+                            .getOneSubModifierDataAsync(subModSHalf.subModifierId ?: 0).await()
+                        if (subModInfo != null) {
+                            prodName += "(${subModInfo.subModifierName} - Half)"
+                            subModifierList.add(SubModifierBrief(
+                                subModSHalf.subModifierId ?: 0, subModInfo.subModifierName ?: "NA",
+                                if (subModSHalf.is2xMode.isNullOrBlank()) 0 else (subModSHalf.is2xMode ?: "0").toInt(),
+                                0))
+                            val subModPrice : Float = if (subModInfo.normalModifierPrice.isNullOrBlank()) {
+                                0f
+                            } else {
+                                if ((pro.varientId ?: 0) > 0) {
+                                    var subVariantPrice = 0f
+                                    for (subVarPriceObj in (subModInfo.variantModifierPrice ?: emptyList())) {
+                                        if (subVarPriceObj.variantId == pro.varientId) {
+                                            subVariantPrice = (if (subVarPriceObj.modifierPrice.isNullOrBlank()) 0f else
+                                                (subVarPriceObj.modifierPrice ?: "0").toFloat()) /2
+                                        }
+                                    }
+                                    subVariantPrice
+                                } else {
+                                    (subModInfo.normalModifierPrice ?: "0").toFloat() /2
+                                }
+                            }
+                            subModifPriceList.add(
+                                InvoiceFragment.SubMod(subModInfo.subModifierName ?: "NA",
+                                    subModPrice, 0.5f))
+                            if (subModSHalf.is2xMode == "1") {
+                                subModifPriceList.add(
+                                    InvoiceFragment.SubMod(subModInfo.subModifierName ?: "NA",
+                                        subModPrice, 0.5f))
+                            }
+                        }
+                    }
+                    val modifierInCart = ModifierInCart(modif.modifierId, 0f, subModifierList)
+                    modifiers.add(modifierInCart)
+                    val includedModifiersCount : Int = modifData?.modifiersIncluded ?: 0
+                    // add modifiers price in item price
+                    val list = subModifPriceList.sortedWith(compareBy({it.price}, {it.weight}))
+                    var payableModifierPrice = 0f
+                    var freeModifier1 = includedModifiersCount.toFloat()
+                    for (product in list) {
+                        freeModifier1 -= product.weight
+                        if (freeModifier1 >= 0) {
+                            Log.d("Modifier0", "do nothing with ${product.name} : ${product.price}")
+                        }
+                        else {
+                            Log.d("Modifier0", "added price of ${product.name} : ${product.price}")
+                            payableModifierPrice += product.price
+                        }
+                    }
+                    Log.d("EditOrder", "${modifData?.modifierName} - $payableModifierPrice")
+                    productPrice += payableModifierPrice
                 }
                 // generate product tax list
                 val taxIdList = pro.taxId?.split(",")
@@ -836,9 +1019,9 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                     }
 
                 }
-                items.add(ItemInCart(id, prodName, variantId, ArrayList(),
+                items.add(ItemInCart(id, prodName, variantId, modifiers,
                     (pro.menuQty ?: "0").toInt(), productPrice,
-                    emptyList(), emptyList(), taxList, order.customer_note, false, fromEdit = true, foodStatus = (pro.foodStatus ?: 0)
+                    categoryDiscounts, productDiscounts, taxList, order.customer_note, false, fromEdit = true, foodStatus = (pro.foodStatus ?: 0)
                 ))
                 itemAdapter.notifyItemInserted(items.size - 1)
             }
@@ -2208,6 +2391,12 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
         }
     }
 
+
+    private fun exitEditingMode() {
+        clearTheCart()
+        inEditingMode = false
+        binding.updateLayout.visibility = View.GONE
+    }
 
     // classes for sub cart
     class SelectedModifierDetails(val name: String?, val subMods: ArrayList<SubModifierBrief>, val totalPrice: Float?)

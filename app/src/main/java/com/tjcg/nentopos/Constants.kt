@@ -21,6 +21,7 @@ class Constants {
         const val SUB_USER_LOGIN_BROADCAST = "com.tjcg.nentopos.subuserlogin"
         const val CUSTOMER_ADDED_BROADCAST = "com.tjcg.nentopos.customer-added"
         const val TABLE_LOADED_BROADCAST = "com.tjcg.nentopos.tables-loaded"
+        const val EXIT_EDITING_MODE_BROADCAST = "com.tjcg.nentopos.exit-editing"
 
         const val IS_SUCCESS = "IsSuccess"
 
@@ -37,7 +38,7 @@ class Constants {
         var selectedOutletId = 1
         var clientId = "-1"
         var currencySign = "$"
-        var databaseBusy = false
+        var databaseBusy = true
 
         const val ORDER_STATUS_PENDING = 1
         const val ORDER_STATUS_PROCESSING = 2

@@ -68,7 +68,7 @@
             android:background="@drawable/image_bg"
             android:padding="6dp"
             android:src="@drawable/ic_edit"
-            android:visibility="gone"
+            android:visibility="visible"
             app:tint="@color/white" />
 
         <LinearLayout

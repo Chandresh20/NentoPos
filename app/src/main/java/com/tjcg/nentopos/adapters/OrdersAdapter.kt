@@ -151,8 +151,16 @@ class OrdersAdapter(val ctx: Context, val list: List<OrdersEntity>, private val 
                 holder.binding.gridLayout.removeView(holder.binding.acceptOrder)
             }
         }
+        if (onlineOrderData.billInfo?.billStatus == 1) {
+            holder.binding.gridLayout.removeView(holder.binding.editOrder)
+        }
         holder.binding.editOrder.setOnClickListener {
             //    ctx?.setFragment(PosTabFragment.newInstance())
+            if (Constants.databaseBusy) {
+                MainActivity.progressDialogRepository.showAlertDialog(
+                    "Database is busy, please try again in few minutes")
+                return@setOnClickListener
+            }
             POSFragment.orderToUpdate = onlineOrderData
             navController.navigate(R.id.navigation_pos)
         }

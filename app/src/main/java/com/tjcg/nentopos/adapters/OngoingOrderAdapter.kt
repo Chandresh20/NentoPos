@@ -24,6 +24,7 @@ import com.tjcg.nentopos.databinding.ItemOngoingOrderBinding
 import com.tjcg.nentopos.dialog.OrderCancelDialog
 import com.tjcg.nentopos.dialog.PaymentDialog
 import com.tjcg.nentopos.fragments.InvoiceFragment
+import com.tjcg.nentopos.fragments.POSFragment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -44,6 +45,16 @@ class OngoingOrderAdapter(val ctx: Context, val list:List<OrdersEntity>, val nav
         val ongoingOrder = list[position]
         if (ongoingOrder.billInfo?.billStatus == 1) {
             holder.binding.paidTick.visibility = View.VISIBLE
+            holder.binding.editOrder.visibility = View.GONE
+        }
+        holder.binding.editOrder.setOnClickListener {
+            if (Constants.databaseBusy) {
+                MainActivity.progressDialogRepository.showAlertDialog(
+                    "Database is busy, please try again in few minutes")
+                return@setOnClickListener
+            }
+            POSFragment.orderToUpdate = ongoingOrder
+            navController.navigate(R.id.navigation_pos)
         }
         CoroutineScope(Dispatchers.Main).launch {
             holder.binding.tableNo.text = "Table No: " + if (ongoingOrder.table_no == null) {
