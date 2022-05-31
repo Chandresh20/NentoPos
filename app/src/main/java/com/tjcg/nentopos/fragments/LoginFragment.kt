@@ -43,6 +43,7 @@ class LoginFragment : Fragment() {
             Handler(Looper.getMainLooper()).postDelayed( {
                 ctx.sendBroadcast(Intent(Constants.TABLE_LOADED_BROADCAST))
             }, 2000)
+            Constants.databaseBusy = false
             return binding.root
         }
         val isNewLogin = MainActivity.mainSharedPreferences.getBoolean(Constants.PREF_IS_NEW_LOGIN, false)

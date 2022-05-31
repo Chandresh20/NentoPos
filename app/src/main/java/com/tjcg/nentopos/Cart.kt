@@ -317,6 +317,7 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                 Log.e("Checkout", "OrderToUpdate is nulll")
                 return
             }
+            val updatedEntity: OrdersEntity = orderToUpdate!!
             val updateRequest = OrderUpdateRequest().apply {
                 this.driverUserId = orderToUpdate?.driver_user_id
                 this.customerId = orderToUpdate?.customer_id
@@ -358,6 +359,15 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                 this.tipAmount = this@Cart.tipAmount
                 this.orderTime = orderToUpdate?.order_time
                 this.billTime = null
+            }
+            updatedEntity.apply {
+                this.cookedtime = mainRepository.formatCookingTime(this@Cart.cookingTimeInMin)
+                this.table_no = this@Cart.selectedTable
+                this.discount = cartViewModel.discountPer.value.toString()
+                this.tip_value = this@Cart.tipAmount.toString()
+                this.totalamount = this@Cart.grandTotal
+                this.order_status = this@Cart.newOrderStatus
+                this.billInfo?.billStatus =  this@Cart.billStatus
             }
             updateRequest.deletedRows // needs to add row ids of delete items
             val addOnsId = ArrayList<Int>()
@@ -471,16 +481,107 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                         Log.d("ProductNotFound", "${item.id}")
                         Toast.makeText(ctx, "Error getting data", Toast.LENGTH_SHORT).show()
                     }
+
+
+                    // for updateEntity
+                    val newItemInfo = OrdersEntity.ItemInfo().apply {
+                        this.rowId = "${item.id}"
+                        this.orderId = updatedEntity.order_id
+                        this.uniqueRecordId = "${System.currentTimeMillis()}uniqueRecord"
+                        this.foodStatus = 0
+                        this.menuId = updatedEntity.menu_id
+                        this.menuQty = item.qty.toString()
+                        this.varientId = item.variantId
+                        this.productId = item.id
+                        val productInfo = mainRepository.getProductDataAsync(this.productId ?: 0).await()
+                        if (productInfo != null) {
+                            this.taxId = productInfo.productTaxIds
+                        }
+               //         this.taxPercentage
+                        this.isHalfAndHalf = "0"
+                //        this.discountType
+               //         this.itemDiscount
+                    }
+                    val x2modeList = ArrayList<Int>()
+                    val modifierList = ArrayList<OrdersEntity.ModifierInfo>()
+                    for (modif in item.modifiers) {
+                        Log.d("searching", "Modifier with id ${modif.modId}")
+                        val isa = modifierList.find { it.modifierId == modif.modId }
+                        if (isa != null) {
+                            Log.d("searching", "Modifier ${modif.modId} available")
+                            continue
+                        } else {
+                            Log.d("searching", "Modifier ${modif.modId} not available")
+                        }
+                        var x2Mode = 0
+                        val entityModifier = OrdersEntity.ModifierInfo()
+                        val entitySubModifier = OrdersEntity.SubModifier()
+                        val subModWhole = ArrayList<OrdersEntity.SubModifierWhole>()
+                        val subModFHalf = ArrayList<OrdersEntity.SubModifierFirstHalf>()
+                        val subModSHalf = ArrayList<OrdersEntity.SubModifierSecondHalf>()
+                        for (subMods in modif.subMods) {
+                            if (subMods.is2xMod == 1) {
+                                x2Mode = 1
+                            }
+                            val subModInfo = mainRepository.getOneSubModifierDataAsync(subMods.id).await()
+                            if (subModInfo != null) {
+                                when (subMods.modeType) {
+                                0 -> {
+                                    val wholeSubModifier = OrdersEntity.SubModifierWhole().apply {
+                                        this.subModifierId = subMods.id
+                                        this.is2xMode = subMods.is2xMod.toString()
+                                        this.subModifierPrice = subModInfo.normalModifierPrice
+                                    }
+                                    subModWhole.add(wholeSubModifier)
+                                }
+                                1 -> {
+                                    val fHalfSubMod = OrdersEntity.SubModifierFirstHalf().apply {
+                                        this.subModifierId = subMods.id
+                                        this.is2xMode = subMods.is2xMod.toString()
+                                        this.subModifierPrice = subModInfo.normalModifierPrice
+                                    }
+                                    subModFHalf.add(fHalfSubMod)
+                                }
+                                2 -> {
+                                    val sHalfSubMod = OrdersEntity.SubModifierSecondHalf().apply {
+                                        this.subModifierId = subMods.id
+                                        this.is2xMode = subMods.is2xMod.toString()
+                                        this.subModifierPrice = subModInfo.normalModifierPrice
+                                    }
+                                    subModSHalf.add(sHalfSubMod)
+                                }
+                                }
+                                entitySubModifier.subModifierWhole = subModWhole
+                                entitySubModifier.subModifierFirstHalf = subModFHalf
+                                entitySubModifier.subModifierSecondHalf = subModSHalf
+                            }
+                        }
+                        entityModifier.isHalfAndHalf = "1"
+                        entityModifier.modifierId = modif.modId
+                        entityModifier.subModifier = entitySubModifier
+                        modifierList.add(entityModifier)
+                        Log.d("ModifierEdit", "${entityModifier.modifierId}")
+                        x2modeList.add(x2Mode)
+                    }
+                    newItemInfo.modifierInfo = modifierList
+                    newItemInfo.is2xMod = x2modeList.joinToString(separator = ",")
+                    val oldItems = updatedEntity.itemsInfo as ArrayList<OrdersEntity.ItemInfo>
+                    oldItems.add(newItemInfo)
+                    updatedEntity.itemsInfo = oldItems
                 }
-                itemsInRequest[0].apply {
-                    this.addOnIds = addOnsId.joinToString()
-                    this.addOnPrice = addOnsPrice.joinToString()
-                    this.addOnUnitPrice = addOnsPrice.joinToString()
-                    this.addOnQty = addOnsQty.joinToString()
-                    this.addOnName = addOnsName.joinToString()
+                if (!itemsInRequest.isNullOrEmpty()) {
+                     itemsInRequest[0].apply {
+                        this.addOnIds = addOnsId.joinToString()
+                        this.addOnPrice = addOnsPrice.joinToString()
+                        this.addOnUnitPrice = addOnsPrice.joinToString()
+                        this.addOnQty = addOnsQty.joinToString()
+                        this.addOnName = addOnsName.joinToString()
+                    }
+                    updateRequest.cartItems = itemsInRequest
                 }
-                updateRequest.cartItems = itemsInRequest
-                MainActivity.orderRepository.updateOrder(ctx, updateRequest)
+                // add new cart items in updatedEntity
+
+                MainActivity.orderRepository.updateOrder(ctx, updateRequest, updatedEntity)
             }
             return
         }
@@ -1010,6 +1111,7 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                 val taxIdList = pro.taxId?.split(",")
                 val taxList = ArrayList<ProductTax>()
                 for (tId in (taxIdList ?: emptyList())) {
+                    if (tId.isNullOrBlank()) continue
                     val alr : ProductTax? = taxList.find { it.id == tId.toInt() }
                     if (alr == null) {
                         val taxData = mainRepository.getOneTaxDetailAsync(tId.toInt()).await()

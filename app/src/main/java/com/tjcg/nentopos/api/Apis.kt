@@ -109,6 +109,11 @@ interface Apis {
     @POST("createSyncCustomer")
     fun syncOfflineCustomers(@Body offlineCustomersJson: String,
         @Header("Authorization") authHeader: String) : Call<CustomerSyncResponse>
+
+    @POST("addToCartUpdateSync")
+    fun synEditedOrders(@Body eSyncJson: String,
+                        @Header("Authorization") authHeader: String) : Call<SimpleResponse>
+
 /*    @POST("getAllCustomerList")
     @FormUrlEncoded
     fun getAllCustomerList(@Field("outlet_id") outlet_id: String?,

@@ -291,11 +291,19 @@ class OngoingOrderAdapter(val ctx: Context, val list:List<OrdersEntity>, val nav
             dialog.show(MainActivity.fManager, "cancelDialog")
         }
         holder.binding.invoicePrint.setOnClickListener {
+            if (Constants.databaseBusy) {
+                MainActivity.progressDialogRepository.showAlertDialog("Database is busy, please try again in few minutes")
+                return@setOnClickListener
+            }
             InvoiceFragment.directPrint = true
             InvoiceFragment.orderId = ongoingOrder.order_id
             navController.navigate(R.id.navigation_invoice)
         }
         holder.binding.getInvoice.setOnClickListener {
+            if (Constants.databaseBusy) {
+                MainActivity.progressDialogRepository.showAlertDialog("Database is busy, please try again in few minutes")
+                return@setOnClickListener
+            }
             InvoiceFragment.orderId = ongoingOrder.order_id
             navController.navigate(R.id.navigation_invoice)
         }

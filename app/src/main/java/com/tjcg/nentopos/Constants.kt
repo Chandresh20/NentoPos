@@ -8,6 +8,8 @@ class Constants {
         const val WRITE_TIMEOUT = 20L
         const val BASE_URL = "https://menuonline.com/api/"
 
+        const val TABLE_IMAGE_DIR = "Table_images"
+
         const val SUCCESS_BROADCAST = "com.tjcg.nentopos.success"
         const val FAILURE_BROADCAST = "com.tjcg.nentopos.failure"
         const val OUTLET_CHANGE_BROADCAST = "com.tjcg.nentopos.outlet_change"
@@ -39,6 +41,8 @@ class Constants {
         var clientId = "-1"
         var currencySign = "$"
         var databaseBusy = true
+        var tableImagesReady = false
+        var displayWidth = 0
 
         const val ORDER_STATUS_PENDING = 1
         const val ORDER_STATUS_PROCESSING = 2

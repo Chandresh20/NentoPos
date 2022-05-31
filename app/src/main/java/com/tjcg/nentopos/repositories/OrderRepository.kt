@@ -21,6 +21,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.util.*
+import java.util.function.LongFunction
 import kotlin.collections.ArrayList
 
 class OrderRepository(ctx : Context) {
@@ -365,6 +366,10 @@ class OrderRepository(ctx : Context) {
                             ctx.sendBroadcast(syncIntent)
                             MainActivity.logOutNow(ctx)
                         }
+                    } else {
+                        syncIntent.putExtra(Constants.IS_SUCCESS, false)
+                        ctx.sendBroadcast(syncIntent)
+                        Log.e("newSync", "API failure : ${response.errorBody()}")
                     }
                 }
                 override fun onFailure(call: Call<SimpleResponse>, t: Throwable) {
@@ -820,6 +825,11 @@ class OrderRepository(ctx : Context) {
             Log.d("Sync", "started")
             val orderSyncEntity = OrderSyncEntity()
             val oList = ArrayList<OrderSyncEntity.OrderSync>()
+            val editedSyncO = getAllEditOrdersAsync(Constants.selectedOutletId).await()
+            if (editedSyncO != null) {
+                startEditedOrderSync(ctx, editedSyncO)
+                Log.d("EditedSync", "Calling API")
+            }
             if (unSyncOrders.isNullOrEmpty()) {
                 Log.d("Unsync", "Unsync Orders not found")
                 return@launch
@@ -976,6 +986,42 @@ class OrderRepository(ctx : Context) {
         }
     }
 
+    private fun startEditedOrderSync(ctx: Context, eSync : OrderUpdateSync) {
+        val gson = Gson()
+        val typeT = object : TypeToken<OrderUpdateSync>() { }
+        val req = gson.toJson(eSync, typeT.type)
+        Log.d("EditedSync", "Req: $req")
+        ApiService.apiService?.synEditedOrders(req, Constants.authorization)
+            ?.enqueue(object : Callback<SimpleResponse> {
+                override fun onResponse(
+                    call: Call<SimpleResponse>,
+                    response: Response<SimpleResponse>
+                ) {
+                    Log.d("EditedSync", "Response: ${response.body()?.message}")
+                    if (response.isSuccessful && response.body()?.status != null && response.body()?.status!!) {
+                        val syncIntent = Intent(Constants.SYNC_COMPLETE_BROADCAST)
+                        syncIntent.putExtra(Constants.IS_SUCCESS, true)
+                        ctx.sendBroadcast(syncIntent)
+                        mainScope.launch {
+                            deleteEditedOrders(Constants.selectedOutletId).await()
+                        }
+                    } else {
+                        val syncIntent = Intent(Constants.SYNC_COMPLETE_BROADCAST)
+                        syncIntent.putExtra(Constants.IS_SUCCESS, false)
+                        ctx.sendBroadcast(syncIntent)
+                    }
+                }
+
+                override fun onFailure(call: Call<SimpleResponse>, t: Throwable) {
+                    Log.e("EditedSync", "Error: ${t.message}")
+                    val syncIntent = Intent(Constants.SYNC_COMPLETE_BROADCAST)
+                    syncIntent.putExtra(Constants.IS_SUCCESS, false)
+                    ctx.sendBroadcast(syncIntent)
+                }
+
+            })
+    }
+
     private fun convertOfflineOrdersToJson(offlineOrders2: List<OfflineOrder2>) : String? {
         val offlineOrderReq = OfflineOrderSyncRequest()
         offlineOrderReq.orders.addAll(offlineOrders2)
@@ -1086,7 +1132,7 @@ class OrderRepository(ctx : Context) {
             })
     }
 
-    fun updateOrder(ctx: Context, oRequest: OrderUpdateRequest) {
+    fun updateOrder(ctx: Context, oRequest: OrderUpdateRequest, orderToUpdate: OrdersEntity) {
         if (MainActivity.isInternetAvailable(ctx)) {
             val pId = MainActivity.progressDialogRepository.getProgressDialog("Updating Order")
             val gson = Gson()
@@ -1103,8 +1149,8 @@ class OrderRepository(ctx : Context) {
                             && response.body()?.status!!) {
                             MainActivity.progressDialogRepository.showAlertDialog(
                                 "Updated Successfully")
-                            updateOrderOffline(ctx, oRequest, 1)
-                            MainActivity.orderRepository.getAllOrdersOnline(ctx, Constants.selectedOutletId,1, true)
+                            updateOrderOffline(orderToUpdate,1)
+                    //        MainActivity.orderRepository.getAllOrdersOnline(ctx, Constants.selectedOutletId,1, true)
                             ctx.sendBroadcast(Intent(Constants.EXIT_EDITING_MODE_BROADCAST))
                         } else {
                             MainActivity.progressDialogRepository.showErrorDialog(
@@ -1121,14 +1167,54 @@ class OrderRepository(ctx : Context) {
                     }
 
                 })
+        } else {
+            mainScope.launch {
+                updateOrderOffline(orderToUpdate,1)
+                MainActivity.mainSharedPreferences.edit()
+                    .putBoolean(Constants.PREF_IS_SYNC_REQUIRES, true).apply()
+                syncRequired = true
+                val editedListO = getAllEditOrdersAsync(Constants.selectedOutletId).await()
+                if (editedListO != null) {
+                    // update list
+                    val eObject = getAllEditOrdersAsync(Constants.selectedOutletId).await()
+                    if (eObject != null) {
+                        val eList = eObject.editedOrders as ArrayList<OrderUpdateRequest>
+                        eList.add(oRequest)
+                        eObject.editedOrders = eList
+                        insertEditedOrdersAsync(eObject).await()
+                        Log.d("EditedOrder", "Added to list")
+                    }
+                } else {
+                    // create new obj
+                    val eOrderList = ArrayList<OrderUpdateRequest>()
+                    eOrderList.add(oRequest)
+                    val eObject = OrderUpdateSync().apply {
+                        this.outletId = Constants.selectedOutletId
+                        this.editedOrders = eOrderList
+                    }
+                    insertEditedOrdersAsync(eObject).await()
+                    Log.d("EditedOrder", "new list created")
+                }
+            }
         }
     }
 
-    fun updateOrderOffline(ctx: Context, oRequest: OrderUpdateRequest, isSync : Int) {
+    fun updateOrderOffline(orderEntity: OrdersEntity?,isSync : Int) {
         mainScope.launch {
-            val orderEntity = getSingleOrderAsync(oRequest.outletId ?: Constants.selectedOutletId,
-                oRequest.orderID ?: 0).await()
             if (orderEntity != null) {
+                if (isSync == 0) {
+                    MainActivity.mainSharedPreferences.edit()
+                        .putBoolean(Constants.PREF_IS_SYNC_REQUIRES, true).apply()
+                    syncRequired = true
+                }
+                orderEntity.syncOrNot = isSync
+                orderEntity.editTime = System.currentTimeMillis()
+                updateSingleOrderAsync(orderEntity).await()
+                Log.d("EditOrder", "updated offline")
+                updateViewModel()
+            }
+
+        /*    if (orderEntity != null) {
                 orderEntity.customer_id = oRequest.customerId
                 orderEntity.waiter_id = oRequest.waiterId
                 orderEntity.cookedtime = oRequest.cookedTime
@@ -1147,24 +1233,25 @@ class OrderRepository(ctx : Context) {
             }
             val itemsInfo = orderEntity?.itemsInfo as ArrayList<OrdersEntity.ItemInfo>
             for (newItem in (oRequest.cartItems ?: emptyList())) {
-                val newItemInEntity = OrdersEntity.ItemInfo().apply {
-                    this.rowId = "Unknown"
-                    this.orderId = orderEntity?.order_id
+                val alreadyExist = itemsInfo.find { it.productId == newItem.productId }
+                if (alreadyExist != null) continue
+                val newItemInfo = OrdersEntity.ItemInfo().apply {
+                    this.rowId = "${System.currentTimeMillis()}row"
+                    this.orderId = orderEntity.order_id
+                    this.uniqueRecordId = "${System.currentTimeMillis()}uniqueRecord"
                     this.foodStatus = 0
-                   // this.menuId
-                    this.menuQty = newItem.qty.toString()
+                    this.menuId = orderEntity.menu_id
+                    this.menuQty = (newItem.qty ?: 0).toString()
                     this.varientId = newItem.sizeId
-                    this.productId = newItem.productId
-                  //  this.taxId
-                  //  this.taxPercentage
-                  //  this.isHalfAndHalf
-                  //  this.is2xMod
-                 //   this.discountType
-                  //  this.itemDiscount
-                 //   this.orderNote
+                    this.productId= newItem.productId
+                    val productInfo = MainActivity.mainRepository.getProductDataAsync(newItem.productId ?: 0).await()
+                    if (productInfo !=null) {
+                        this.taxId = productInfo.productTaxIds
+                    }
+             //       this.isHalfAndHalf =
+            //        this.is2xMod =
                 }
-                itemsInfo.add(newItemInEntity)
-            }
+            }  */
         }
     }
 
@@ -1200,6 +1287,13 @@ class OrderRepository(ctx : Context) {
         coroutineScope {
             async(Dispatchers.IO) {
                 oDao.insertNewOffline2Order(offlineOrder2)
+            }
+        }
+
+    private suspend fun insertEditedOrdersAsync(editedOrderO : OrderUpdateSync) =
+        coroutineScope {
+            async(Dispatchers.IO) {
+                oDao.insertEditedOrders(editedOrderO)
             }
         }
 
@@ -1333,6 +1427,13 @@ class OrderRepository(ctx : Context) {
         coroutineScope {
             async(Dispatchers.IO) {
                 return@async oDao.getOneOffline2Order(outletId, tmpId)
+            }
+        }
+
+    private suspend fun getAllEditOrdersAsync(outletId: Int) : Deferred<OrderUpdateSync?> =
+        coroutineScope {
+            async(Dispatchers.IO) {
+                return@async oDao.getAllEditedOrders(outletId)
             }
         }
 
@@ -1516,6 +1617,13 @@ class OrderRepository(ctx : Context) {
             }
         }
 
+    private suspend fun updateEditOrdersAsync(eOrders : OrderUpdateSync) =
+        coroutineScope {
+            async(Dispatchers.IO) {
+                oDao.insertEditedOrders(eOrders)
+            }
+        }
+
     private suspend fun deleteAllOrdersAsync(outletId: Int) =
         coroutineScope {
             async(Dispatchers.IO) {
@@ -1542,6 +1650,13 @@ class OrderRepository(ctx : Context) {
         coroutineScope {
             async (Dispatchers.IO) {
                 oDao.deleteOneOfflineOrder(tmpId)
+            }
+        }
+
+    private suspend fun deleteEditedOrders(outletId: Int) =
+        coroutineScope {
+            async(Dispatchers.IO) {
+                oDao.deleteEditedOrders(outletId)
             }
         }
 

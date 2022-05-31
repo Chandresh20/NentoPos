@@ -73,4 +73,18 @@ class OrdersTypeConverter {
         return gson.fromJson(string, typeT.type)
     }
 
+    @TypeConverter
+    fun fromEditedOrders(eOrders : List<OrderUpdateRequest>?) : String? {
+        val gson = Gson()
+        val typeT = object : TypeToken<List<OrderUpdateRequest>>() { }
+        return gson.toJson(eOrders, typeT.type)
+    }
+
+    @TypeConverter
+    fun toEditedOrders(string: String): List<OrderUpdateRequest>? {
+        val gson = Gson()
+        val typeT = object : TypeToken<List<OrderUpdateRequest>>() {}
+        return gson.fromJson(string, typeT.type)
+    }
+
 }

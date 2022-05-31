@@ -15,6 +15,9 @@ interface OrdersDao {
     @Insert(onConflict = REPLACE)
     fun insertSingleOrder(order: OrdersEntity)
 
+    @Insert(onConflict = REPLACE)
+    fun insertEditedOrders(eOrders : OrderUpdateSync)
+
     @Query("delete from orders where outlet_id=:outletId")
     fun deleteAllOrders(outletId: Int)
     /*   @Query("update orders set orderItems=:details where outlet_id=:outletId and order_id=:orderId")
@@ -29,6 +32,7 @@ interface OrdersDao {
     @Update(onConflict = REPLACE)
     fun updateSingleOfflineOrder(offlineOrder2: OfflineOrder2)
 
+
     /*   @Query("select orderItems from orders where outlet_id=:outletId and order_id=:orderId")
        fun getSingleOrderItems(outletId:String, orderId: String) : String  */
 
@@ -37,6 +41,9 @@ interface OrdersDao {
 
     @Query("select * from orders where outlet_id=:outletId and syncOrNot=0")
     fun getUnSyncOrders(outletId: Int) : List<OrdersEntity>?
+
+    @Query("select * from Edited_Orders where outletId=:outletId")
+    fun getAllEditedOrders(outletId: Int) : OrderUpdateSync?
 
     @Query("select * from orders where outlet_id=:outletId and order_status=:statusInt")
     fun getOrdersByStatus(outletId: Int, statusInt: Int) : List<OrdersEntity>
@@ -98,6 +105,9 @@ interface OrdersDao {
 
     @Query("delete from OfflineOrder2 where outletId=:outletId")
     fun deleteAllOffline2Orders(outletId: Int)
+
+    @Query("delete from Edited_Orders where outletId=:outletId")
+    fun deleteEditedOrders(outletId: Int)
 
     @Query("delete from orders")
     fun deleteAllOrders()

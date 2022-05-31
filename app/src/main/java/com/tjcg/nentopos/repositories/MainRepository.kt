@@ -16,6 +16,9 @@ import kotlinx.coroutines.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.File
+import java.lang.Exception
+import java.net.URL
 import java.time.LocalDate
 import java.util.*
 import kotlin.collections.ArrayList
@@ -142,6 +145,7 @@ class MainRepository(ctx : Context) {
             Log.d("FirstLogin", "Loading data for default outlet ${outlet.outletId}")
             if (isDefault) {
                 Constants.databaseBusy = true
+                Log.d("Database---", "Set to busy")
             }
             loadProductData(ctx, outlet.outletId, outlet.uniqueId ?: "NA", MainActivity.deviceID, 1, isDefault)
             loadCustomerData(ctx, outlet.outletId, MainActivity.deviceID, 1, isDefault)
@@ -252,8 +256,11 @@ class MainRepository(ctx : Context) {
             ) {
                 if (response.isSuccessful && response.body()?.status != null &&
                     response.body()?.status!!) {
-                        Constants.databaseBusy = true
                     val menus = response.body()?.menuData
+                    if (defaultOutlet) {
+                        Constants.databaseBusy = true
+                        Log.d("Database---", "set to busy")
+                    }
                     CoroutineScope(Dispatchers.Main).launch {
                         insertMenusInDatabaseAsync(menus ?: ArrayList()).await()
                         Log.d("AllProducts", "Menu Inserted in database ${menus?.size}")
@@ -312,7 +319,10 @@ class MainRepository(ctx : Context) {
                             Log.d("AllProduct", "Modifiers data : ${modifiers.size}")
                             insertSubModifiersInDatabaseAsync(subModifiers).await()
                             Log.d("AllProduct", "SubModifiers: ${subModifiers.size}")
-                            Constants.databaseBusy = false
+                            if (defaultOutlet) {
+                                Constants.databaseBusy = false
+                                Log.d("Database---", "now free")
+                            }
                         }
                     }
                 } else {
@@ -436,6 +446,7 @@ class MainRepository(ctx : Context) {
                         }
                         CoroutineScope(Dispatchers.Main).launch {
                             insertTableDataAsync(tables2).await()
+                            downloadTableData(ctx, tables2).await()
                             ctx.sendBroadcast(Intent(Constants.TABLE_LOADED_BROADCAST))
                             Log.d("Tables", "Inserted: ${tables2.size} for Id: $outletId")
                         }
@@ -461,6 +472,38 @@ class MainRepository(ctx : Context) {
 
         })
     }
+
+    private suspend fun downloadTableData(ctx: Context, tables : ArrayList<TableData>) =
+        coroutineScope {
+            async(Dispatchers.IO) {
+                Constants.tableImagesReady = false
+                val tableDir = File(ctx.getExternalFilesDir(Constants.TABLE_IMAGE_DIR), Constants.TABLE_IMAGE_DIR)
+                if (tableDir.exists()) {
+                    tableDir.delete()
+                }
+                tableDir.mkdirs()
+                for (table in tables) {
+                    try {
+                        val tbFile = File(tableDir, "${table.tableId}.jpg")
+                        val tbImageURL = URL(table.tableIcon)
+                        val tbStream = tbImageURL.openStream()
+                        var read = 0
+                        var buff : ByteArray
+                        val outStream = tbFile.outputStream()
+                        while (true) {
+                            buff = ByteArray(1024)
+                            read = tbStream.read(buff)
+                            if (read <= 0) break
+                            outStream.write(buff, 0, read)
+                        }
+                        Log.d("TableIMage", "${table.tableId} downloaded")
+                    } catch (e: Exception) {
+                        Log.e("TableIMage", "${table.tableId} failed--$e")
+                    }
+                }
+            }
+        }
+
 
     private fun loadCustomerTypes() {
         ApiService.apiService?.getCustomerTypes(Constants.authorization)

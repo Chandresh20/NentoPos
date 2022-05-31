@@ -62,4 +62,5 @@
         tools:layout="@layout/fragment_table"
         android:name="com.tjcg.nentopos.fragments.TableFragment"
         android:label="Table"/>
+
 </navigation>
