@@ -94,24 +94,6 @@ class InvoiceFragment : Fragment() {
         (ctx).bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE)
         prefixStr = getString(R.string.amount_prefix)
         binding.printBtn.setOnClickListener {
-
-            // test printing value
-            /*       var str = ""
-                   for (tax in taxPrints) {
-                       str += "${tax.key} : ${tax.value}"
-                   }
-                   Toast.makeText(ctx, str, Toast.LENGTH_LONG).show()
-                   str += "Subtotal : $PRINT_CURRENCY ${amountPrints[PRINT_SUBTOTAL]}\n"
-                   str += "Discount : $PRINT_CURRENCY ${amountPrints[PRINT_DISCOUNT]}\n"
-                   str += "Tip : $PRINT_CURRENCY ${amountPrints[PRINT_TIP]}\n"
-                   str += "StoreCharge : $PRINT_CURRENCY ${amountPrints[PRINT_STORE_CHARGE]}\n"
-                   str += "GrandTotal : $PRINT_CURRENCY ${amountPrints[PRINT_GRAND_TOTAL]}\n"
-                   str += "Customer Paid : $PRINT_CURRENCY ${amountPrints[PRINT_CUSTOMER_PAID]}\n"
-                   str += "Change Due : $PRINT_CURRENCY ${amountPrints[PRINT_CHANGE_DUE]}\n"
-
-                   Toast.makeText(ctx, str, Toast.LENGTH_LONG).show()  */
-
-
             initializePrinting()
         }
         binding.backBtn.setOnClickListener {
@@ -466,7 +448,9 @@ class InvoiceFragment : Fragment() {
                 }
                 if (!productData.productPrice.isNullOrBlank() && productData.productPrice == "0") {
                     // if product price is 0 in database then search for variant price
-                    val variantData = MainActivity.mainRepository.getOneVariantDataAsync(item.varientId ?: 0).await()
+                    val proVariants = productData.productVariants
+                    val variantData = proVariants?.find { it.variantId == item.varientId }
+                    Log.d("InvoiceProductPrice", "${item.varientId}")
                     if (variantData != null) {
                         variantName = variantData.variantName ?: "Unknown"
                         productPrice += (variantData.variantPrice ?: "0").toFloat()
@@ -800,7 +784,7 @@ class InvoiceFragment : Fragment() {
                             val taxValue = if (taxDetail.taxType == Constants.TAX_IN_PERCENT) {
                                 (totalPrice * (taxDetail.taxPercentage ?: "0").toFloat() / 100)
                             } else {
-                                    Log.d("TAXADD ${taxDetail.taxPercentage}", "${addOn.addOnId}")
+                                    Log.d("TAX-ADD ${taxDetail.taxPercentage}", "${addOn.addOnId}")
                                 (taxDetail.taxPercentage ?: "0").toFloat() * (addOn.addOnQty ?: "0").toFloat()
                             }
                             val currentTax = manageTaxes.getTaxValue(taxId)

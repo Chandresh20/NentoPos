@@ -28,8 +28,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.tjcg.nentopos.MainActivity;
 import com.tjcg.nentopos.R;
-import com.tjcg.nentopos.java.DeviceReceiver;
-import com.tjcg.nentopos.java.R80Activity;
 
 import net.posprinter.posprinterface.IMyBinder;
 import net.posprinter.posprinterface.TaskCallback;

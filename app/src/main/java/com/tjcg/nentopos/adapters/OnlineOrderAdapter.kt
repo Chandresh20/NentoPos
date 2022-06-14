@@ -62,26 +62,6 @@ class OnlineOrderAdapter(val ctx: Context, val list: List<OrdersEntity>, val nav
             holder.binding.acceptOrder.visibility = View.GONE
             holder.binding.assignDriver.visibility = View.GONE
         }
-  /*      if (!onlineOrderData.future_order_date.isNullOrBlank()) {
-
-            holder.binding.acceptOrder.visibility = View.GONE
-            holder.binding.assignDriver.visibility = View.GONE
-            // look for future order date
-            val fDate = onlineOrderData.future_order_date?.split("-")
-            val cal = Calendar.getInstance()
-            val year = cal.get(Calendar.YEAR)
-            val month = cal.get(Calendar.MONTH) + 1
-            val day = cal.get(Calendar.DAY_OF_MONTH)
-            if (!fDate?.get(0).isNullOrBlank() && fDate?.get(0)?.toInt() == year) {
-                if (!fDate[1].isBlank() && fDate[1].toInt() == month) {
-                    if (!fDate[2].isBlank() && fDate[2].toInt() == day) {
-                        holder.binding.acceptOrder.visibility = View.VISIBLE
-                        holder.binding.assignDriver.visibility = View.VISIBLE
-                    }
-                }
-            }
-        }  */
-
         holder.binding.acceptOrder.setOnClickListener {
             val dialog = OrderAcceptDialog.getInstance(ctx, onlineOrderData)
             dialog.show(MainActivity.fManager, "dialog")
@@ -140,79 +120,6 @@ class OnlineOrderAdapter(val ctx: Context, val list: List<OrdersEntity>, val nav
 
             }
             ctx.registerReceiver(orderCompleteReceiver, IntentFilter(Constants.CLOSE_DIALOG_BROADCAST))
-        /*    val tipDialog = PaymentMethodDialog(object: PaymentMethodDialog.ClickListener {
-                override fun paymentMethodClick(type: String, orderId: String) {
-                    when (type) {
-                        Constants.PAYMENT_METHOD_CASH -> {
-                            val calcDialog = CalculatorDialog(object : CalculatorDialog.ClickListener {
-                                override fun onCalculatorNext(customerPaidAmount: String) {
-                                    Log.d("OngoingAdapter", "calling complete API")
-                                    lottieProgressDialog.showDialog()
-                                    OrderRepository1.completeOrderWithPayment(ctx, customerPaidAmount.toFloat(),
-                                        onlineOrderData.order_id, (onlineOrderData.outlet_id ?: "1"))
-                                }
-                            }, if (onlineOrderData.totalAmount.isNullOrBlank()) "0" else onlineOrderData.totalAmount!!)
-                            calcDialog.show((ctx as AppCompatActivity).supportFragmentManager, "tag")
-                            val closeReceiver = object : BroadcastReceiver() {
-                                override fun onReceive(p0: Context?, p1: Intent?) {
-                                    val success = p1?.getBooleanExtra(SharedPreferencesKeys.IS_SUCCESS, false)
-                                    if (success!=null && success) {
-                                        val builder = AlertDialog.Builder(ctx).apply {
-                                            setMessage("Order completed successfully, Would you like to print the invoice?")
-                                            setPositiveButton("Print") { dialog, _ ->
-                                                (ctx as MainActivity).setFragment(InvoiceFragment1.getInstance(onlineOrderData.order_id))
-                                                dialog.dismiss()
-                                            }
-                                            setNegativeButton("Skip") { _, _ -> }
-                                        }
-                                        val dialog = builder.create()
-                                        dialog.show()
-                                    } else {
-                                        val builder = AlertDialog.Builder(ctx).apply {
-                                            setMessage("An Error Occurred7, please try again..")
-                                            setPositiveButton("Dismiss") { dialog, _ ->
-                                                dialog.dismiss()
-                                            }
-                                        }
-                                        val dialog = builder.create()
-                                        dialog.show()
-                                    }
-                                    calcDialog.dismiss()
-                                    lottieProgressDialog.cancelDialog()
-                                    ctx.unregisterReceiver(this)
-                                }
-                            }
-                            ctx.registerReceiver(closeReceiver, IntentFilter(Constants.CLOSE_DIALOG))
-                        }
-                        Constants.PAYMENT_METHOD_DEBIT -> {
-                            val orderDialog = OrderStatusDialog(object : OrderStatusDialog.ClickListener {
-                                override fun onNext(order_status: String, orderId: String) {
-
-                                }
-                            }, onlineOrderData.order_id)
-                            orderDialog.show((ctx as AppCompatActivity).supportFragmentManager, "tag")
-                        }
-                        Constants.PAYMENT_METHOD_CREDIT -> {
-                            val cardDialog = CardTerminalDialog(object : CardTerminalDialog.creditCard {
-                                override fun onCardSelect(
-                                    orderId: String,
-                                    selectedCardId: String
-                                ) {
-
-                                }
-                            }, onlineOrderData.order_id)
-                            cardDialog.show((ctx as AppCompatActivity).supportFragmentManager, "tag")
-                        }
-                    }
-                }
-            },onlineOrderData.order_id)
-            tipDialog.show((ctx as AppCompatActivity).supportFragmentManager, "Payment Method")
-            val closeReceiver = object : BroadcastReceiver() {
-                override fun onReceive(p0: Context?, p1: Intent?) {
-                    tipDialog.dismiss()
-                }
-            }
-            ctx.registerReceiver(closeReceiver, IntentFilter(Constants.CLOSE_DIALOG))  */
         }
         holder.binding.cancelOrder.setOnClickListener {
             val dialog = OrderCancelDialog.getInstance(ctx, onlineOrderData)
@@ -398,27 +305,6 @@ class OnlineOrderAdapter(val ctx: Context, val list: List<OrdersEntity>, val nav
                     }
                     ctx.registerReceiver(closeReceiver, IntentFilter(Constants.CLOSE_DIALOG_BROADCAST))
                 }
-                /*      if (dBinding.driverSpinner.selectedIndex == -1) {
-                    this.dialog?.dismiss()
-                    Toast.makeText(ctx,
-                        "Person not assigned", Toast.LENGTH_SHORT).show()
-                } else {
-                    val assignedName = selectedPersonName.split(" ")
-                    var assignedId : String? = null
-                    for (subUser in subUsers) {
-                        if (subUser?.firstname == assignedName[0] && subUser.lastname == assignedName[1]) {
-                            assignedId = subUser.id
-                        }
-                    }
-                    lottieProgressDialog.showDialog()
-                    OrderRepository1.assignDriverOnline(ctx, orderId, assignedId ?: "0")
-                    val closeReceiver = object : BroadcastReceiver() {
-                        override fun onReceive(p0: Context?, p1: Intent?) {
-                            lottieProgressDialog.cancelDialog()
-                            this@DriverDialog.dialog?.dismiss()
-                        }
-                    }
-                    ctx.registerReceiver(closeReceiver, IntentFilter(Constants.CLOSE_DIALOG))  */
             }
             return dBinding.root
         }

@@ -1,20 +1,14 @@
 package com.tjcg.nentopos.java;
 
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-//import android.support.v7.app.AppCompatActivity;
-import android.os.IBinder;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.text.HtmlCompat;
 
 import com.tjcg.nentopos.R;
 
@@ -25,13 +19,9 @@ import net.posprinter.utils.BitmapProcess;
 import net.posprinter.utils.BitmapToByteData;
 import net.posprinter.utils.DataForSendToPrinterPos80;
 import net.posprinter.utils.StringUtils;
-//import net.printer.printdemo16.MainActivity;
-//import net.printer.printdemo16.R;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class R80Activity extends AppCompatActivity implements View.OnClickListener {
 

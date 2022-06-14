@@ -75,10 +75,6 @@ class CounterDisplayFragment : Fragment() {
                 val sortedList = counterList.sortedBy { it.remainedTime }
                 inProcessingList = sortedList
                 updateRecyclers(inProcessingList, readyList)
-                /*     binding.noDataFound.visibility = View.GONE
-                     binding.recyclerViewCounterDisplay.visibility = View.VISIBLE
-                     binding.recyclerViewCounterDisplay.layoutManager = LinearLayoutManager(ctx)
-                     binding.recyclerViewCounterDisplay.adapter = CounterAdapter1(ctx, sortedList)*/
             })
         MainActivity.orderViewModel.readyOrdersToday.observe(viewLifecycleOwner, { readyList ->
                 this.readyList = readyList

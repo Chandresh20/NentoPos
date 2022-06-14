@@ -115,12 +115,6 @@ class KitchenAdapter(private val ctx: Context, private val list : List<OrdersEnt
 
             dBinding.applyBtn.setOnClickListener {
                 MainActivity.orderRepository.changeKitchenOrderStatusMulti(ctx, kitchenOperation)
-         /*       for (operation in kitchenOperation) {
-                    Log.d("RowIds", operation.rowId)
-                    MainActivity.orderRepository.changeKitchenOrderStatusOnline(ctx, Constants.selectedOutletId,
-                        operation.orderId, operation.menuId ?: 0, operation.orderStatus, operation.rowId, operation.addOnId,
-                        Constants.authorization)
-                } */
             }
             dBinding.closeButton.setOnClickListener {
                 this.dismiss()
@@ -269,9 +263,6 @@ class KitchenAdapter(private val ctx: Context, private val list : List<OrdersEnt
                     for (order in kitchenOperation) {
                         Log.d("operation: ", "${order.rowId}, ${order.orderId}, ${order.foodStatus}")
                     }
-                    /*   val orderStatus : String = if (b) "1" else "0"
-                       OrderRepository1.changeKitchenOrderStatusOnline(ctx, Constants.selectedOutletId, (item.orderId ?: "0"),
-                           (item.menuId ?: "0") , orderStatus, (item.rowId ?: "0") ,Constants.Authorization)  */
                 }
             }
 

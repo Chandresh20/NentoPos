@@ -41,6 +41,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                 ALL_ORDER_UPDATE -> {
                     MainActivity.orderRepository.getAllOrdersOnline(
                         this, Constants.selectedOutletId, 0,true)
+              /*      MainActivity.mainRepository.loadTableData(this, Constants.selectedOutletId,
+                        MainActivity.deviceID, MainActivity.deviceID, 1, false)  */
                 }
                 VARIATION_UPDATE -> {
 

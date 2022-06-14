@@ -15,13 +15,13 @@ import com.tjcg.nentopos.adapters.KitchenAdapter
 import com.tjcg.nentopos.api.ApiService
 import com.tjcg.nentopos.data.*
 import com.tjcg.nentopos.dialog.SendEmailDialog
+import com.tjcg.nentopos.fragments.POSFragment
 import com.tjcg.nentopos.responses.*
 import kotlinx.coroutines.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.util.*
-import java.util.function.LongFunction
 import kotlin.collections.ArrayList
 
 class OrderRepository(ctx : Context) {
@@ -77,6 +77,7 @@ class OrderRepository(ctx : Context) {
             MainActivity.progressDialogRepository.showSmallProgressBar(
                 "getting new Orders")
         }
+        Log.d("AllOrdersReq", "$outletId, ${MainActivity.deviceID}, $isAllData, ${Constants.authorization}")
         ApiService.apiService?.getAllOrders(
             outletId, MainActivity.deviceID, isAllData, Constants.authorization)
             ?.enqueue(object: Callback<OrdersResponse?> {
@@ -84,31 +85,34 @@ class OrderRepository(ctx : Context) {
                     call: Call<OrdersResponse?>,
                     response: Response<OrdersResponse?>
                 ) {
-                    Log.d("ordersRes", "response ${response.raw()}")
+                    Log.d("ordersRes", "response ${response.body()?.status}")
                     if (response.isSuccessful && response.body()?.status == "true") {
                         Log.d("ordersRes", "Good Response")
                         //           oDao.deleteAllOrders()  // should be removed after getEditOrderAPI update
                         mainScope.launch {
                             insertAllOrdersAsync(response.body()?.data as List<OrdersEntity>).await()
                             Log.d("ordersRes", "Data inserted to database ${response.body()?.data?.size}")
+                            MainActivity.mainRepository.loadTableData(ctx, outletId, MainActivity.deviceID, MainActivity.deviceID,
+                                1, false)
                             updateViewModel()
-                            MainActivity.orderViewModel.lastSyncTiming.value = Calendar.getInstance().timeInMillis
                   /*          MainActivity.mainSharedPreferences.edit()
                                 .putInt(Constants.PREF_IS_ALL_DATA, 0).apply()  */
                         }
                         //       updateCustomerList(ctx, outletId, MainActivity.deviceID, "0")
                         //      Above line will be inserted after getEditOrderApi update
-                    }
-                    if (response.body()?.status == "false" && response.body()?.message != null &&
+                    } else if (response.body()?.status == "false" && response.body()?.message != null &&
                         (response.body()?.message?.contains("Invalid")!! ||
                                 response.body()?.message?.contains("invalid")!!)) {
                         MainActivity.logOutNow(ctx)
+                    } else {
+                        updateViewModel()
                     }
                     if (selectedOutlet) {
                         MainActivity.progressDialogRepository.dismissDialog(dId)
                     } else {
                         MainActivity.progressDialogRepository.closeSmallProgressBar()
                     }
+                    MainActivity.orderViewModel.lastSyncTiming.value = Calendar.getInstance().timeInMillis
                 }
 
                 override fun onFailure(call: Call<OrdersResponse?>, t: Throwable) {
@@ -697,12 +701,49 @@ class OrderRepository(ctx : Context) {
 
             mainScope.launch {
                 insertOffline2OrderAsync(offlineOrder2).await()
-     //           Toast.makeText(ctx, "Inserted in offline database", Toast.LENGTH_SHORT).show()
+                //           Toast.makeText(ctx, "Inserted in offline database", Toast.LENGTH_SHORT).show()
                 ctx.sendBroadcast(Intent(Constants.CLEAR_CART_BROADCAST))
                 MainActivity.mainSharedPreferences.edit()
                     .putBoolean(Constants.PREF_IS_SYNC_REQUIRES, true).apply()
+                MainActivity.progressDialogRepository.showAlertDialog(
+                    "Successfully sent to kitchen")
                 MainActivity.orderViewModel.updaterTodayOrders()
                 syncRequired = true
+                // insert in table data
+                val tableId: Int = if (orderRequest.table.isNullOrBlank()) {
+                    0
+                } else {
+                    (orderRequest.table ?: "0").toInt()
+                }
+                val tableData = MainActivity.mainRepository.getOneTableDataAsync(tableId).await()
+                if (tableData != null) {
+                    tableData.assignedOrNot = 1
+                    val relatedOrders = TableData.RelatedOrderInfo().apply {
+                        this.orderId = newId
+                        this.customerType = orderRequest.customerType
+                        this.orderStatus = orderRequest.orderStatus
+                        this.customerPaid = orderRequest.customerPaid.toString()
+                        val waiterInfo =
+                            MainActivity.mainRepository.getOneSubUserDetailAsync(
+                                orderRequest.waiterId ?: 0
+                            ).await()
+                        if (waiterInfo != null) {
+                            this.firstName = waiterInfo.firstname
+                            this.lastName = waiterInfo.lastname
+                        }
+                        this.billStatus = orderRequest.billStatus
+                    }
+                    val tableOrders =
+                        tableData.relatedOrders as ArrayList<TableData.RelatedOrderInfo>
+                    tableOrders.add(relatedOrders)
+                    tableData.relatedOrders = tableOrders
+                    MainActivity.mainRepository.updateOneTableDataAsync(
+                        tableData
+                    ).await()
+                    Log.d("NewOrder", "Table data updated")
+                } else {
+                    Log.e("NewOrder", "Table data not found for $tableId")
+                }
             }
             /*      Toast.makeText(ctx, "Internet Not available", Toast.LENGTH_SHORT).show()
                   val newId = Calendar.getInstance().timeInMillis
@@ -790,6 +831,8 @@ class OrderRepository(ctx : Context) {
                  SendEmailDialog((orderId ?: 0).toLong()).show(MainActivity.fManager, "email")
                     MainActivity.orderRepository.getAllOrdersOnline(
                         ctx, Constants.selectedOutletId, 0,false)
+             //       MainActivity.mainRepository.loadTableData(ctx, Constants.selectedOutletId,
+           //         MainActivity.deviceID, MainActivity.deviceID, 1, false)
                     ctx.sendBroadcast(Intent(Constants.CLEAR_CART_BROADCAST))
                 } else {
                     //                 showErrorDialog(ctx, "Error: ${response.body()?.message}")
@@ -948,6 +991,7 @@ class OrderRepository(ctx : Context) {
                         if (response.isSuccessful && response.body()?.status!= null && response.body()?.status!!) {
                             Log.d("MultiOrder", "${response.body()?.message}")
                             val resData = response.body()?.sycResponse
+                            Log.d("MultiOrderResSize", "${resData?.size}")
                             if (!resData.isNullOrEmpty()) {
                                 mainScope.launch {
                                     for (syncData in resData) {
@@ -964,7 +1008,7 @@ class OrderRepository(ctx : Context) {
                                             )
                                         }
                                     }
-                                    getAllOrdersOnline(ctx, Constants.selectedOutletId, 0,false)
+                                    Log.d("Calling:", "GetAllORders")
                                 }
                             }
                         } else {
@@ -1173,28 +1217,33 @@ class OrderRepository(ctx : Context) {
                 MainActivity.mainSharedPreferences.edit()
                     .putBoolean(Constants.PREF_IS_SYNC_REQUIRES, true).apply()
                 syncRequired = true
-                val editedListO = getAllEditOrdersAsync(Constants.selectedOutletId).await()
-                if (editedListO != null) {
-                    // update list
-                    val eObject = getAllEditOrdersAsync(Constants.selectedOutletId).await()
-                    if (eObject != null) {
-                        val eList = eObject.editedOrders as ArrayList<OrderUpdateRequest>
-                        eList.add(oRequest)
-                        eObject.editedOrders = eList
+                if (!isOfflineOrder(orderToUpdate.order_id)) {
+                    val editedListO = getAllEditOrdersAsync(Constants.selectedOutletId).await()
+                    if (editedListO != null) {
+                        // update list
+                        val eObject = getAllEditOrdersAsync(Constants.selectedOutletId).await()
+                        if (eObject != null) {
+                            val eList = eObject.editedOrders as ArrayList<OrderUpdateRequest>
+                            eList.add(oRequest)
+                            eObject.editedOrders = eList
+                            insertEditedOrdersAsync(eObject).await()
+                            Log.d("EditedOrder", "Added to list")
+                        }
+                    } else {
+                        // create new obj
+                        val eOrderList = ArrayList<OrderUpdateRequest>()
+                        eOrderList.add(oRequest)
+                        val eObject = OrderUpdateSync().apply {
+                            this.outletId = Constants.selectedOutletId
+                            this.editedOrders = eOrderList
+                        }
                         insertEditedOrdersAsync(eObject).await()
-                        Log.d("EditedOrder", "Added to list")
+                        Log.d("EditedOrder", "new list created")
                     }
-                } else {
-                    // create new obj
-                    val eOrderList = ArrayList<OrderUpdateRequest>()
-                    eOrderList.add(oRequest)
-                    val eObject = OrderUpdateSync().apply {
-                        this.outletId = Constants.selectedOutletId
-                        this.editedOrders = eOrderList
-                    }
-                    insertEditedOrdersAsync(eObject).await()
-                    Log.d("EditedOrder", "new list created")
                 }
+                MainActivity.progressDialogRepository.showAlertDialog(
+                    "Order edited successfully")
+                ctx.sendBroadcast(Intent(Constants.EXIT_EDITING_MODE_BROADCAST))
             }
         }
     }
@@ -1202,15 +1251,84 @@ class OrderRepository(ctx : Context) {
     fun updateOrderOffline(orderEntity: OrdersEntity?,isSync : Int) {
         mainScope.launch {
             if (orderEntity != null) {
-                if (isSync == 0) {
-                    MainActivity.mainSharedPreferences.edit()
-                        .putBoolean(Constants.PREF_IS_SYNC_REQUIRES, true).apply()
-                    syncRequired = true
+                if (isOfflineOrder(orderEntity.order_id)) {
+                    val oldOfflineOrder = getOneOffline2OrderAsync(Constants.selectedOutletId,
+                        orderEntity.order_id).await()
+                    val offlineOrder2 = OfflineOrder2().apply {
+                        this.tmpOrderId = orderEntity.order_id
+                        this.customerType = oldOfflineOrder?.customerType
+                        this.billTime = oldOfflineOrder?.billTime
+                        this.selectedCardType = oldOfflineOrder?.selectedCardType
+                        this.driverUserId = oldOfflineOrder?.driverUserId
+                        this.orderDate = oldOfflineOrder?.orderDate
+                        this.outletId = oldOfflineOrder?.outletId
+                        this.orderAcceptDate = oldOfflineOrder?.orderAcceptDate
+                        this.billDate = oldOfflineOrder?.billDate
+                        this.customerPaid = if (orderEntity.customerpaid.isNullOrBlank()) {
+                            0f
+                        } else {
+                            (orderEntity.customerpaid ?: "0").toFloat()
+                        }
+                        this.table = orderEntity.table_no.toString()
+                        this.accountNo = orderEntity.account_number
+                        this.driverAssigned = orderEntity.pis_driver_assigned
+                        this.cardType = oldOfflineOrder?.cardType
+                        this.discount = if (orderEntity.discount.isNullOrBlank()) {
+                            0f
+                        } else {
+                            (orderEntity.discount ?: "0").toFloat()
+                        }
+                        this.billStatus = orderEntity.billInfo?.billStatus
+                        this.cookedTime = orderEntity.cookedtime
+                        this.orderTime = orderEntity.order_time
+                        this.tipAmount = if (orderEntity.tip_amount.isNullOrBlank()) {
+                            0f
+                        } else {
+                            (orderEntity.tip_amount ?: "0").toFloat()
+                        }
+                        this.tipType = orderEntity.tip_type
+                        this.createdBy = oldOfflineOrder?.createdBy
+                        this.totalAmount = orderEntity.totalamount
+                        this.paymentMethodId = if (orderEntity.payment_method_id.isNullOrBlank()) {
+                            0
+                        } else {
+                            (orderEntity.payment_method_id ?: "0").toInt()
+                        }
+                        this.tipValue = if (orderEntity.tip_amount.isNullOrBlank()) {
+                            0f
+                        } else {
+                            (orderEntity.tip_amount ?: "0").toFloat()
+                        }
+                        this.waiterId = orderEntity.waiter_id
+                        this.customerId = orderEntity.customer_id
+                        this.receivedPaymentAmount = if (orderEntity.received_payment_amount.isNullOrBlank()) {
+                            0f
+                        } else {
+                            (orderEntity.received_payment_amount ?: "0").toFloat()
+                        }
+                        this.selectedCard = oldOfflineOrder?.selectedCard
+                        this.orderDeliveredOrNot = orderEntity.pis_order_delivered
+                        this.paymentReceivedOrNot = if (orderEntity.pis_payment_received.isNullOrBlank()) {
+                            0
+                        } else {
+                            (orderEntity.pis_payment_received ?: "0").toInt()
+                        }
+                        this.orderStatus = orderEntity.order_status
+                        this.cartItems = oldOfflineOrder?.cartItems
+                    }
+                    updateSingleOfflineOrderAsync(offlineOrder2).await()
+                    Log.d("EditOrder", "updated offline")
+                } else {
+                    if (isSync == 0) {
+                        MainActivity.mainSharedPreferences.edit()
+                            .putBoolean(Constants.PREF_IS_SYNC_REQUIRES, true).apply()
+                        syncRequired = true
+                    }
+                    orderEntity.syncOrNot = isSync
+                    orderEntity.editTime = System.currentTimeMillis()
+                    updateSingleOrderAsync(orderEntity).await()
+                    Log.d("EditOrder", "updated offline")
                 }
-                orderEntity.syncOrNot = isSync
-                orderEntity.editTime = System.currentTimeMillis()
-                updateSingleOrderAsync(orderEntity).await()
-                Log.d("EditOrder", "updated offline")
                 updateViewModel()
             }
 

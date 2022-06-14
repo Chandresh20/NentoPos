@@ -38,8 +38,23 @@ class TableData {
         @SerializedName("order_id")
         var orderId : Long? = null
 
+        @SerializedName("cutomertype")
+        var customerType : Int? = null
+
         @SerializedName("order_status")
         var orderStatus : Int? = null
+
+        @SerializedName("customerpaid")
+        var customerPaid : String? = null
+
+        @SerializedName("first_name")
+        var firstName : String? = ""
+
+        @SerializedName("last_name")
+        var lastName: String? = ""
+
+        @SerializedName("bill_status")
+        var billStatus : Int? = null
     }
 
     override fun toString(): String {

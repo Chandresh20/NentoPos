@@ -53,6 +53,7 @@ class POSFragment : Fragment() {
     private var categorySelected = 0
     private lateinit var cart : Cart
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -141,6 +142,10 @@ class POSFragment : Fragment() {
             }
         }
         MainActivity.orderRepository.getAllOrdersOnline(ctx, Constants.selectedOutletId, 0,false)
+        if (MainActivity.isInternetAvailable(ctx)) {
+            mainRepository.loadTableData(ctx, Constants.selectedOutletId, MainActivity.deviceID,
+                MainActivity.deviceID, 1, false)
+        }
    /*     if (directLogin) {
             updateProductShowcase()
             directLogin = false
@@ -256,17 +261,17 @@ class POSFragment : Fragment() {
             if (allProductData.isNullOrEmpty()) {
                 val outlet = mainRepository.getOutletDataAsync(Constants.selectedOutletId).await()
                 if (outlet != null) {
-                    Log.d("ProductForDefault", "loding...")
+                    Log.d("ProductForDefault", "loading...")
                     mainRepository.loadProductData(ctx,
                         Constants.selectedOutletId,
                         outlet.uniqueId ?: "NA", "0",
                         1, true)
-                    Log.d("CustomerforDefault", "loding...")
+                    Log.d("CustomerForDefault", "loading...")
                     mainRepository.loadCustomerData(
                         ctx, Constants.selectedOutletId,
                         "0", 1, true
                     )
-                    Log.d("TablesforDefault", "loding...")
+                    Log.d("TablesForDefault", "loading...")
                     mainRepository.loadTableData(ctx, Constants.selectedOutletId,
                         outlet.uniqueId ?: "NA", "0", 1, true)
                     mainRepository.loadSubUsersData(ctx, Constants.selectedOutletId,
@@ -400,9 +405,9 @@ class POSFragment : Fragment() {
             if (discount.discountSchedule == 1) {
                 available = true
             }
-            else {
+        /*    else {
                 // TODO("discount will be available on particular")
-            }
+            } */
         }
         return available
     }
@@ -524,10 +529,6 @@ class POSFragment : Fragment() {
                             R.drawable.product_selector_reverse, ctx.theme)
                 } else {
                     holder.pBinding.productLayout.visibility = View.GONE
-               /*     holder.pBinding.productLayout.background =
-                        ResourcesCompat.getDrawable(ctx.resources,
-                            R.drawable.inacitive_product, ctx.theme)
-                    holder.pBinding.productPrice.visibility = View.GONE  */
                 }
             }
             holder.pBinding.productPrice.text = if (product.productPrice.isNullOrBlank() || product.productPrice == "0") {

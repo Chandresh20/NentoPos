@@ -9,6 +9,7 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
@@ -30,6 +31,7 @@ import com.tjcg.nentopos.repositories.MainRepository
 import com.tjcg.nentopos.repositories.OrderRepository
 import com.tjcg.nentopos.viewmodels.MainViewModel
 import com.tjcg.nentopos.viewmodels.OrderViewModel
+import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -164,7 +166,12 @@ class MainActivity : AppCompatActivity() {
         }
         val logoutReceiver = object : BroadcastReceiver() {
             override fun onReceive(p0: Context?, p1: Intent?) {
-                findNavController(binding.fragmentContainerView).navigate(R.id.navigation_login)
+                try {
+                    findNavController(binding.fragmentContainerView).navigate(R.id.navigation_login)
+                } catch (e: Exception) {
+                    Log.e("ErrorSignOut", "$e")
+                    Sentry.captureMessage("SignOutError : $e")
+                }
             }
         }
         registerReceiver(logoutReceiver, IntentFilter(Constants.LOG_OUT_NOW_BROADCAST))

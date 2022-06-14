@@ -69,7 +69,6 @@ class CounterAdapter(private val ctx: Context, private val list : List<OrdersEnt
             }
         }
         holder.binding.completedItems.text = "$completedItems / $totalItems"
-        //       holder.binding.completedItems.text = counterData.completed_items
         val formattedDate = getTimeWithAMPMFromTime(counterData.order_time)
         holder.binding.orderTime.text = formattedDate
         holder.binding.orderStatus.text = Constants.getOrderStatus(counterData.order_status!!)
@@ -109,8 +108,6 @@ class CounterAdapter(private val ctx: Context, private val list : List<OrdersEnt
 
             override fun onFinish() {
                 textView.text = ctx.resources.getString(R.string.time_over)
-           /*     DatabaseUpdates.isNewCounter = true
-                ctx.sendBroadcast(Intent(Constants.COUNTER_UPDATE))  */
             }
         }.start()
     }

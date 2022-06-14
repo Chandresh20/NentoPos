@@ -50,6 +50,7 @@ class SyncDialog : DialogFragment() {
                         CoroutineScope(Dispatchers.Main).launch {
                             MainActivity.mainRepository.deleteOfflineCustomersAsync().await()
                         }
+                        MainActivity.orderRepository.getAllOrdersOnline(ctx, Constants.selectedOutletId, 0, true)
                     } else {
                         syncBinding.synText.text = "An Error Occurred, Please try again"
                     }
@@ -67,10 +68,7 @@ class SyncDialog : DialogFragment() {
             this.dismiss()
         }
         syncBinding.synNowBtn.setOnClickListener {
-      //      MainActivity.orderRepository.startSync(ctx)
-      //      MainActivity.orderRepository.startUploadingOfflineOrders(ctx)
             MainActivity.mainRepository.startCustomerSync(ctx)
-//      first customerSync -> mapCustomerToOfflineOrders -> All Orders Sync
             pDialogId = MainActivity.progressDialogRepository.getProgressDialog("Sync in progress")
             ctx.registerReceiver(synCompleteReceiver, IntentFilter(Constants.SYNC_COMPLETE_BROADCAST))
         }

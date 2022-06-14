@@ -63,7 +63,6 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
     private var tipAmount = 0f
     private var paymentMethod : Int? = null
     private var newOrderStatus = Constants.ORDER_STATUS_SERVED
-    private var selectedTable = 0
     private var billStatus = 0
     private var categoryDiscounts : List<DiscountData> = emptyList()
     private var productDiscounts : List<DiscountData> = emptyList()
@@ -71,6 +70,8 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
     private var productDiscount = 0f
     private var inEditingMode = false
     private var orderToUpdate : OrdersEntity? = null
+    private var removedWhileEdit = ArrayList<String?>()
+ //   private var selectedTable = 0
 /*    private var categoryDiscountPercentage = false
     private var categoryDiscount = 0f
     private var productDiscountPercentage = false
@@ -187,7 +188,7 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                 MainActivity.progressDialogRepository.showErrorDialog("Cart is Empty..")
                 return@setOnClickListener
             }
-            if (selectedTable == 0) {
+            if (selectedTableCompanion == 0) {
                 MainActivity.progressDialogRepository.showErrorDialog("Please select Table...")
                 return@setOnClickListener
             }
@@ -215,7 +216,7 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                 MainActivity.progressDialogRepository.showErrorDialog("Cart is Empty..")
                 return@setOnClickListener
             }
-            if (selectedTable == 0) {
+            if (selectedTableCompanion == 0) {
                 MainActivity.progressDialogRepository.showErrorDialog("Please select Table...")
                 return@setOnClickListener
             }
@@ -264,6 +265,20 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
         ctx.registerReceiver(outletChangeReceiver, IntentFilter(Constants.OUTLET_CHANGE_BROADCAST))
         ctx.registerReceiver(outletChangeReceiver, IntentFilter(Constants.OUTLET_CHANGE_BROADCAST))
         ctx.registerReceiver(editExitReceiver, IntentFilter(Constants.EXIT_EDITING_MODE_BROADCAST))
+        if (tableAdapter != null) {
+            for (i in 0 until tableAdapter!!.count) {
+                val tableData = tableAdapter!!.getItem(i) as TableData
+                Log.d("LoadedTable", "${tableData.tableId} : $selectedTableCompanion")
+                if (tableData.tableId == selectedTableCompanion) {
+                    Handler(Looper.getMainLooper()).postDelayed( {
+                        binding.tableSpinner.setSelection(i)
+                        binding.tableBtn.performClick()
+                    }, 1000)
+                    break
+                }
+        }
+        }
+
     }
 
     fun updateTableList() {
@@ -272,8 +287,8 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                 .getTablesForOutletAsync(Constants.selectedOutletId).await()
             Log.d("Available Tables for ${Constants.selectedOutletId}", "${tables?.size}")
             if (!tables.isNullOrEmpty()) {
-                val arrayAdapter = ArrayAdapter(ctx, R.layout.item_light_spinner, R.id.light_spinner_text, tables)
-                binding.tableSpinner.adapter = arrayAdapter
+                tableAdapter = ArrayAdapter(ctx, R.layout.item_light_spinner, R.id.light_spinner_text, tables)
+                binding.tableSpinner.adapter = tableAdapter
     //            binding.tableSpinner.visibility = View.VISIBLE
                 binding.tableSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                     override fun onItemSelected(
@@ -282,7 +297,7 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                         p2: Int,
                         p3: Long
                     ) {
-                        selectedTable = tables[p2].tableId
+                        selectedTableCompanion = tables[p2].tableId
                         Log.d("Selected Table", "${tables[p2].tableId}")
                     }
 
@@ -324,13 +339,13 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                 this.orderID = orderToUpdate?.order_id
                 this.tipType = orderToUpdate?.tip_type
                 this.tipValue = this@Cart.tipAmount
-                this.paymentReceivedOrNot = 0
+                this.paymentReceivedOrNot = this@Cart.billStatus
                 this.billDate = null
                 this.cardType = null
                 this.cookedTime = mainRepository.formatCookingTime(this@Cart.cookingTimeInMin)
                 this.discount = cartViewModel.discountPer.value
                 this.orderDeliveredOrNot = orderToUpdate?.pis_order_delivered
-                this.receivedPaymentAmount =  orderToUpdate?.received_payment_amount?.toFloat()
+                this.receivedPaymentAmount =  this@Cart.customerPaid
                 this.billStatus = this@Cart.billStatus
                 this.outletId = orderToUpdate?.outlet_id
                 this.deviceId = MainActivity.deviceID
@@ -349,7 +364,7 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                 this.waiterId = orderToUpdate?.waiter_id
                 this.orderDate = orderToUpdate?.order_date
                 this.orderStatus = this@Cart.newOrderStatus
-                this.table = this@Cart.selectedTable
+                this.table = selectedTableCompanion
                 this.customerType = if (orderToUpdate?.customer_type.isNullOrBlank()
                     || orderToUpdate?.customer_type.equals("NA")) {
                     "0"
@@ -362,14 +377,18 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
             }
             updatedEntity.apply {
                 this.cookedtime = mainRepository.formatCookingTime(this@Cart.cookingTimeInMin)
-                this.table_no = this@Cart.selectedTable
+                this.table_no = selectedTableCompanion
                 this.discount = cartViewModel.discountPer.value.toString()
                 this.tip_value = this@Cart.tipAmount.toString()
                 this.totalamount = this@Cart.grandTotal
                 this.order_status = this@Cart.newOrderStatus
                 this.billInfo?.billStatus =  this@Cart.billStatus
             }
-            updateRequest.deletedRows // needs to add row ids of delete items
+            updateRequest.deletedRows = if (removedWhileEdit.isNotEmpty()) {
+                removedWhileEdit.joinToString(separator = ",")
+            } else {
+                ""
+            }
             val addOnsId = ArrayList<Int>()
             val addOnsPrice = ArrayList<Float>()
             val addOnsQty = ArrayList<Int>()
@@ -578,9 +597,17 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                         this.addOnName = addOnsName.joinToString()
                     }
                     updateRequest.cartItems = itemsInRequest
+                } else {
+                    updateRequest.cartItems = ArrayList()
                 }
-                // add new cart items in updatedEntity
-
+                val eItems = updatedEntity.itemsInfo as ArrayList<OrdersEntity.ItemInfo>
+                for (removed in removedWhileEdit) {
+                    val toRemove = eItems.find { it.rowId == removed }
+                    if (toRemove != null) {
+                        eItems.remove(toRemove)
+                    }
+                }
+                updatedEntity.itemsInfo = eItems
                 MainActivity.orderRepository.updateOrder(ctx, updateRequest, updatedEntity)
             }
             return
@@ -608,7 +635,7 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
         orderRequest.orderAcceptDate = ""
         orderRequest.billDate = mainRepository.getTodayString()
         orderRequest.customerPaid = customerPaid
-        orderRequest.table = selectedTable.toString()
+        orderRequest.table = selectedTableCompanion.toString()
         Log.d("Table", "${orderRequest.table}")
         orderRequest.accountNo = ""
         orderRequest.driverAssigned = 0
@@ -913,6 +940,7 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
     }
 
     fun insertProductToUpdate(order: OrdersEntity) {
+        removedWhileEdit.clear()
         binding.updateLayout.visibility = View.VISIBLE
         binding.updateOrderText.text = "Updating Order No. ${order.order_id}"
         binding.updateCancelBtn.setOnClickListener {
@@ -933,10 +961,12 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                 val variantId = pro.varientId
                 var productPrice = (prodInfo?.productPrice ?: "0").toFloat()
                 if (variantId != null && variantId > 0) {
-                    val variantData = mainRepository.getOneVariantDataAsync(variantId).await()
-                    if (variantData != null) {
-                        prodName += " ${variantData.variantName}"
-                        productPrice = (variantData.variantPrice ?: "0").toFloat()
+                    if (!prodInfo?.productVariants.isNullOrEmpty()) {
+                        val variantData = prodInfo?.productVariants?.find { it.variantId == variantId }
+                        if (variantData != null) {
+                            prodName += " ${variantData.variantName}"
+                            productPrice = (variantData.variantPrice ?: "0").toFloat()
+                        }
                     }
                 }
                 val modifiers = ArrayList<ModifierInCart>()
@@ -1123,7 +1153,8 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                 }
                 items.add(ItemInCart(id, prodName, variantId, modifiers,
                     (pro.menuQty ?: "0").toInt(), productPrice,
-                    categoryDiscounts, productDiscounts, taxList, order.customer_note, false, fromEdit = true, foodStatus = (pro.foodStatus ?: 0)
+                    categoryDiscounts, productDiscounts, taxList, order.customer_note, false,
+                    fromEdit = true, rowId = pro.rowId ,foodStatus = (pro.foodStatus ?: 0)
                 ))
                 itemAdapter.notifyItemInserted(items.size - 1)
             }
@@ -1150,15 +1181,17 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                 itemAdapter.notifyItemInserted(items.size - 1)
             }
             // set up table
-            selectedTable = order.table_no ?: 0
-            val tableAdapter = binding.tableSpinner.adapter
-            for (i in 0 until tableAdapter.count) {
-                val tableData = tableAdapter.getItem(i) as TableData
-                if (tableData.tableId == selectedTable) {
+            selectedTableCompanion = order.table_no ?: 0
+     //       val tableAdapter = binding.tableSpinner.adapter
+            if (tableAdapter != null) {
+                for (i in 0 until tableAdapter!!.count) {
+                val tableData = tableAdapter!!.getItem(i) as TableData
+                if (tableData.tableId == selectedTableCompanion) {
                     binding.tableSpinner.setSelection(i)
                     binding.tableBtn.performClick()
                     break
                 }
+            }
             }
             // set up discount
             cartViewModel.setDiscount((order.discount ?: "0").toFloat())
@@ -1331,6 +1364,10 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
             }
         }
         if (itemToReplace != null) {
+            if (inEditingMode) {
+                itemToReplace.fromEdit = false
+                removedWhileEdit.add(itemToReplace.rowId)
+            }
      //       items.remove(itemToReplace)
             itemToReplace.qty = (itemToReplace.qty ?: 0) + 1
      //       items.add(itemToReplace)
@@ -1353,7 +1390,7 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
             if ((itemToReplace.qty ?: 0) <= 0) {
                 items.remove(itemToReplace)
                 if (itemToReplace.fromEdit) {
-
+                    removedWhileEdit.add(itemToReplace.rowId)
                 }
                 itemAdapter.notifyDataSetChanged()
             } else {
@@ -1466,10 +1503,16 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
 
     private fun Float.format() = "%.2f".format(this)
 
+    companion object {
+        var selectedTableCompanion = 0
+        var tableAdapter : SpinnerAdapter? = null
+    }
+
     class ItemInCart(
         val id:Int?, val name:String?, val variantId: Int?, val modifiers: ArrayList<ModifierInCart>,
         var qty: Int?, val price: Float?,val catDiscounts : List<DiscountData>, val prodDiscount : List<DiscountData>,
-        val taxes: List<ProductTax>?, val orderNote: String?, val isAddOn : Boolean, val fromEdit: Boolean= false, val foodStatus:Int = 0,
+        val taxes: List<ProductTax>?, val orderNote: String?, val isAddOn : Boolean, var fromEdit: Boolean= false, val foodStatus:Int = 0,
+        val rowId: String? = null,
         var holderPosition:Int = 0)
     // missing field in cart modifierIds, orderNotes, SubModIds
     class ModifierInCart(val modId: Int?, val modPrice: Float?, val subMods : ArrayList<SubModifierBrief>)
@@ -1515,6 +1558,7 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
         }
 
         companion object {
+
             fun getInstance(ctx: Context, viewModel: CartViewModel) : DiscountDialog {
                 val dialog = DiscountDialog()
                 dialog.ctx = ctx
@@ -1691,7 +1735,7 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                         typeface = typeFace
                     }
                     val variantRadioBtn = RadioButton(ctx).apply {
-                        id = variant.variantId
+                        id = variant.variantId ?: 0
                         text = "${variant.variantPrice} ${Constants.currencySign}"
                         typeface = typeFace
                     }
@@ -1709,6 +1753,7 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
                             selectedVariantPrice = vari.price ?: 0f
                             cartViewModel.setVariantId(i)
                             variantName = vari.label ?: "NA"
+                            Log.d("SelectVariant", "${vari.id} - $variantName")
                             setTotalAmount()
                             break
                         }

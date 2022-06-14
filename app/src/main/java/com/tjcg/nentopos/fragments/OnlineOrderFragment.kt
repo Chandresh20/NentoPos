@@ -110,45 +110,11 @@ class OnlineOrderFragment : Fragment() {
     private fun updateOnlineOrdersList() {
         val mainList = ArrayList<OrdersEntity>()
         mainList.addAll(onlineOrders)
-   //     mainList.addAll(activeFutureOrders)
         val sortedList = mainList.sortedByDescending { it.order_id }
         binding.productRecyclerView.layoutManager = LinearLayoutManager(ctx)
         binding.productRecyclerView.adapter = OnlineOrderAdapter(ctx, sortedList, findNavController())
         selectTab()
     }
- /*   private fun removeFutureOrdersOfThePast(allList : List<OrdersEntity>) : List<OrdersEntity> {
-        val newList  = ArrayList<OrdersEntity>()
-        val cal = Calendar.getInstance()
-        val todayYear = cal.get(Calendar.YEAR)
-        val todayMonth = cal.get(Calendar.MONTH) + 1
-        val todayDay = cal.get(Calendar.DAY_OF_MONTH)
-        try {
-            todayFutureOrders.clear()
-            for (order in allList) {
-                if (!order.future_order_date.isNullOrBlank()) {
-                    Log.d("FutureSort", "${order.future_order_date}")
-                    val strs = order.future_order_date?.split("-")
-                    if (strs?.get(0)?.toInt()!! >= todayYear) {
-                        if (strs[1].toInt() >= todayMonth) {
-                            if (strs[2].toInt() > todayDay) {
-                                newList.add(order)
-                            }
-                            if (strs[2].toInt() == todayDay) {
-                                // put this order in new order tab
-                                todayFutureOrders.add(order)
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (e:Exception) {
-            Log.e("FutureOrderError", "Formatting error: $e")
-            Toast.makeText(ctx, "An Error Occured while filtering future orders",
-                Toast.LENGTH_SHORT).show()
-        }
-        currentFutureOrders = newList.size
-        return newList
-    }  */
 
     private fun showOnlineOrders() {
         if (onlineOrders.isNullOrEmpty() && activeFutureOrders.isNullOrEmpty()) {
@@ -158,20 +124,6 @@ class OnlineOrderFragment : Fragment() {
             binding.noDataFound.visibility = View.GONE
             binding.productRecyclerView.visibility = View.VISIBLE
         }
-   /*     val onlineOrders = MainActivity.orderViewModel.onlineOrders.value ?: ArrayList()
-        val withFutureOrders = ArrayList<OrdersEntity>()
-        withFutureOrders.addAll(onlineOrders)
-        withFutureOrders.addAll(todayFutureOrders)
-        if (withFutureOrders.isNullOrEmpty()) {
-            binding.noDataFound.visibility = View.VISIBLE
-    //        MainActivity.stopMedia()
-            return
-        }
-        val sortedList = withFutureOrders.sortedByDescending { it.order_id.toInt() }
-        binding.noDataFound.visibility = View.GONE
-        binding.productRecyclerView.visibility = View.VISIBLE
-        binding.productRecyclerView.layoutManager = LinearLayoutManager(ctx)
-        binding.productRecyclerView.adapter = OnlineOrderAdapter(ctx, sortedList, findNavController())  */
     }
 
     private fun showAcceptedOrders() {

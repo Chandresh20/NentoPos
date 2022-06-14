@@ -9,7 +9,7 @@ import com.google.gson.annotations.SerializedName
 class ProductVariants {
 
     @SerializedName("item_menu_variant_id")
-    var itemMenuVariantId: String? = null
+    var itemMenuVariantId: Int? = null
 
     @PrimaryKey
     @NonNull

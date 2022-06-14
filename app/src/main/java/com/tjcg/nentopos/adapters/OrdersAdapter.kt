@@ -41,7 +41,6 @@ class OrdersAdapter(val ctx: Context, val list: List<OrdersEntity>, private val 
     override fun onBindViewHolder(holder: OrdersAdapter.MyHolder, position: Int) {
         val onlineOrderData = list[position]
         holder.binding.orderId.text = onlineOrderData.order_id.toString()
-    //    holder.binding.gridLayout.removeView(holder.binding.editOrder)
         if (onlineOrderData.futureOrderType == Constants.FUTURE_ORDER_FAR) {
             holder.binding.gridLayout.removeView(holder.binding.editOrder)
             holder.binding.gridLayout.removeView(holder.binding.acceptOrder)
@@ -145,7 +144,6 @@ class OrdersAdapter(val ctx: Context, val list: List<OrdersEntity>, private val 
             }
             Constants.ORDER_STATUS_PROCESSING -> {
                 holder.binding.gridLayout.removeView(holder.binding.acceptOrder)
-             //   holder.binding.gridLayout.removeView(holder.binding.editOrder)
             }
             Constants.ORDER_STATUS_READY -> {
                 holder.binding.gridLayout.removeView(holder.binding.acceptOrder)
@@ -155,7 +153,6 @@ class OrdersAdapter(val ctx: Context, val list: List<OrdersEntity>, private val 
             holder.binding.gridLayout.removeView(holder.binding.editOrder)
         }
         holder.binding.editOrder.setOnClickListener {
-            //    ctx?.setFragment(PosTabFragment.newInstance())
             if (Constants.databaseBusy) {
                 MainActivity.progressDialogRepository.showAlertDialog(
                     "Database is busy, please try again in few minutes")

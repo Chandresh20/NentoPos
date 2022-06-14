@@ -19,7 +19,6 @@ import retrofit2.Response
 import java.io.File
 import java.lang.Exception
 import java.net.URL
-import java.time.LocalDate
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -423,13 +422,13 @@ class MainRepository(ctx : Context) {
     fun loadTableData(ctx: Context, outletId: Int, uniqueId: String, deviceId: String,
                       isAllData: Int, defaultOutlet: Boolean) {
         var dialogId = 0
-        if (defaultOutlet) {
+    /*    if (defaultOutlet) {
             dialogId = MainActivity.progressDialogRepository
                 .getProgressDialog("Loading Table Data")
         } else {
             MainActivity.progressDialogRepository
                 .showSmallProgressBar("Loading Table Data for id : $outletId")
-        }
+        }  */
         ApiService.apiService?.getTableList(outletId, uniqueId, deviceId, isAllData,
             Constants.authorization)?.enqueue(object : Callback<TableResponse?> {
             override fun onResponse(
@@ -446,17 +445,17 @@ class MainRepository(ctx : Context) {
                         }
                         CoroutineScope(Dispatchers.Main).launch {
                             insertTableDataAsync(tables2).await()
-                            downloadTableData(ctx, tables2).await()
+                            downloadTableDataAsync(ctx, tables2).await()
                             ctx.sendBroadcast(Intent(Constants.TABLE_LOADED_BROADCAST))
                             Log.d("Tables", "Inserted: ${tables2.size} for Id: $outletId")
                         }
                     }
                 }
-                if (defaultOutlet) {
+          /*      if (defaultOutlet) {
                     MainActivity.progressDialogRepository.dismissDialog(dialogId)
                 } else {
                     MainActivity.progressDialogRepository.closeSmallProgressBar()
-                }
+                }  */
             }
 
             override fun onFailure(call: Call<TableResponse?>, t: Throwable) {
@@ -473,7 +472,7 @@ class MainRepository(ctx : Context) {
         })
     }
 
-    private suspend fun downloadTableData(ctx: Context, tables : ArrayList<TableData>) =
+    private suspend fun downloadTableDataAsync(ctx: Context, tables : ArrayList<TableData>) =
         coroutineScope {
             async(Dispatchers.IO) {
                 Constants.tableImagesReady = false
@@ -487,7 +486,7 @@ class MainRepository(ctx : Context) {
                         val tbFile = File(tableDir, "${table.tableId}.jpg")
                         val tbImageURL = URL(table.tableIcon)
                         val tbStream = tbImageURL.openStream()
-                        var read = 0
+                        var read: Int
                         var buff : ByteArray
                         val outStream = tbFile.outputStream()
                         while (true) {
@@ -740,7 +739,7 @@ class MainRepository(ctx : Context) {
                 MainActivity.orderRepository.mapOfflineCustomers(ctx, null)
                 return@launch
             }
-            val req = convertCustomerReqToJson(allOffCustomer ?: emptyList())
+            val req = convertCustomerReqToJson(allOffCustomer)
             Log.d("customerReq", req)
             ApiService.apiService?.syncOfflineCustomers(req, Constants.authorization)
                 ?.enqueue(object : Callback<CustomerSyncResponse> {
@@ -903,6 +902,13 @@ class MainRepository(ctx : Context) {
         coroutineScope {
             async (Dispatchers.IO) {
                 productDao.insertOneProductData(productData)
+            }
+        }
+
+    suspend fun updateOneTableDataAsync(table: TableData) =
+        coroutineScope {
+            async(Dispatchers.IO) {
+                userDao.updateOneTable(table)
             }
         }
 

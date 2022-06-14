@@ -27,7 +27,6 @@ class AllOrderFragment : Fragment() {
     private var allReadyList = emptyList<OrdersEntity>()
     private var allCompletedList = emptyList<OrdersEntity>()
     private var allCancelledList = emptyList<OrdersEntity>()
- //   private val orderRepository = MainActivity.orderRepository
 
     override fun onCreateView(
         inflater: LayoutInflater,

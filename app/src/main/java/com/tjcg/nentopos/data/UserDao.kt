@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy.REPLACE
 import androidx.room.Query
+import androidx.room.Update
 
 @Dao
 interface UserDao {
@@ -16,6 +17,9 @@ interface UserDao {
 
     @Insert(onConflict = REPLACE)
     fun insertAllTablesData(tables: List<TableData>)
+
+    @Update
+    fun updateOneTable(table: TableData)
 
     @Insert(onConflict = REPLACE)
     fun insertSubUsersData(subUsers : List<SubUserData>)

@@ -52,17 +52,6 @@ interface Apis {
                      @Field("is_all_data") is_all_data: Int = 1,
                      @Header("Authorization") authHeader: String?) : Call<OrdersResponse?>
 
-    /*  @POST("getEditOrderDetail")
-      @FormUrlEncoded
-      fun getSingleOrder(@Field("outlet_id") outlet_id: String?,
-                          @Field("order_id") order_id: String?) : Call<OrdersResponse>  */
-
-/*    @POST("getEditOrderDetail")
-    @FormUrlEncoded
-    fun getOrderDetails(@Field("outlet_id") outlet_id: String?,
-                        @Field("order_id") order_id : String?,
-                        @Header("Authorization") authHeader: String? ): Call<OrderDetailsResponse?>  */
-
     @POST("getSubUsers")
     @FormUrlEncoded
     fun getSubUsers(@Field("outlet_id") outletId: Int,
@@ -80,13 +69,6 @@ interface Apis {
                                 @Field("cooking_time") cooking_time: String?,
                                 @Field("reason") reason: String?,
                                 @Header("Authorization") authHeader: String): Call<OrderAcceptResponse>
-
-  /*  @POST("changeOrderStatus")
-    @FormUrlEncoded
-    fun changeOrderStatus(@Field("outlet_id") outlet_id: String?,
-                          @Field("order_id") order_id: String?,
-                          @Field("status") status: String?,
-                          @Header("Authorization") authHeader: String?) : Call<SimpleResponse>  */
 
     @POST("changeKitchenOrderStatus")
     @FormUrlEncoded
@@ -113,13 +95,6 @@ interface Apis {
     @POST("addToCartUpdateSync")
     fun synEditedOrders(@Body eSyncJson: String,
                         @Header("Authorization") authHeader: String) : Call<SimpleResponse>
-
-/*    @POST("getAllCustomerList")
-    @FormUrlEncoded
-    fun getAllCustomerList(@Field("outlet_id") outlet_id: String?,
-                           @Field("device_id") device_id: String?,
-                           @Field("is_all_data") is_all_data: String?,
-                           @Header("Authorization") authHeader: String?) : Call<CustomerListRS?>  */
 
     @POST("getDiscountList")
     @FormUrlEncoded
