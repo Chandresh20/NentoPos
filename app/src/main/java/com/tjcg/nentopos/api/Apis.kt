@@ -15,11 +15,13 @@ interface Apis {
 
     @POST("loginSubUser")
     @FormUrlEncoded
-    fun loginSubUser(@Field("email") emailId: String?,
+    fun loginSubUser(
+            //        @Field("email") emailId: String?,
                      @Field("pin") pin: String?,
-                     @Field("domain_name") domain_name: String?,
-                     @Field("device_token") device_token: String?,
-                    @Field("device_type") device_type: String?): Call<SubUserLoginResponse?>
+                     @Field("device_id") deviceId : String,
+                     @Field("domain_name") domain_name: String?): Call<SubUserLoginResponse?>
+           //          @Field("device_token") device_token: String?,
+            //        @Field("device_type") device_type: String?
 
     @POST("getLocationBasedMenusProducts")
     @FormUrlEncoded
@@ -150,4 +152,10 @@ interface Apis {
     fun updateOrder(
         @Body updateOrderRequest : String,
         @Header("Authorization") authHeader: String) : Call<SimpleResponse>
+
+    @POST("logoutFromDevice")
+    @FormUrlEncoded
+    fun logoutFromDevice(
+        @Field("device_id") deviceId: String,
+        @Header("Authorization") authString: String) : Call<String>
 }

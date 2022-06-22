@@ -66,6 +66,8 @@ class Constants {
         const val FUTURE_ORDER_FAR = 1
         const val FUTURE_ORDER_NEAR = 2
 
+        const val SUB_USER_AUTO_SIGN_OUT = 120 //in minutes
+
 
         fun getOrderStatus(status: Int): String {
             return when (status) {

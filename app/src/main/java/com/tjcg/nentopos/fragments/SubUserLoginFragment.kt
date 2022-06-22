@@ -80,7 +80,8 @@ class SubUserLoginFragment : Fragment() {
                 }
             }
             ctx.registerReceiver(loginReceiver, IntentFilter(Constants.SUB_USER_LOGIN_BROADCAST))
-            MainActivity.mainRepository.loginSubUser(ctx, superEmail ?: "", pin, domainName ?: "")
+     //       MainActivity.mainRepository.loginSubUser(ctx, superEmail ?: "", pin, domainName ?: "", MainActivity.deviceID)
+            MainActivity.mainRepository.loginSubUser(ctx, pin, domainName ?: "NA", MainActivity.deviceID)
         }
         return binding.root
     }

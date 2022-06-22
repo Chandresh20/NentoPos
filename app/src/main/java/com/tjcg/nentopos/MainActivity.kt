@@ -27,6 +27,7 @@ import com.tjcg.nentopos.databinding.DrowerMainBinding
 import com.tjcg.nentopos.dialog.ProgressDialog
 import com.tjcg.nentopos.dialog.ProgressDialogRepository
 import com.tjcg.nentopos.java.MainActivitySetting
+import com.tjcg.nentopos.receiver.ScreenReceiver
 import com.tjcg.nentopos.repositories.MainRepository
 import com.tjcg.nentopos.repositories.OrderRepository
 import com.tjcg.nentopos.viewmodels.MainViewModel
@@ -66,6 +67,7 @@ class MainActivity : AppCompatActivity() {
         binding = mainDrawerBinding.mainLayout
         setContentView(mainDrawerBinding.root)
         deviceID = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
+        Log.d("DeviceId", deviceID)
         dummyViewActionBar = binding.dummyView
         Constants.isNewLogin = mainSharedPreferences.getBoolean(
             Constants.PREF_IS_NEW_LOGIN, true)
@@ -214,6 +216,12 @@ class MainActivity : AppCompatActivity() {
         orderViewModel.lastSyncTiming.observe(this,  { time ->
             mainSharedPreferences.edit().putLong(Constants.PREF_SYN_TIME ,time).apply()
         })
+        val idleReceiver = ScreenReceiver()
+        val iFilter2 = IntentFilter().apply {
+            addAction(Intent.ACTION_SCREEN_ON)
+            addAction(Intent.ACTION_SCREEN_OFF)
+        }
+        registerReceiver(idleReceiver, iFilter2)
     }
 
     private fun navigateTo(nav: Int) {

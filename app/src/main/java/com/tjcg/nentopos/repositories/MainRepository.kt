@@ -157,12 +157,13 @@ class MainRepository(ctx : Context) {
         loadCustomerTypes()
     }
 
-    fun loginSubUser(ctx: Context, superEmail: String, pin: String, domainName: String) {
+    fun loginSubUser(ctx: Context, pin: String, domainName: String, deviceId: String) {
         val subUserIntent = Intent(Constants.SUB_USER_LOGIN_BROADCAST)
         val dialogId: Int
         if (MainActivity.isInternetAvailable(ctx)) {
             dialogId = MainActivity.progressDialogRepository.getProgressDialog("Logging in....")
-            ApiService.apiService?.loginSubUser(superEmail, pin, domainName, Constants.firebaseToken, "android")
+      //      ApiService.apiService?.loginSubUser(superEmail, pin, domainName, deviceId,Constants.firebaseToken, "android")
+            ApiService.apiService?.loginSubUser(pin, deviceId, domainName)
                 ?.enqueue(object : Callback<SubUserLoginResponse?> {
                     override fun onResponse(
                         call: Call<SubUserLoginResponse?>,
@@ -772,6 +773,26 @@ class MainRepository(ctx : Context) {
         val gson = Gson()
         val typeT = object : TypeToken<List<CustomerOffline>>() { }
         return gson.toJson(allCustomer, typeT.type)
+    }
+
+    fun logOutSubUser(ctx: Context, deviceId: String) {
+        if (MainActivity.isInternetAvailable(ctx)) {
+            ApiService.apiService?.logoutFromDevice(
+                deviceId, Constants.authorization)
+                ?.enqueue(object : Callback<String> {
+                    override fun onResponse(
+                        call: Call<String>,
+                        response: Response<String>
+                    ) {
+                        Log.d("LogOutAPI", "response : $response")
+                    }
+
+                    override fun onFailure(call: Call<String>, t: Throwable) {
+                        Log.e("LogOutAPI", "failed: ${t.message}")
+                    }
+
+                })
+        }
     }
 
     //user database operations

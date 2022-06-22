@@ -92,6 +92,9 @@ class Cart(val ctx: Context, private val binding: IncludeCartLayoutBinding, subB
             MainActivity.changeOutletBtn.performClick()
         }
         binding.logoutBtn.setOnClickListener {
+            if (Constants.isFromSubUser) {
+                mainRepository.logOutSubUser(ctx, MainActivity.deviceID)
+            }
             MainActivity.logOutNow(ctx)
         }
         binding.addDiscountBtn.setOnClickListener {
