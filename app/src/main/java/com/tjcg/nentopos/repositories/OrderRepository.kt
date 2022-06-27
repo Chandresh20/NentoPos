@@ -1384,7 +1384,33 @@ class OrderRepository(ctx : Context) {
                 updateViewModel()
             }
         }
+    }
 
+    fun getSingleOrderOnline(ctx: Context, outletId: Int, queries: String) {
+        if (MainActivity.isInternetAvailable(ctx)) {
+            ApiService.apiService?.getSingleOrderDetails(outletId, queries, Constants.authorization)
+                ?.enqueue(object : Callback<OrdersResponse?> {
+                    override fun onResponse(
+                        call: Call<OrdersResponse?>,
+                        response: Response<OrdersResponse?>
+                    ) {
+                        Log.d("SingleOrderAPI", "response :$response")
+                        if (response.isSuccessful && response.body()?.status != null &&
+                                response.body()?.status.equals("true")) {
+                            val allOrders= response.body()?.data
+                            mainScope.launch {
+                                insertAllOrdersAsync(allOrders ?: emptyList()).await()
+                                Log.d("SingleOrderAPI", "Edited in database")
+                            }
+                        }
+                    }
+
+                    override fun onFailure(call: Call<OrdersResponse?>, t: Throwable) {
+                        Log.e("SingleOrderAPI", "Failed :${t.message}")
+                    }
+
+                })
+        }
     }
 
     suspend fun insertAllOrdersAsync(orders: List<OrdersEntity>) =

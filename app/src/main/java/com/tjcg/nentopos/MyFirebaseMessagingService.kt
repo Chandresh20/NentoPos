@@ -18,6 +18,10 @@ const val VARIATION_UPDATE = "VARIATION_UPDATE"
 const val CATEGORY_UPDATE = "CATEGORY_UPDATE"
 const val PRODUCT_UPDATE = "PRODUCT_UPDATE"
 
+const val ACTION_KEY = "action"
+const val ORDER_ID_KEY = "order_id"
+const val ACTION_UPDATE = "UPDATE"
+
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
@@ -33,16 +37,23 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         for (d in data) {
             dataMap += "${d.key}: ${d.value}\n"
         }
+        message.data.get("action")
         Log.d("FirebaseMessage", dataMap)
         sendNotification(message.notification, data)
         val forOutlet = data["outlet_id"]
         if (forOutlet?.toInt() == Constants.selectedOutletId) {
             when (data["message"]) {
                 ALL_ORDER_UPDATE -> {
-                    MainActivity.orderRepository.getAllOrdersOnline(
-                        this, Constants.selectedOutletId, 0,true)
-              /*      MainActivity.mainRepository.loadTableData(this, Constants.selectedOutletId,
-                        MainActivity.deviceID, MainActivity.deviceID, 1, false)  */
+                    Log.d("ALLORDERUPDATE", "${message.data[ACTION_KEY]} && $ACTION_UPDATE")
+                    if (message.data[ACTION_KEY] == ACTION_UPDATE) {
+                        val orderId = message.data[ORDER_ID_KEY]
+                        Log.d("NotificationUpdate", "for order: $orderId")
+                        MainActivity.orderRepository.getSingleOrderOnline(
+                            this, Constants.selectedOutletId, orderId ?: "0")
+                    } else {
+                        MainActivity.orderRepository.getAllOrdersOnline(
+                            this, Constants.selectedOutletId, 0,true)
+                    }
                 }
                 VARIATION_UPDATE -> {
 

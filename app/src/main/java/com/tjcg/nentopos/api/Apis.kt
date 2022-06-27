@@ -54,6 +54,12 @@ interface Apis {
                      @Field("is_all_data") is_all_data: Int = 1,
                      @Header("Authorization") authHeader: String?) : Call<OrdersResponse?>
 
+    @POST("getSingleOrderDetails")
+    @FormUrlEncoded
+    fun getSingleOrderDetails(@Field("outlet_id") outletId: Int,
+                        @Field("order_ids") orderIds: String,
+                              @Header("Authorization") authHeader: String?) : Call<OrdersResponse?>
+
     @POST("getSubUsers")
     @FormUrlEncoded
     fun getSubUsers(@Field("outlet_id") outletId: Int,

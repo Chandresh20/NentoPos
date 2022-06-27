@@ -452,6 +452,9 @@ class MainRepository(ctx : Context) {
                         }
                     }
                 }
+                if (response.body()?.message?.lowercase()?.contains("invalid") == true) {
+                    MainActivity.logOutNow(ctx)
+                }
           /*      if (defaultOutlet) {
                     MainActivity.progressDialogRepository.dismissDialog(dialogId)
                 } else {
