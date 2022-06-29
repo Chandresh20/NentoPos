@@ -85,38 +85,38 @@ class POSFragment : Fragment() {
                 val outletData = mainRepository.getOutletDataAsync(Constants.selectedOutletId).await()
                 MainActivity.orderViewModel.setOutletName(outletData?.outletName ?: "MenuOnline")
             }
-            binding.syncInPOS.setOnClickListener {
-                if (!MainActivity.isInternetAvailable(ctx)) {
-                    Toast.makeText(ctx, "Internet Not Available", Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
+        }
+        binding.syncInPOS.setOnClickListener {
+            if (!MainActivity.isInternetAvailable(ctx)) {
+                Toast.makeText(ctx, "Internet Not Available", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            if (MainActivity.orderRepository.syncRequired) {
+                MainActivity.progressDialogRepository.showSyncDialog()
+                return@setOnClickListener
+            }
+            val synDialogBuilder = AlertDialog.Builder(ctx).apply {
+                setMessage("Select any option")
+                setPositiveButton("Refresh Orders") { _, _ ->
+                    MainActivity.orderRepository.getAllOrdersOnline(ctx, Constants.selectedOutletId,0, true)
                 }
-                if (MainActivity.orderRepository.syncRequired) {
-                    MainActivity.progressDialogRepository.showSyncDialog()
-                    return@setOnClickListener
+                setNegativeButton("Reload All Orders") { _, _ ->
+                    //       mainSharedPreferences.edit().putInt(Constants.PREF_IS_ALL_DATA, 1).apply()
+                    MainActivity.orderRepository.getAllOrdersOnline(ctx, Constants.selectedOutletId,1, true)
                 }
-                val synDialogBuilder = AlertDialog.Builder(ctx).apply {
-                    setMessage("Select any option")
-                    setPositiveButton("Refresh Orders") { _, _ ->
-                        MainActivity.orderRepository.getAllOrdersOnline(ctx, Constants.selectedOutletId,0, true)
-                    }
-                    setNegativeButton("Reload All Orders") { _, _ ->
-                        //       mainSharedPreferences.edit().putInt(Constants.PREF_IS_ALL_DATA, 1).apply()
-                        MainActivity.orderRepository.getAllOrdersOnline(ctx, Constants.selectedOutletId,1, true)
-                    }
-                    setNeutralButton("Reload All Products") { _, _ ->
-                        CoroutineScope(Dispatchers.Main).launch {
-                            val thisOutlet = mainRepository.getOutletDataAsync(Constants.selectedOutletId).await()
-                            if (thisOutlet != null) {
-                                val listOfOutlet = ArrayList<OutletData>()
-                                listOfOutlet.add(thisOutlet)
-                                mainRepository.loadOnFirstLogin(ctx, listOfOutlet)
-                            }
+                setNeutralButton("Reload All Products") { _, _ ->
+                    CoroutineScope(Dispatchers.Main).launch {
+                        val thisOutlet = mainRepository.getOutletDataAsync(Constants.selectedOutletId).await()
+                        if (thisOutlet != null) {
+                            val listOfOutlet = ArrayList<OutletData>()
+                            listOfOutlet.add(thisOutlet)
+                            mainRepository.loadOnFirstLogin(ctx, listOfOutlet)
                         }
                     }
                 }
-                val synDialog = synDialogBuilder.create()
-                synDialog.show()
             }
+            val synDialog = synDialogBuilder.create()
+            synDialog.show()
         }
         val posPermission = mainSharedPreferences.getInt(
             Constants.PREF_PERMISSION_POS, 0)

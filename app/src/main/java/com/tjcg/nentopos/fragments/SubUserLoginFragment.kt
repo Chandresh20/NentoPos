@@ -81,7 +81,8 @@ class SubUserLoginFragment : Fragment() {
             }
             ctx.registerReceiver(loginReceiver, IntentFilter(Constants.SUB_USER_LOGIN_BROADCAST))
      //       MainActivity.mainRepository.loginSubUser(ctx, superEmail ?: "", pin, domainName ?: "", MainActivity.deviceID)
-            MainActivity.mainRepository.loginSubUser(ctx, pin, domainName ?: "NA", MainActivity.deviceID)
+            MainActivity.mainRepository.loginSubUser(ctx, pin, domainName ?: "NA", Constants.firebaseToken)
+            Log.d("SubUserToken", Constants.firebaseToken)
         }
         return binding.root
     }

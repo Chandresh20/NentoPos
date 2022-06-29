@@ -157,13 +157,13 @@ class MainRepository(ctx : Context) {
         loadCustomerTypes()
     }
 
-    fun loginSubUser(ctx: Context, pin: String, domainName: String, deviceId: String) {
+    fun loginSubUser(ctx: Context, pin: String, domainName: String, deviceToken: String) {
         val subUserIntent = Intent(Constants.SUB_USER_LOGIN_BROADCAST)
         val dialogId: Int
         if (MainActivity.isInternetAvailable(ctx)) {
             dialogId = MainActivity.progressDialogRepository.getProgressDialog("Logging in....")
       //      ApiService.apiService?.loginSubUser(superEmail, pin, domainName, deviceId,Constants.firebaseToken, "android")
-            ApiService.apiService?.loginSubUser(pin, deviceId, domainName)
+            ApiService.apiService?.loginSubUser(pin, deviceToken, domainName)
                 ?.enqueue(object : Callback<SubUserLoginResponse?> {
                     override fun onResponse(
                         call: Call<SubUserLoginResponse?>,

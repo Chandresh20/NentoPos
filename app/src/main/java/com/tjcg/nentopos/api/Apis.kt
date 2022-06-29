@@ -18,7 +18,7 @@ interface Apis {
     fun loginSubUser(
             //        @Field("email") emailId: String?,
                      @Field("pin") pin: String?,
-                     @Field("device_id") deviceId : String,
+                     @Field("device_token") deviceToken : String,
                      @Field("domain_name") domain_name: String?): Call<SubUserLoginResponse?>
            //          @Field("device_token") device_token: String?,
             //        @Field("device_type") device_type: String?

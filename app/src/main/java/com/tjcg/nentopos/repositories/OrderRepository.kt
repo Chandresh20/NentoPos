@@ -1401,6 +1401,7 @@ class OrderRepository(ctx : Context) {
                             mainScope.launch {
                                 insertAllOrdersAsync(allOrders ?: emptyList()).await()
                                 Log.d("SingleOrderAPI", "Edited in database")
+                                updateViewModel()
                             }
                         }
                     }
